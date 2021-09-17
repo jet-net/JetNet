@@ -1,4 +1,4 @@
-from typing import Union
+from typing import List, Union
 import torch
 import logging
 from os.path import exists
@@ -17,8 +17,8 @@ class JetNet(torch.utils.data.Dataset):
         data_dir (str): directory which contains (or in which to download) dataset. Defaults to "./" i.e. the working directory.
         download (bool): download the dataset, even if the csv file exists already. Defaults to False.
         num_particles (int): number of particles to use, has to be less than the total in JetNet (30). 0 means use all. Defaults to 0.
-        feature_norms (list[float]): max absolute value of each feature (in order) when normalizing. None means feature won't be scaled. Defaults to [1.0, 1.0, 1., 1.].
-        feature_shifts (list[float]): shifts features by this value *after* scaling to maxes in `feature_norms`. None or 0 means won't be shifted. Defaults to [0., 0., -0.5, -0.5].
+        feature_norms (List[float]): max absolute value of each feature (in order) when normalizing. None means feature won't be scaled. Defaults to [1.0, 1.0, 1., 1.].
+        feature_shifts (List[float]): shifts features by this value *after* scaling to maxes in `feature_norms`. None or 0 means won't be shifted. Defaults to [0., 0., -0.5, -0.5].
         use_mask (bool): Defaults to True.
         train (bool): whether for training or testing. Defaults to True.
         train_fraction (float): fraction of data to use as training - rest is for testing. Defaults to 0.7.
@@ -33,8 +33,8 @@ class JetNet(torch.utils.data.Dataset):
         data_dir: str = "./",
         download: bool = False,
         num_particles: int = 0,
-        feature_norms: list[float] = [1.0, 1.0, 1.0, 1.0],
-        feature_shifts: list[float] = [0.0, 0.0, -0.5, -0.5],
+        feature_norms: List[float] = [1.0, 1.0, 1.0, 1.0],
+        feature_shifts: List[float] = [0.0, 0.0, -0.5, -0.5],
         use_mask: bool = True,
         train: bool = True,
         train_fraction: float = 0.7,
