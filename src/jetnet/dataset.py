@@ -147,7 +147,7 @@ class JetNet(torch.utils.data.Dataset):
         logging.debug("{num_particles = }")
         return jet_num_particles
 
-    def normalize_features(self, dataset: torch.Tensor, feature_norms: list[float], feature_shifts: list[float]):
+    def normalize_features(self, dataset: torch.Tensor, feature_norms: List[float], feature_shifts: List[float]):
         """
         Normalizes dataset features, by scaling to `feature_norms` maximum and shifting by `feature_shifts`.
         If the value in the list for a feature is None, it won't be scaled or shifted.
