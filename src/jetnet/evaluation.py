@@ -7,8 +7,6 @@ import torch
 from torch import Tensor
 from torch.utils.data import TensorDataset, DataLoader
 
-from tqdm import tqdm
-
 import numpy as np
 
 from scipy.spatial.distance import jensenshannon
