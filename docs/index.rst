@@ -6,17 +6,19 @@
 Welcome to JetNet's documentation!
 ==================================
 
+JetNet is a library for all your ML jet needs.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
 
-JetNet dataset
+JetNet Dataset
 **********************************
 .. automodule:: jetnet.dataset
    :members:
 
-JetNet evaluation methods
+JetNet Evaluation Methods
 **********************************
 .. automodule:: jetnet.evaluation
    :members:
