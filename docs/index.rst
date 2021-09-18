@@ -3,30 +3,36 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to JetNet's documentation!
+JetNet
 ==================================
 
 JetNet is a library for all your ML jet needs.
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+.. contents:: Contents
+  :local:
 
 
-JetNet Datasets
+Datasets
 **********************************
 .. automodule:: jetnet.datasets
-   :members:
+  :members:
+  :imported-members:
+  :autosummary:
 
-JetNet Evaluation Methods
+
+Evaluation Methods
 **********************************
 .. automodule:: jetnet.evaluation
-   :members:
+  :members:
+  :imported-members:
+  :autosummary:
 
-JetNet Utility Methods
+Utility Methods
 **********************************
 .. automodule:: jetnet.utils
-   :members:
+  :imported-members:
+  :members:
+  :autosummary:
 
 
 Indices and tables
