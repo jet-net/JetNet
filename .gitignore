@@ -4,3 +4,4 @@ docs/_build
 **/__pycache__
 dist
 *egg-info
+*test*.py

@@ -1,3 +1,5 @@
 # JetNet
 
-Library for JetNet datasets and a collection of evaluation and plotting functions.
+*One jet library to rule them all.*
+
+A library for developing and reproducing jet-based machine learning projects. Currently under development.
