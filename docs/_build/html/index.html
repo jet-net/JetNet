@@ -38,8 +38,9 @@
               <!-- Local TOC -->
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">Welcome to JetNet’s documentation!</a><ul>
-<li><a class="reference internal" href="#module-jetnet.dataset">JetNet dataset</a></li>
-<li><a class="reference internal" href="#module-jetnet.evaluation">JetNet evaluation methods</a></li>
+<li><a class="reference internal" href="#module-jetnet.datasets">JetNet Datasets</a></li>
+<li><a class="reference internal" href="#module-jetnet.evaluation">JetNet Evaluation Methods</a></li>
+<li><a class="reference internal" href="#module-jetnet.utils">JetNet Utility Methods</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
@@ -71,126 +72,17 @@
              
   <section id="welcome-to-jetnet-s-documentation">
 <h1>Welcome to JetNet’s documentation!<a class="headerlink" href="#welcome-to-jetnet-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>JetNet is a library for all your ML jet needs.</p>
 <div class="toctree-wrapper compound">
 </div>
-<section id="module-jetnet.dataset">
-<span id="jetnet-dataset"></span><h2>JetNet dataset<a class="headerlink" href="#module-jetnet.dataset" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="jetnet.dataset.JetNet">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">jetnet.dataset.</span></span><span class="sig-name descname"><span class="pre">JetNet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">jet_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'./'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_particles</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_norms</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">[1.0,</span> <span class="pre">1.0,</span> <span class="pre">1.0,</span> <span class="pre">1.0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_shifts</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">[0.0,</span> <span class="pre">0.0,</span> <span class="pre">-</span> <span class="pre">0.5,</span> <span class="pre">-</span> <span class="pre">0.5]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_mask</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_fraction</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_pad_particles</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_num_particles_jet_feature</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_padding</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#jetnet.dataset.JetNet" title="Permalink to this definition">¶</a></dt>
-<dd><p>PyTorch <cite>torch.utils.data.Dataset</cite> class for the JetNet dataset, shape is [num_jets, num_particles, num_features].
-Features, in order: if polar coords - [eta, phi, pt, mask], if cartesian coords - [px, py, pz, mask].</p>
-<p>Dataset is downloaded from <a class="reference external" href="https://zenodo.org/record/4834876/">https://zenodo.org/record/4834876/</a> if pt or csv file is not found in the <cite>data_dir</cite> directory.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>jet_type</strong> (<em>str</em>) – ‘g’ (gluon), ‘t’ (top quarks), or ‘q’ (light quarks).</p></li>
-<li><p><strong>data_dir</strong> (<em>str</em>) – directory which contains (or in which to download) dataset. Defaults to “./” i.e. the working directory.</p></li>
-<li><p><strong>download</strong> (<em>bool</em>) – download the dataset, even if the csv file exists already. Defaults to False.</p></li>
-<li><p><strong>num_particles</strong> (<em>int</em>) – number of particles to use, has to be less than the total in JetNet (30). 0 means use all. Defaults to 0.</p></li>
-<li><p><strong>feature_norms</strong> (<em>list</em><em>[</em><em>float</em><em>]</em>) – max absolute value of each feature (in order) when normalizing. None means feature won’t be scaled. Defaults to [1.0, 1.0, 1., 1.].</p></li>
-<li><p><strong>feature_shifts</strong> (<em>list</em><em>[</em><em>float</em><em>]</em>) – shifts features by this value <em>after</em> scaling to maxes in <cite>feature_norms</cite>. None or 0 means won’t be shifted. Defaults to [0., 0., -0.5, -0.5].</p></li>
-<li><p><strong>use_mask</strong> (<em>bool</em>) – Defaults to True.</p></li>
-<li><p><strong>train</strong> (<em>bool</em>) – whether for training or testing. Defaults to True.</p></li>
-<li><p><strong>train_fraction</strong> (<em>float</em>) – fraction of data to use as training - rest is for testing. Defaults to 0.7.</p></li>
-<li><p><strong>num_pad_particles</strong> (<em>int</em>) – how many out of <cite>num_particles</cite> should be zero-padded. Defaults to 0.</p></li>
-<li><p><strong>use_num_particles_jet_feature</strong> (<em>bool</em>) – Store the # of particles in each jet as a jet-level feature. Only works if using mask. Defaults to True.</p></li>
-<li><p><strong>noise_padding</strong> (<em>bool</em>) – instead of 0s, pad extra particles with Gaussian noise. Only works if using mask. Defaults to False.</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="jetnet.dataset.JetNet.add_noise_padding">
-<span class="sig-name descname"><span class="pre">add_noise_padding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#jetnet.dataset.JetNet.add_noise_padding" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add Gaussian noise to zero-masked particles</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="jetnet.dataset.JetNet.csv_to_pt">
-<span class="sig-name descname"><span class="pre">csv_to_pt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jet_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_file</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#jetnet.dataset.JetNet.csv_to_pt" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts and saves downloaded csv file to pytorch tensor</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="jetnet.dataset.JetNet.download">
-<span class="sig-name descname"><span class="pre">download</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">jet_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_file</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#jetnet.dataset.JetNet.download" title="Permalink to this definition">¶</a></dt>
-<dd><p>Downloads the <cite>jet_type</cite> jet csv from Zenodo and saves it as <cite>csv_file</cite></p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="jetnet.dataset.JetNet.download_and_convert_to_pt">
-<span class="sig-name descname"><span class="pre">download_and_convert_to_pt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jet_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#jetnet.dataset.JetNet.download_and_convert_to_pt" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download jet dataset and convert and save to pytorch tensor</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="jetnet.dataset.JetNet.get_jet_features">
-<span class="sig-name descname"><span class="pre">get_jet_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_num_particles_jet_feature</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#jetnet.dataset.JetNet.get_jet_features" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns jet-level features. Will be expanded to include jet pT and eta</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="jetnet.dataset.JetNet.load_dataset">
-<span class="sig-name descname"><span class="pre">load_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pt_file</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_particles</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_pad_particles</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_mask</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#jetnet.dataset.JetNet.load_dataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load the dataset</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="jetnet.dataset.JetNet.normalize_features">
-<span class="sig-name descname"><span class="pre">normalize_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_norms</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_shifts</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#jetnet.dataset.JetNet.normalize_features" title="Permalink to this definition">¶</a></dt>
-<dd><p>Normalizes dataset features, by scaling to <cite>feature_norms</cite> maximum and shifting by <cite>feature_shifts</cite>.
-If the value in the list for a feature is None, it won’t be scaled or shifted.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="jetnet.dataset.JetNet.unnormalize_features">
-<span class="sig-name descname"><span class="pre">unnormalize_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span> </span><span class="pre">numpy.array</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ret_mask_separate</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_real_data</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_mask_particles</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_neg_pt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#jetnet.dataset.JetNet.unnormalize_features" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inverts the <cite>normalize_features()</cite> function on the input <cite>dataset</cite> array or tensor, plus optionally zero’s the masked particles and negative pTs.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dataset</strong> (<em>Union</em><em>[</em><em>torch.Tensor</em><em>, </em><em>np.array</em><em>]</em>) – Dataset to unnormalize.</p></li>
-<li><p><strong>ret_mask_separate</strong> (<em>bool</em>) – Return the jet and mask separately. Defaults to True.</p></li>
-<li><p><strong>is_real_data</strong> (<em>bool</em>) – Real or generated data. Defaults to False.</p></li>
-<li><p><strong>zero_mask_particles</strong> (<em>bool</em>) – Set features of zero-masked particles to 0. Not needed for real data. Defaults to True.</p></li>
-<li><p><strong>zero_neg_pt</strong> (<em>bool</em>) – Set pt to 0 for particles with negative pt. Not needed for real data. Defaults to True.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Unnormalized dataset of same type as input</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+<section id="module-jetnet.datasets">
+<span id="jetnet-datasets"></span><h2>JetNet Datasets<a class="headerlink" href="#module-jetnet.datasets" title="Permalink to this headline">¶</a></h2>
 </section>
 <section id="module-jetnet.evaluation">
-<span id="jetnet-evaluation-methods"></span><h2>JetNet evaluation methods<a class="headerlink" href="#module-jetnet.evaluation" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="jetnet.evaluation.cov_mmd">
-<span class="sig-prename descclassname"><span class="pre">jetnet.evaluation.</span></span><span class="sig-name descname"><span class="pre">cov_mmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">real_jets</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span> </span><span class="pre">numpy.array</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gen_jets</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span> </span><span class="pre">numpy.array</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_eval_samples</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_batches</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_energyflow_format</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#jetnet.evaluation.cov_mmd" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate coverage and MMD between real and generated jets, using the Energy Mover’s Distance as the distance metric.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>real_jets</strong> (<em>Union</em><em>[</em><em>Tensor</em><em>, </em><em>np.array</em><em>]</em>) – tensor or array of real jets, in either JetNet format [eta, phi, pt, mask] or energyflow format [pt, eta, phi] (specified via <cite>in_energyflow_format</cite> optional bool).</p></li>
-<li><p><strong>gen_jets</strong> (<em>Union</em><em>[</em><em>Tensor</em><em>, </em><em>np.array</em><em>]</em>) – tensor or array of generated jets, same format as real_jets.</p></li>
-<li><p><strong>num_eval_samples</strong> (<em>int</em>) – number of jets out of the real and gen jets each between which to evaluate COV and MMD. Defaults to 100.</p></li>
-<li><p><strong>num_batches</strong> (<em>int</em>) – number of different batches to calculate COV and MMD and average over. Defaults to 100.</p></li>
-<li><p><strong>in_energyflow_format</strong> (<em>bool</em>) – are the jets in energyflow or JetNet format. Defaults to False.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>coverage, averaged over <cite>num_batches</cite>.
-float: MMD, averaged over <cite>num_batches</cite>.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
-
+<span id="jetnet-evaluation-methods"></span><h2>JetNet Evaluation Methods<a class="headerlink" href="#module-jetnet.evaluation" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-jetnet.utils">
+<span id="jetnet-utility-methods"></span><h2>JetNet Utility Methods<a class="headerlink" href="#module-jetnet.utils" title="Permalink to this headline">¶</a></h2>
 </section>
 </section>
 <section id="indices-and-tables">

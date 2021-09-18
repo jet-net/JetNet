@@ -13,9 +13,9 @@ JetNet is a library for all your ML jet needs.
    :caption: Contents:
 
 
-JetNet Dataset
+JetNet Datasets
 **********************************
-.. automodule:: jetnet.dataset
+.. automodule:: jetnet.datasets
    :members:
 
 JetNet Evaluation Methods
@@ -23,6 +23,10 @@ JetNet Evaluation Methods
 .. automodule:: jetnet.evaluation
    :members:
 
+JetNet Utility Methods
+**********************************
+.. automodule:: jetnet.utils
+   :members:
 
 
 Indices and tables
