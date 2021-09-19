@@ -20,7 +20,7 @@ Datasets
   :autosummary:
 
 
-Evaluation Methods
+Evaluation
 **********************************
 .. automodule:: jetnet.evaluation
   :members:
@@ -29,7 +29,7 @@ Evaluation Methods
   :exclude-members: JetNet
 
 
-Utility Methods
+Utility Functions
 **********************************
 .. automodule:: jetnet.utils
   :imported-members:
