@@ -12,7 +12,6 @@ from torch import Tensor
 from torch.utils.data import DataLoader
 
 from jetnet.datasets import JetNet
-from .particlenet import _ParticleNet
 from jetnet import utils
 
 from scipy import linalg
@@ -91,6 +90,12 @@ _eval_module.fpnd_dict = {"NUM_SAMPLES": 50000}
 
 
 def _init_fpnd_dict(dataset_name: str, jet_type: str, num_particles: int, num_particle_features: int, device: str = ""):
+    try:
+        from .particlenet import _ParticleNet
+    except ModuleNotFoundError:
+        print("torch_geometric needs to be installed for FPND")
+        raise
+
     if dataset_name not in _eval_module.fpnd_dict:
         _eval_module.fpnd_dict[dataset_name] = {}
 
@@ -120,6 +125,8 @@ def fpnd(
 
     ``jets`` are passed through our pretrained ParticleNet module and activations are compared with the cached activations from real jets.
     The recommended and max number of jets is 50,000
+
+    **torch_geometric must be installed separately for running inference with ParticleNet** 
 
     Currently FPND only supported for the JetNet dataset with 30 particles,
     but functionality for other datasets + ability for users to use their own version is in development.

@@ -18,7 +18,7 @@ def readme():
 
 
 setup(name='jetnet',
-      version='0.0.1rc3',
+      version='0.0.1.post2',
       description='One jet library to rule them all.',
       long_description=readme(),
       long_description_content_type='text/markdown',
