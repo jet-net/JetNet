@@ -8,9 +8,9 @@ import numpy as np
 import torch.nn.functional as F
 
 
-class ParticleNetEdgeNet(nn.Module):
+class _ParticleNetEdgeNet(nn.Module):
     def __init__(self, in_size, layer_size):
-        super(ParticleNetEdgeNet, self).__init__()
+        super(_ParticleNetEdgeNet, self).__init__()
 
         layers = []
 
@@ -32,9 +32,9 @@ class ParticleNetEdgeNet(nn.Module):
         return "{}(nn={})".format(self.__class__.__name__, self.model)
 
 
-class ParticleNet(nn.Module):
+class _ParticleNet(nn.Module):
     def __init__(self, num_hits, node_feat_size, num_classes=5, device=torch.device("cpu")):
-        super(ParticleNet, self).__init__()
+        super(_ParticleNet, self).__init__()
         self.num_hits = num_hits
         self.node_feat_size = node_feat_size
         self.num_classes = num_classes
@@ -52,12 +52,12 @@ class ParticleNet(nn.Module):
         self.kernel_sizes.insert(0, self.node_feat_size)
         self.output_sizes = np.cumsum(self.kernel_sizes)
 
-        self.edge_nets.append(ParticleNetEdgeNet(self.node_feat_size, self.kernel_sizes[1]))
+        self.edge_nets.append(_ParticleNetEdgeNet(self.node_feat_size, self.kernel_sizes[1]))
         self.edge_convs.append(EdgeConv(self.edge_nets[-1], aggr="mean"))
 
         for i in range(1, self.num_edge_convs):
             # adding kernel sizes because of skip connections
-            self.edge_nets.append(ParticleNetEdgeNet(self.output_sizes[i], self.kernel_sizes[i + 1]))
+            self.edge_nets.append(_ParticleNetEdgeNet(self.output_sizes[i], self.kernel_sizes[i + 1]))
             self.edge_convs.append(EdgeConv(self.edge_nets[-1], aggr="mean"))
 
         self.fc1 = nn.Sequential(nn.Linear(self.output_sizes[-1], self.fc_size))

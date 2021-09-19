@@ -2,21 +2,27 @@
 from energyflow.emd import emds
 from energyflow import EFPSet
 
+import logging
+import warnings
 from typing import Union, Tuple
 
 import numpy as np
 import torch
 from torch import Tensor
+from torch.utils.data import DataLoader
 
+from jetnet.datasets import JetNet
+from .particlenet import _ParticleNet
 from jetnet import utils
 
+from scipy import linalg
 from scipy.stats import wasserstein_distance
 
 # from .particlenet import ParticleNet
 
 from tqdm import tqdm
 
-from os import path
+import pathlib
 import sys
 
 
@@ -27,100 +33,173 @@ rng = np.random.default_rng()
 # - Functionality for adding FPND for new datasets
 # - Cartesian coordinates
 
-#
-#
-# def get_mu2_sigma2(args, C, X_loaded, fullpath):
-#     """calculates means (mu) and covariance matrix (sigma) of activations of classifier C wrt real data"""
-#
-#     logging.info("Getting mu2, sigma2")
-#
-#     C.eval()
-#     for i, jet in tqdm(enumerate(X_loaded), total=len(X_loaded)):
-#         if i == 0:
-#             activations = C(jet[0][:, :, :3].to(args.device), ret_activations=True).cpu().detach()
-#         else:
-#             activations = torch.cat((C(jet[0][:, :, :3].to(args.device), ret_activations=True).cpu().detach(), activations), axis=0)
-#
-#     activations = activations.numpy()
-#
-#     mu = np.mean(activations, axis=0)
-#     sigma = np.cov(activations, rowvar=False)
-#
-#     np.savetxt(fullpath + "mu2.txt", mu)
-#     np.savetxt(fullpath + "sigma2.txt", sigma)
-#
-#     return mu, sigma
-#
-#
-# def load(args, X_loaded=None):
-#     """loads pre-trained ParticleNet classifier and either calculates or loads from directory the means and covariance matrix of the activations wrt real data"""
-#
-#     C = ParticleNet(args.num_hits, args.node_feat_size, device=args.device).to(args.device)
-#     C.load_state_dict(torch.load(args.evaluation_path + "C_state_dict.pt", map_location=args.device))
-#
-#     fullpath = args.evaluation_path + args.jets
-#     logging.debug(fullpath)
-#     if path.exists(fullpath + "mu2.txt"):
-#         mu2 = np.loadtxt(fullpath + "mu2.txt")
-#         sigma2 = np.loadtxt(fullpath + "sigma2.txt")
-#     else:
-#         mu2, sigma2 = get_mu2_sigma2(args, C, X_loaded, fullpath)
-#
-#     return (C, mu2, sigma2)
-#
-# def get_fpnd(args, C, gen_out, mu2, sigma2):
-#     """calculates Frechet ParticleNet Distance of generated samples ``gen_out``"""
-#
-#     logging.info("Evaluating FPND")
-#
-#     gen_out_loaded = DataLoader(TensorDataset(torch.tensor(gen_out)), batch_size=args.fpnd_batch_size)
-#
-#     logging.info("Getting ParticleNet Acivations")
-#     C.eval()
-#     for i, gen_jets in tqdm(enumerate(gen_out_loaded), total=len(gen_out_loaded)):
-#         gen_jets = gen_jets[0]
-#         if args.mask:
-#             mask = gen_jets[:, :, 3:4] >= 0
-#             gen_jets = (gen_jets * mask)[:, :, :3]
-#         if i == 0:
-#             activations = C(gen_jets.to(args.device), ret_activations=True).cpu().detach()
-#         else:
-#             activations = torch.cat((C(gen_jets.to(args.device), ret_activations=True).cpu().detach(), activations), axis=0)
-#
-#     activations = activations.numpy()
-#
-#     mu1 = np.mean(activations, axis=0)
-#     sigma1 = np.cov(activations, rowvar=False)
-#
-#     fpnd = utils.calculate_frechet_distance(mu1, sigma1, mu2, sigma2)
-#     logging.info("PFND: " + str(fpnd))
-#
-#     return fpnd
-#
-#
-# # this is a pointer to the module object instance itself. from https://stackoverflow.com/a/35904211/3759946
-# eval_module = sys.modules[__name__]
-# # for saving fpnd objects after the first loading
-# eval_module.fpnd_dict = {
-#     'NUM_SAMPLES': 50000
-# }
-#
-#
-# def fpnd(gen_jets: Union[Tensor, np.array], jet_type: str, dataset_name: str = 'JetNet'):
-#     """
-#     Plan for this function:
-#     - first time called, loads the network and mu/sigma and saves in eval_module.fpnd_dict. after that keeps reusing from the dict
-#     - can specify which dataset to use
-#     - normalization will come from dataset's `normalize_features` function, which will include a special `fpnd` arg to normalize it the same way as was used for training.
-#     - eventually build functionality for people to make fpnd for different datasets. this is complicated so LOWEST PRIORITY.
-#     """
-#     fpnd = None
-#     return fpnd
+
+# from https://github.com/mseitzer/pytorch-fid
+def _calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6):
+    """Numpy implementation of the Frechet Distance.
+    The Frechet distance between two multivariate Gaussians X_1 ~ N(mu_1, C_1)
+    and X_2 ~ N(mu_2, C_2) is
+            d^2 = ||mu_1 - mu_2||^2 + Tr(C_1 + C_2 - 2*sqrt(C_1*C_2)).
+    Stable version by Dougal J. Sutherland.
+    Params:
+    -- mu1   : Numpy array containing the activations of a layer of the
+               inception net (like returned by the function 'get_predictions')
+               for generated samples.
+    -- mu2   : The sample mean over activations, precalculated on an
+               representative data set.
+    -- sigma1: The covariance matrix over activations for generated samples.
+    -- sigma2: The covariance matrix over activations, precalculated on an
+               representative data set.
+    Returns:
+    --   : The Frechet Distance.
+    """
+
+    mu1 = np.atleast_1d(mu1)
+    mu2 = np.atleast_1d(mu2)
+
+    sigma1 = np.atleast_2d(sigma1)
+    sigma2 = np.atleast_2d(sigma2)
+
+    assert mu1.shape == mu2.shape, "Training and test mean vectors have different lengths"
+    assert sigma1.shape == sigma2.shape, "Training and test covariances have different dimensions"
+
+    diff = mu1 - mu2
+
+    # Product might be almost singular
+    covmean, _ = linalg.sqrtm(sigma1.dot(sigma2), disp=False)
+    if not np.isfinite(covmean).all():
+        msg = ("fid calculation produces singular product; " "adding %s to diagonal of cov estimates") % eps
+        logging.debug(msg)
+        offset = np.eye(sigma1.shape[0]) * eps
+        covmean = linalg.sqrtm((sigma1 + offset).dot(sigma2 + offset))
+
+    # Numerical error might give slight imaginary component
+    if np.iscomplexobj(covmean):
+        if not np.allclose(np.diagonal(covmean).imag, 0, atol=1e-3):
+            m = np.max(np.abs(covmean.imag))
+            raise ValueError("Imaginary component {}".format(m))
+        covmean = covmean.real
+
+    tr_covmean = np.trace(covmean)
+
+    return diff.dot(diff) + np.trace(sigma1) + np.trace(sigma2) - 2 * tr_covmean
+
+
+_eval_module = sys.modules[__name__]
+# for saving fpnd objects after the first loading
+_eval_module.fpnd_dict = {"NUM_SAMPLES": 50000}
+
+
+def _init_fpnd_dict(dataset_name: str, jet_type: str, num_particles: int, num_particle_features: int, device: str = ""):
+    if dataset_name not in _eval_module.fpnd_dict:
+        _eval_module.fpnd_dict[dataset_name] = {}
+
+    if num_particles not in _eval_module.fpnd_dict[dataset_name]:
+        _eval_module.fpnd_dict[dataset_name][num_particles] = {}
+
+    if jet_type not in _eval_module.fpnd_dict[dataset_name][num_particles]:
+        _eval_module.fpnd_dict[dataset_name][num_particles][jet_type] = {}
+
+    _eval_module_path = str(pathlib.Path(__file__).parent.resolve())
+    resources_path = f"{_eval_module_path}/fpnd_resources/{dataset_name}/{num_particles}_particles"
+
+    pnet = _ParticleNet(num_particles, num_particle_features)
+    pnet.load_state_dict(torch.load(f"{resources_path}/pnet_state_dict.pt", map_location=device))
+
+    _eval_module.fpnd_dict[dataset_name][num_particles][jet_type]["pnet"] = pnet
+    _eval_module.fpnd_dict[dataset_name][num_particles][jet_type]["mu"] = np.loadtxt(f"{resources_path}/{jet_type}_mu.txt")
+    _eval_module.fpnd_dict[dataset_name][num_particles][jet_type]["sigma"] = np.loadtxt(f"{resources_path}/{jet_type}_sigma.txt")
+
+
+# TODO !!! check gen jets are not in place normalized !!!
+def fpnd(
+    jets: Union[Tensor, np.ndarray], jet_type: str, use_mask: bool = True, dataset_name: str = "JetNet", device: str = "", batch_size: int = 16
+) -> float:
+    """
+    Calculates the Frechet ParticleNet Distance, as defined in https://arxiv.org/abs/2106.11535, for input ``jets`` of type ``jet_type``.
+
+    ``jets`` are passed through our pretrained ParticleNet module and activations are compared with the cached activations from real jets.
+    The recommended and max number of jets is 50,000
+
+    Currently FPND only supported for the JetNet dataset with 30 particles,
+    but functionality for other datasets + ability for users to use their own version is in development.
+
+    Args:
+        jets (Union[Tensor, np.ndarray]): Tensor or array of jets, of shape ``[num_jets, num_particles, num_features]`` with features in order ``[eta, phi, pt, (optional) mask]``
+        jet_type (str): jet type, out of ``['g', 't', 'q']``.
+        use_mask (bool): Use the last binary mask feature to zero the 0-masked particles. Defaults to True.
+        dataset_name (str): Dataset to use. Currently only JetNet is supported. Defaults to "JetNet".
+        device (str): 'cpu' or 'cuda'. If not specified, defaults to cuda if available else cpu.
+        batch_size (int): Batch size for ParticleNet inference. Defaults to 16.
+
+    Returns:
+        float: the measured FPND.
+
+    """
+    assert dataset_name == "JetNet", "Only JetNet is currently supported with FPND"
+
+    num_particles = jets.shape[1]
+    num_particle_features = jets.shape[2] - int(use_mask)
+
+    assert num_particles == 30, "Currently FPND only supported for 30 particles - more functionality coming soon."
+    assert num_particle_features == 3, "Not the right number of particle features for the JetNet dataset."
+
+    if jets.shape[0] < _eval_module.fpnd_dict["NUM_SAMPLES"]:
+        warnings.warn(f"Recommended number of jets for FPND calculation is {_eval_module.fpnd_dict['NUM_SAMPLES']}", RuntimeWarning)
+
+    if isinstance(jets, np.ndarray):
+        jets = Tensor(jets)
+
+    if device == "":
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    assert device == "cuda" or device == "cpu", "Invalid device type"
+
+    if dataset_name == "JetNet":
+        JetNet.normalize_features(jets, fpnd=True)
+        # TODO other datasets
+
+    if use_mask:
+        # features for all masked paricles are set to 0 and mask feature is removed
+        mask = jets[:, :, -1:] > 0
+        jets = (jets * mask)[:, :, :-1]
+
+    # ParticleNet module and the real mu's and sigma's are only loaded once
+    if (
+        dataset_name not in _eval_module.fpnd_dict
+        or num_particles not in _eval_module.fpnd_dict[dataset_name]
+        or jet_type not in _eval_module.fpnd_dict[dataset_name][num_particles]
+    ):
+        _init_fpnd_dict(dataset_name, jet_type, num_particles, num_particle_features, device)
+
+    pnet = _eval_module.fpnd_dict[dataset_name][num_particles][jet_type]["pnet"].to(device)
+    pnet.eval()
+
+    mu1 = _eval_module.fpnd_dict[dataset_name][num_particles][jet_type]["mu"]
+    sigma1 = _eval_module.fpnd_dict[dataset_name][num_particles][jet_type]["sigma"]
+
+    # run inference and store activations
+    jets_loaded = DataLoader(jets[:, :, : _eval_module.fpnd_dict["NUM_SAMPLES"]], batch_size)
+
+    logging.info(f"Calculating ParticleNet inferences with {batch_size = }")
+    activations = []
+    for i, jets_batch in tqdm(enumerate(jets_loaded), total=len(jets_loaded)):
+        activations.append(pnet(jets.to(device), ret_activations=True).cpu().detach().numpy())
+
+    activations = np.array(activations)
+    activations = activations.reshape(-1, activations.shape[-1])  # remove batch dimension
+
+    mu2 = np.mean(activations, axis=0)
+    sigma2 = np.cov(activations, rowvar=False)
+
+    fpnd = _calculate_frechet_distance(mu1, sigma1, mu2, sigma2)
+
+    return fpnd
 
 
 def w1p(
-    jets1: Union[Tensor, np.array],
-    jets2: Union[Tensor, np.array],
+    jets1: Union[Tensor, np.ndarray],
+    jets2: Union[Tensor, np.ndarray],
     use_mask: bool = True,
     num_particle_features: int = 0,
     num_eval_samples: int = 10000,
@@ -132,21 +211,22 @@ def w1p(
     Get 1-Wasserstein distances between particle features of ``jets1`` and ``jets2``.
 
     Args:
-        jets1 (Union[Tensor, np.array]): Tensor or array of jets, of shape ``[num_jets, num_particles_per_jet, num_features_per_particle]`` with an optional last binary mask feature per particle.
-        jets2 (Union[Tensor, np.array]): Tensor or array of jets, of same format as ``jets1``.
+        jets1 (Union[Tensor, np.ndarray]): Tensor or array of jets, of shape ``[num_jets, num_particles_per_jet, num_features_per_particle]`` with an optional last binary mask feature per particle.
+        jets2 (Union[Tensor, np.ndarray]): Tensor or array of jets, of same format as ``jets1``.
         use_mask (bool): Use the last binary mask feature to ignore 0-masked particles. Defaults to True.
-        num_particle_features (int): Will return W1 scores of the first ``num_particle_features`` particle features. If 0, will calcualte for all, excluding the optional mask feature if ``use_mask`` is True. Defaults to 0.
+        num_particle_features (int): Will return W1 scores of the first ``num_particle_features`` particle features. If 0, will calculate for all,
+          excluding the optional mask feature if ``use_mask`` is True. Defaults to 0.
         num_eval_samples (int): Number of jets out of the total to use for W1 measurement. Defaults to 10000.
         num_batches (int): Number of different batches to average W1 scores over. Defaults to 5.
         average_over_features (bool): Average over the particle features to return a single W1-P score. Defaults to True.
         return_std (bool): Return the standard deviation as well of the W1 scores over the ``num_batches`` batches. Defaults to True.
 
     Returns:
-        Tuple[Union[float, np.array], Union[float, np.array]]:
-        - **Union[float, np.array]**: if ``average_over_features`` is True, float of average W1 scores for each particle feature, first averaged over ``num_batches``,
+        Tuple[Union[float, np.ndarray], Union[float, np.ndarray]]:
+        - **Union[float, np.ndarray]**: if ``average_over_features`` is True, float of average W1 scores for each particle feature, first averaged over ``num_batches``,
           else array of length ``num_particle_features`` containing average W1 scores for each feature
-        - **Union[float, np.array]** `(optional, only if ``return_std`` is True)`: if ``average_over_features`` is True, float of standard deviation of all W1 scores for each particle feature, first calculated over ``num_batches`` then propagated for the final average,
-          else array of length ``num_particle_features`` containing standard deviation W1 scores for each feature
+        - **Union[float, np.ndarray]** `(optional, only if ``return_std`` is True)`: if ``average_over_features`` is True, float of standard deviation of all W1 scores for each particle feature,
+          first calculated over ``num_batches`` then propagated for the final average, else array of length ``num_particle_features`` containing standard deviation W1 scores for each feature
 
     """
     assert len(jets1.shape) == 3 and len(jets2.shape) == 3, "input jets format is incorrect"
@@ -195,8 +275,8 @@ def w1p(
 
 
 def w1m(
-    jets1: Union[Tensor, np.array],
-    jets2: Union[Tensor, np.array],
+    jets1: Union[Tensor, np.ndarray],
+    jets2: Union[Tensor, np.ndarray],
     num_eval_samples: int = 10000,
     num_batches: int = 5,
     average_over_features: bool = True,
@@ -206,8 +286,8 @@ def w1m(
     Get 1-Wasserstein distance between masses of ``jets1`` and ``jets2``.
 
     Args:
-        jets1 (Union[Tensor, np.array]): Tensor or array of jets, of shape ``[num_jets, num_particles, num_features]`` with features in order ``[eta, phi, pt]``
-        jets2 (Union[Tensor, np.array]): Tensor or array of jets, of same format as ``jets1``.
+        jets1 (Union[Tensor, np.ndarray]): Tensor or array of jets, of shape ``[num_jets, num_particles, num_features]`` with features in order ``[eta, phi, pt]``
+        jets2 (Union[Tensor, np.ndarray]): Tensor or array of jets, of same format as ``jets1``.
         num_eval_samples (int): Number of jets out of the total to use for W1 measurement. Defaults to 10000.
         num_batches (int): Number of different batches to average W1 scores over. Defaults to 5.
         return_std (bool): Return the standard deviation as well of the W1 scores over the ``num_batches`` batches. Defaults to True.
@@ -244,8 +324,8 @@ def w1m(
 
 
 def w1efp(
-    jets1: Union[Tensor, np.array],
-    jets2: Union[Tensor, np.array],
+    jets1: Union[Tensor, np.ndarray],
+    jets2: Union[Tensor, np.ndarray],
     particle_masses: bool = False,
     efpset_args: list = [("n==", 4), ("d==", 4), ("p==", 1)],
     num_eval_samples: int = 10000,
@@ -257,21 +337,23 @@ def w1efp(
     Get 1-Wasserstein distances between Energy Flow Polynomials (Komiske et al. 2017 https://arxiv.org/abs/1712.07124) of ``jets1`` and ``jets2``.
 
     Args:
-        jets1 (Union[Tensor, np.array]): Tensor or array of jets of shape ``[num_jets, num_particles, num_features]``, with features in order ``[eta, phi, pt, (optional) mass]``. If no particle masses given (``particle_masses`` should be False), they are assumed to be 0.
-        jets2 (Union[Tensor, np.array]): Tensor or array of jets, of same format as ``jets1``.
+        jets1 (Union[Tensor, np.ndarray]): Tensor or array of jets of shape ``[num_jets, num_particles, num_features]``, with features in order ``[eta, phi, pt, (optional) mass]``.
+          If no particle masses given (``particle_masses`` should be False), they are assumed to be 0.
+        jets2 (Union[Tensor, np.ndarray]): Tensor or array of jets, of same format as ``jets1``.
         particle_masses (bool): Whether ``jets1`` and ``jets2`` have particle masses as their 4th particle features. Defaults to False.
-        efpset_args (List): Args for the energyflow.efpset function to specify which EFPs to use, as defined here https://energyflow.network/docs/efp/#efpset. Defaults to the n=4, d=5, prime EFPs.
+        efpset_args (List): Args for the energyflow.efpset function to specify which EFPs to use, as defined here https://energyflow.network/docs/efp/#efpset.
+          Defaults to the n=4, d=5, prime EFPs.
         num_eval_samples (int): Number of jets out of the total to use for W1 measurement. Defaults to 10000.
         num_batches (int): Number of different batches to average W1 scores over. Defaults to 5.
         average_over_features (bool): Average over the particle features to return a single W1-P score. Defaults to True.
         return_std (bool): Return the standard deviation as well of the W1 scores over the ``num_batches`` batches. Defaults to True.
 
     Returns:
-        Tuple[Union[float, np.array], Union[float, np.array]]:
-        - **Union[float, np.array]**: if ``average_over_features`` is True, float of average W1 scores for each particle feature, first averaged over ``num_batches``,
+        Tuple[Union[float, np.ndarray], Union[float, np.ndarray]]:
+        - **Union[float, np.ndarray]**: if ``average_over_features`` is True, float of average W1 scores for each particle feature, first averaged over ``num_batches``,
           else array of length ``num_particle_features`` containing average W1 scores for each feature
-        - **Union[float, np.array]** `(optional, only if ``return_std`` is True)`: if ``average_over_features`` is True, float of standard deviation of all W1 scores for each particle feature, first calculated over ``num_batches`` then propagated for the final average,
-          else array of length ``num_particle_features`` containing standard deviation W1 scores for each feature
+        - **Union[float, np.ndarray]** `(optional, only if ``return_std`` is True)`: if ``average_over_features`` is True, float of standard deviation of all W1 scores for each particle feature,
+          first calculated over ``num_batches`` then propagated for the final average, else array of length ``num_particle_features`` containing standard deviation W1 scores for each feature
 
     """
 
@@ -321,8 +403,8 @@ def w1efp(
 
 
 def cov_mmd(
-    real_jets: Union[Tensor, np.array],
-    gen_jets: Union[Tensor, np.array],
+    real_jets: Union[Tensor, np.ndarray],
+    gen_jets: Union[Tensor, np.ndarray],
     num_eval_samples: int = 100,
     num_batches: int = 100,
 ) -> Tuple[float, float]:
@@ -330,8 +412,8 @@ def cov_mmd(
     Calculate coverage and MMD between real and generated jets, using the Energy Mover's Distance as the distance metric.
 
     Args:
-        real_jets (Union[Tensor, np.array]): Tensor or array of jets, of shape ``[num_jets, num_particles, num_features]`` with features in order ``[eta, phi, pt]``
-        gen_jets (Union[Tensor, np.array]): tensor or array of generated jets, same format as real_jets.
+        real_jets (Union[Tensor, np.ndarray]): Tensor or array of jets, of shape ``[num_jets, num_particles, num_features]`` with features in order ``[eta, phi, pt]``
+        gen_jets (Union[Tensor, np.ndarray]): tensor or array of generated jets, same format as real_jets.
         num_eval_samples (int): number of jets out of the real and gen jets each between which to evaluate COV and MMD. Defaults to 100.
         num_batches (int): number of different batches to calculate COV and MMD and average over. Defaults to 100.
         in_energyflow_format (bool): are the jets in energyflow or JetNet format. Defaults to False.
