@@ -26,6 +26,7 @@ Evaluation Methods
   :members:
   :imported-members:
   :autosummary:
+  :exclude-members: JetNet
 
 
 Utility Methods
