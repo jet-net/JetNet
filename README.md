@@ -3,7 +3,7 @@
 
 A library for developing and reproducing jet-based machine learning (ML) projects.
 
-JetNet provides common standardized PyTorch-based datasets, evaluation metrics, and loss functions for working with jets using ML. Currently supports the flagship JetNet dataset, and the Fréchet ParticleNet Distance (FPDN), Wasserstein-1 (W1), coverage and minimum matching distance (MMD) all introduced in Ref. [[1](#References)], as well as jet utilities and differentiable implementation of the energy mover's distance [[2](#References)] for use as a loss function. Additional functionality is currently under development.
+JetNet provides common standardized PyTorch-based datasets, evaluation metrics, and loss functions for working with jets using ML. Currently supports the flagship JetNet dataset, and the Fréchet ParticleNet Distance (FPDN), Wasserstein-1 (W1), coverage and minimum matching distance (MMD) metrics all introduced in Ref. [[1](#References)], as well as jet utilities and differentiable implementation of the energy mover's distance [[2](#References)] for use as a loss function. Additional functionality is currently under development.
 
 
 ## Installation
@@ -20,16 +20,16 @@ To use the differentiable EMD loss `jetnet.losses.EMDLoss`, additional libraries
 pip install jetnet[emdloss]
 ```
 
-Finally [PyTorch Geometric](https://github.com/pyg-team/pytorch_geometric) must be installed independently for the Fréchet ParticleNet Distance metric `jetnet.evaluation.fpnd` ([Installation instructions](https://github.com/pyg-team/pytorch_geometric#installation)).
+Finally, [PyTorch Geometric](https://github.com/pyg-team/pytorch_geometric) must be installed independently for the Fréchet ParticleNet Distance metric `jetnet.evaluation.fpnd` ([Installation instructions](https://github.com/pyg-team/pytorch_geometric#installation)).
 
 
 ## Documentation
 
 The API reference is available at [jetnet.readthedocs.io](https://jetnet.readthedocs.io/en/latest/).
 
-More detailed information about each dataset can (or will) be found at [jet-net.github.io](https://jet-net.github.io/jetnet/).
+More detailed information about each dataset can (or will) be found at [jet-net.github.io](https://jet-net.github.io/).
 
-Tutorials for datasets and functions are coming soon.
+*Tutorials for datasets and functions are coming soon.*
 
 
 ### References
