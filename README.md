@@ -3,7 +3,7 @@
 
 A library for developing and reproducing jet-based machine learning (ML) projects.
 
-JetNet provides common standardized PyTorch-based datasets, evaluation metrics, and loss functions for working with jets using ML. Currently supports the flagship JetNet dataset, and the Fréchet ParticleNet Distance (FPDN), Wasserstein-1 (W1), coverage and minimum matching distance (MMD) metrics all introduced in Ref. [[1](#References)], as well as jet utilities and differentiable implementation of the energy mover's distance [[2](#References)] for use as a loss function. Additional functionality is currently under development.
+JetNet provides common standardized PyTorch-based datasets, evaluation metrics, and loss functions for working with jets using ML. Currently supports the flagship JetNet dataset, and the Fréchet ParticleNet Distance (FPND), Wasserstein-1 (W1), coverage and minimum matching distance (MMD) metrics all introduced in Ref. [[1](#References)], as well as jet utilities and differentiable implementation of the energy mover's distance [[2](#References)] for use as a loss function. Additional functionality is currently under development.
 
 
 ## Installation
