@@ -22,7 +22,7 @@ def readme():
 
 
 setup(name='jetnet',
-      version='0.0.2a',
+      version='0.0.2',
       description='Jets + ML integration',
       long_description=readme(),
       long_description_content_type='text/markdown',
