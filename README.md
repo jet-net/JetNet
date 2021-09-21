@@ -17,7 +17,7 @@ pip install jetnet
 To use the differentiable EMD loss `jetnet.losses.EMDLoss`, additional libraries must be installed via
 
 ```bash
-pip install jetnet[emdloss]
+pip install "jetnet[emdloss]"
 ```
 
 Finally, [PyTorch Geometric](https://github.com/pyg-team/pytorch_geometric) must be installed independently for the Fréchet ParticleNet Distance metric `jetnet.evaluation.fpnd` ([Installation instructions](https://github.com/pyg-team/pytorch_geometric#installation)).
