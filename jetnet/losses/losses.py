@@ -151,9 +151,9 @@ class EMDLoss(nn.Module):
             - **Tensor** *Optional*, if ``return_flows`` is True: tensor of flows between particles fo shape ``[num_jets, num_particles, num_particles]``.
 
         """
-        assert (len(jets1.shape[0]) == 3) and (len(jets2.shape[0]) == 3), "Jets shape incorrect"
+        assert (len(jets1.shape) == 3) and (len(jets2.shape) == 3), "Jets shape incorrect"
         assert jets1.shape[0] == jets2.shape[0], "jets1 and jets2 have different numbers of jets"
-        assert (jets1.shape[1] == self.num_particles) and (jets2.shape[1] == self.n_part), "jets don't have num_particles particles"
+        assert (jets1.shape[1] == self.num_particles) and (jets2.shape[1] == self.num_particles), "jets don't have num_particles particles"
 
         if self.method == "cvxpy":
             diffs = -(jets1[:, :, :2].unsqueeze(2) - jets2[:, :, :2].unsqueeze(1)) + 1e-12
