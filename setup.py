@@ -11,6 +11,10 @@ install_requires = [
     'tqdm',
 ]
 
+extras_require = {
+    'emdloss': ['qpth', 'cvxpy']
+}
+
 
 def readme():
     with open('README.md') as f:
@@ -18,8 +22,8 @@ def readme():
 
 
 setup(name='jetnet',
-      version='0.0.1.post2',
-      description='One jet library to rule them all.',
+      version='0.0.2a',
+      description='Jets + ML integration',
       long_description=readme(),
       long_description_content_type='text/markdown',
       url='http://github.com/rkansal47/JetNet',
@@ -28,4 +32,5 @@ setup(name='jetnet',
       license='MIT',
       packages=find_packages(),
       install_requires=install_requires,
+      extras_require=extras_require,
       zip_safe=False)

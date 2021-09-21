@@ -1,1 +1,2 @@
 include README.md
+recursive-include jetnet/evaluation/fpnd_resources *.txt *.pt

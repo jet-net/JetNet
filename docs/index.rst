@@ -6,7 +6,7 @@
 JetNet
 ==================================
 
-JetNet is a library for all your ML jet needs.
+API reference for the JetNet library.
 
 .. contents:: Contents
   :local:
@@ -27,6 +27,14 @@ Evaluation
   :imported-members:
   :autosummary:
   :exclude-members: JetNet
+
+
+Losses
+**********************************
+.. automodule:: jetnet.losses
+  :members:
+  :imported-members:
+  :autosummary:
 
 
 Utility Functions
