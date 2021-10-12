@@ -23,9 +23,31 @@ pip install "jetnet[emdloss]"
 Finally, [PyTorch Geometric](https://github.com/pyg-team/pytorch_geometric) must be installed independently for the Fréchet ParticleNet Distance metric `jetnet.evaluation.fpnd` ([Installation instructions](https://github.com/pyg-team/pytorch_geometric#installation)).
 
 
+## Quickstart
+
+Datasets can be loaded quickly with, for example:
+
+```python
+dataset = jetnet.datasets.JetNet(jet_type='g')
+```
+
+Evaluation metrics can used as such:
+
+```python
+generated_jets = np.random.rand(50000, 30, 3)
+fpnd_score = jetnet.evaluation.fpnd(generated_jets, jet_type='g')
+```
+
+Loss functions can be initialized similar to standard PyTorch in-built losses such as MSE:
+
+```python
+emd_loss = jetnet.losses.EMDLoss(num_particles=30)
+loss = emd_loss(real_jets, generated_jets)
+```
+
 ## Documentation
 
-The API reference is available at [jetnet.readthedocs.io](https://jetnet.readthedocs.io/en/latest/).
+Full API reference is available at [jetnet.readthedocs.io](https://jetnet.readthedocs.io/en/latest/).
 
 More detailed information about each dataset can (or will) be found at [jet-net.github.io](https://jet-net.github.io/).
 
