@@ -31,18 +31,19 @@ Datasets can be loaded quickly with, for example:
 dataset = jetnet.datasets.JetNet(jet_type='g')
 ```
 
-Evaluation metrics can used as such:
+Evaluation metrics can be used as such:
 
 ```python
 generated_jets = np.random.rand(50000, 30, 3)
 fpnd_score = jetnet.evaluation.fpnd(generated_jets, jet_type='g')
 ```
 
-Loss functions can be initialized similar to standard PyTorch in-built losses such as MSE:
+Loss functions can be initialized and used similarly to standard PyTorch in-built losses such as MSE:
 
 ```python
 emd_loss = jetnet.losses.EMDLoss(num_particles=30)
 loss = emd_loss(real_jets, generated_jets)
+loss.backward()
 ```
 
 ## Documentation
