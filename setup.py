@@ -21,7 +21,7 @@ def readme():
 
 setup(
     name="jetnet",
-    version="0.0.3",
+    version="0.0.3post1",
     description="Jets + ML integration",
     long_description=readme(),
     long_description_content_type="text/markdown",
@@ -33,4 +33,5 @@ setup(
     install_requires=install_requires,
     extras_require=extras_require,
     zip_safe=False,
+    include_package_data=True,
 )
