@@ -11,7 +11,7 @@ import numpy as np
 
 class JetNet(torch.utils.data.Dataset):
     """
-    PyTorch ``torch.utils.data.Dataset`` class for the JetNet dataset, shape is [num_jets, num_particles, num_features].
+    PyTorch ``torch.utils.data.Dataset`` class for the JetNet dataset, shape is ``[num_jets, num_particles, num_features]``.
 
     Features, in order: ``[eta, phi, pt, mask]``.
 
@@ -23,13 +23,16 @@ class JetNet(torch.utils.data.Dataset):
         download (bool): download the dataset, even if the csv file exists already. Defaults to False.
         num_particles (int): number of particles to use, has to be less than the total in JetNet (30). 0 means use all. Defaults to 0.
         normalize (bool): normalize features for training or not, using parameters defined below. Defaults to True.
-        feature_norms (Union[float, List[float]]): max value to scale each feature to. Can either be a single float for all features, or a list of length ``num_features``. Defaults to 1.0.
-        feature_shifts (Union[float, List[float]]): after scaling, value to shift feature by. Can either be a single float for all features, or a list of length ``num_features``. Defaults to 0.0.
+        feature_norms (Union[float, List[float]]): max value to scale each feature to.
+          Can either be a single float for all features, or a list of length ``num_features``. Defaults to 1.0.
+        feature_shifts (Union[float, List[float]]): after scaling, value to shift feature by.
+          Can either be a single float for all features, or a list of length ``num_features``. Defaults to 0.0.
         use_mask (bool): Defaults to True.
         train (bool): whether for training or testing. Defaults to True.
         train_fraction (float): fraction of data to use as training - rest is for testing. Defaults to 0.7.
         num_pad_particles (int): how many out of ``num_particles`` should be zero-padded. Defaults to 0.
-        use_num_particles_jet_feature (bool): Store the # of particles in each jet as a jet-level feature. Only works if using mask. Defaults to True.
+        use_num_particles_jet_feature (bool): Store the # of particles in each jet as a jet-level feature.
+          Only works if using mask. Defaults to True.
         noise_padding (bool): instead of 0s, pad extra particles with Gaussian noise. Only works if using mask. Defaults to False.
     """
 
@@ -100,6 +103,9 @@ class JetNet(torch.utils.data.Dataset):
             jet_type (str): jet type to download, out of ``['g', 't', 'q']``.
 
         """
+        import os
+
+        os.system(f"mkdir -p {data_dir}")
         csv_file = f"{data_dir}/{jet_type}_jets.csv"
 
         if not exists(csv_file):
@@ -124,7 +130,9 @@ class JetNet(torch.utils.data.Dataset):
         records_url = "https://zenodo.org/api/records/5502543"
         r = requests.get(records_url).json()
         key = f"{jet_type}_jets.csv"
-        file_url = next(item for item in r["files"] if item["key"] == key)["links"]["self"]  # finding the url for the particular jet type dataset
+        file_url = next(item for item in r["files"] if item["key"] == key)["links"][
+            "self"
+        ]  # finding the url for the particular jet type dataset
         logging.info(f"{file_url = }")
 
         # modified from https://sumit-ghosh.com/articles/python-download-progress-bar/
@@ -138,11 +146,16 @@ class JetNet(torch.utils.data.Dataset):
                 downloaded = 0
                 total = int(total)
 
+                print("Downloading dataset")
                 for data in response.iter_content(chunk_size=max(int(total / 1000), 1024 * 1024)):
                     downloaded += len(data)
                     f.write(data)
                     done = int(50 * downloaded / total)
-                    sys.stdout.write("\r[{}{}] {:.0f}%".format("█" * done, "." * (50 - done), float(downloaded / total) * 100))
+                    sys.stdout.write(
+                        "\r[{}{}] {:.0f}%".format(
+                            "█" * done, "." * (50 - done), float(downloaded / total) * 100
+                        )
+                    )
                     sys.stdout.flush()
 
         sys.stdout.write("\n")
@@ -160,7 +173,9 @@ class JetNet(torch.utils.data.Dataset):
         pt_file = f"{data_dir}/{jet_type}_jets.pt"
         torch.save(Tensor(np.loadtxt(csv_file).reshape(-1, 30, 4)), pt_file)
 
-    def load_dataset(self, pt_file: str, num_particles: int, num_pad_particles: int = 0, use_mask: bool = True) -> Tensor:
+    def load_dataset(
+        self, pt_file: str, num_particles: int, num_pad_particles: int = 0, use_mask: bool = True
+    ) -> Tensor:
         """
         Load the dataset, optionally padding the particles.
 
@@ -222,18 +237,24 @@ class JetNet(torch.utils.data.Dataset):
 
         Args:
             dataset (Tensor): dataset tensor of shape [N, num_particles, num_features].
-            feature_norms (Union[float, List[float]]): max value to scale each feature to. Can either be a single float for all features, or a list of length ``num_features``. Defaults to 1.0.
-            feature_shifts (Union[float, List[float]]): after scaling, value to shift feature by. Can either be a single float for all features, or a list of length ``num_features``. Defaults to 0.0.
-            fpnd (bool): Normalize features for ParticleNet inference for the Frechet ParticleNet Distance metric. Will override `feature_norms`` and ``feature_shifts`` inputs. Defaults to False.
+            feature_norms (Union[float, List[float]]): max value to scale each feature to.
+              Can either be a single float for all features, or a list of length ``num_features``. Defaults to 1.0.
+            feature_shifts (Union[float, List[float]]): after scaling, value to shift feature by.
+              Can either be a single float for all features, or a list of length ``num_features``. Defaults to 0.0.
+            fpnd (bool): Normalize features for ParticleNet inference for the Frechet ParticleNet Distance metric.
+              Will override `feature_norms`` and ``feature_shifts`` inputs. Defaults to False.
 
         Returns:
-            Optional[List]: if ``fpnd`` is False, returns list of length ``num_features`` of max absolute values for each feature. Used for unnormalizing features.
+            Optional[List]: if ``fpnd`` is False, returns list of length ``num_features`` of max absolute values for each feature.
+              Used for unnormalizing features.
 
         """
         num_features = dataset.shape[2]
 
         if not fpnd:
-            feature_maxes = [float(torch.max(torch.abs(dataset[:, :, i]))) for i in range(num_features)]
+            feature_maxes = [
+                float(torch.max(torch.abs(dataset[:, :, i]))) for i in range(num_features)
+            ]
         else:
             feature_maxes = JetNet._fpnd_feature_maxes
             feature_norms = JetNet._fpnd_feature_norms
@@ -267,7 +288,8 @@ class JetNet(torch.utils.data.Dataset):
         zero_neg_pt: bool = True,
     ):
         """
-        Inverts the ``normalize_features()`` function on the input ``dataset`` array or tensor, plus optionally zero's the masked particles and negative pTs.
+        Inverts the ``normalize_features()`` function on the input ``dataset`` array or tensor,
+        plus optionally zero's the masked particles and negative pTs.
         Only applicable if dataset was normalized first i.e. ``normalize`` arg into JetNet instance is True.
 
         Args:
@@ -278,8 +300,9 @@ class JetNet(torch.utils.data.Dataset):
             zero_neg_pt (bool): Set pT to 0 for particles with negative pt. Not needed for real data. Defaults to True.
 
         Returns:
-            Unnormalized dataset of same type as input. Either a tensor/array of shape ``[num_jets, num_particles, num_features (including mask)]`` if ``ret_mask_separate`` is False,
-            else a tuple with a tensor/array of shape ``[num_jets, num_particles, num_features (excluding mask)]`` and another binary mask tensor/array of shape ``[num_jets, num_particles, 1]``.
+            Unnormalized dataset of same type as input. Either a tensor/array of shape ``[num_jets, num_particles, num_features (including mask)]``
+            if ``ret_mask_separate`` is False, else a tuple with a tensor/array of shape ``[num_jets, num_particles, num_features (excluding mask)]``
+            and another binary mask tensor/array of shape ``[num_jets, num_particles, 1]``.
         """
         if not self.normalize:
             raise RuntimeError("Can't unnormalize features if dataset has not been normalized.")
@@ -294,7 +317,7 @@ class JetNet(torch.utils.data.Dataset):
                 dataset[:, :, i] /= self.feature_norms[i]
                 dataset[:, :, i] *= self.feature_maxes[i]
 
-        mask = dataset[:, :, -1:] >= 0.5 if self.use_mask else None
+        mask = dataset[:, :, -1] >= 0.5 if self.use_mask else None
 
         if not is_real_data and zero_mask_particles and self.use_mask:
             dataset[~mask] = 0
@@ -308,14 +331,17 @@ class JetNet(torch.utils.data.Dataset):
         """Add Gaussian noise to zero-masked particles"""
         logging.debug(f"Pre-noise padded dataset: \n {dataset[:2, -10:]}")
 
-        noise_padding = torch.randn((len(dataset), self.num_particles, dataset.shape[2] - 1)) / 5  # up to 5 sigmas will be within ±1
+        # up to 5 sigmas will be within ±1
+        noise_padding = torch.randn((len(dataset), self.num_particles, dataset.shape[2] - 1)) / 5
         noise_padding[noise_padding > 1] = 1
         noise_padding[noise_padding < -1] = -1
         noise_padding[:, :, 2] /= 2.0  # pt is scaled between ±0.5
 
         mask = (dataset[:, :, 3] + 0.5).bool()
         noise_padding[mask] = 0  # only adding noise to zero-masked particles
-        dataset += torch.cat((noise_padding, torch.zeros((len(dataset), self.num_particles, 1))), dim=2)
+        dataset += torch.cat(
+            (noise_padding, torch.zeros((len(dataset), self.num_particles, 1))), dim=2
+        )
 
         logging.debug("Post-noise padded dataset: \n {dataset[:2, -10:]}")
 
