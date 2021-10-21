@@ -1,4 +1,5 @@
-# energyflow needs to be imported before pytorch because of https://github.com/pkomiske/EnergyFlow/issues/24
+# energyflow needs to be imported before pytorch
+# because of https://github.com/pkomiske/EnergyFlow/issues/24
 from energyflow.emd import emds
 
 import logging
@@ -195,21 +196,25 @@ def fpnd(
     use_tqdm: bool = True,
 ) -> float:
     """
-    Calculates the Frechet ParticleNet Distance, as defined in https://arxiv.org/abs/2106.11535, for input ``jets`` of type ``jet_type``.
+    Calculates the Frechet ParticleNet Distance, as defined in https://arxiv.org/abs/2106.11535,
+    for input ``jets`` of type ``jet_type``.
 
-    ``jets`` are passed through our pretrained ParticleNet module and activations are compared with the cached activations from real jets.
+    ``jets`` are passed through our pretrained ParticleNet module and activations are compared
+    with the cached activations from real jets.
     The recommended and max number of jets is 50,000
 
     **torch_geometric must be installed separately for running inference with ParticleNet**
 
-    Currently FPND only supported for the JetNet dataset with 30 particles,
-    but functionality for other datasets + ability for users to use their own version is in development.
+    Currently FPND only supported for the JetNet dataset with 30 particles, but functionality for
+    other datasets + ability for users to use their own version is in development.
 
     Args:
-        jets (Union[Tensor, np.ndarray]): Tensor or array of jets, of shape ``[num_jets, num_particles, num_features]``
-          with features in order ``[eta, phi, pt, (optional) mask]``
+        jets (Union[Tensor, np.ndarray]): Tensor or array of jets, of shape
+          ``[num_jets, num_particles, num_features]`` with features in order
+          ``[eta, phi, pt, (optional) mask]``
         jet_type (str): jet type, out of ``['g', 't', 'q']``.
-        dataset_name (str): Dataset to use. Currently only JetNet is supported. Defaults to "jetnet".
+        dataset_name (str): Dataset to use. Currently only JetNet is supported.
+          Defaults to "jetnet".
         device (str): 'cpu' or 'cuda'. If not specified, defaults to cuda if available else cpu.
         batch_size (int): Batch size for ParticleNet inference. Defaults to 16.
         use_tqdm (bool): use tqdm bar while getting ParticleNet activations. Defaults to True.
@@ -300,24 +305,35 @@ def w1p(
     Get 1-Wasserstein distances between particle features of ``jets1`` and ``jets2``.
 
     Args:
-        jets1 (Union[Tensor, np.ndarray]): Tensor or array of jets, of shape ``[num_jets, num_particles_per_jet, num_features_per_particle]``.
+        jets1 (Union[Tensor, np.ndarray]): Tensor or array of jets, of shape
+          ``[num_jets, num_particles_per_jet, num_features_per_particle]``.
         jets2 (Union[Tensor, np.ndarray]): Tensor or array of jets, of same format as ``jets1``.
-        mask1 (Union[Tensor, np.ndarray]): Optional tensor or array of binary particle masks, of shape ``[num_jets, num_particles_per_jet]`` or ``[num_jets, num_particles_per_jet, 1]``.
+        mask1 (Union[Tensor, np.ndarray]): Optional tensor or array of binary particle masks, of
+          shape ``[num_jets, num_particles_per_jet]`` or ``[num_jets, num_particles_per_jet, 1]``.
           If given, 0-masked particles will be excluded from w1 calculation.
         mask2 (Union[Tensor, np.ndarray]): Optional tensor or array of same format as ``masks2``.
-        exclude_zeros (bool): Ignore zero-padded particles i.e. those whose whose feature norms are exactly 0. Defaults to True.
-        num_particle_features (int): Will return W1 scores of the first ``num_particle_features`` particle features. If 0, will calculate for all.
-        num_eval_samples (int): Number of jets out of the total to use for W1 measurement. Defaults to 10000.
+        exclude_zeros (bool): Ignore zero-padded particles i.e.
+          those whose whose feature norms are exactly 0. Defaults to True.
+        num_particle_features (int): Will return W1 scores of the first
+          ``num_particle_features`` particle features. If 0, will calculate for all.
+        num_eval_samples (int): Number of jets out of the total to use for W1 measurement.
+          Defaults to 10000.
         num_batches (int): Number of different batches to average W1 scores over. Defaults to 5.
-        average_over_features (bool): Average over the particle features to return a single W1-P score. Defaults to True.
-        return_std (bool): Return the standard deviation as well of the W1 scores over the ``num_batches`` batches. Defaults to True.
+        average_over_features (bool): Average over the particle features to return
+          a single W1-P score. Defaults to True.
+        return_std (bool): Return the standard deviation as well of the W1 scores over the
+          ``num_batches`` batches. Defaults to True.
 
     Returns:
         Tuple[Union[float, np.ndarray], Union[float, np.ndarray]]:
-        - **Union[float, np.ndarray]**: if ``average_over_features`` is True, float of average W1 scores for each particle feature, first averaged over ``num_batches``,
-          else array of length ``num_particle_features`` containing average W1 scores for each feature
-        - **Union[float, np.ndarray]** `(optional, only if ``return_std`` is True)`: if ``average_over_features`` is True, float of standard deviation of all W1 scores for each particle feature,
-          first calculated over ``num_batches`` then propagated for the final average, else array of length ``num_particle_features`` containing standard deviation W1 scores for each feature
+        - **Union[float, np.ndarray]**: if ``average_over_features`` is True, float of average W1
+          scores for each particle feature, first averaged over ``num_batches``, else array of
+          length ``num_particle_features`` containing average W1 scores for each feature.
+        - **Union[float, np.ndarray]** `(optional, only if ``return_std`` is True)`: if
+          ``average_over_features`` is True, float of standard deviation of all W1 scores for each
+          particle feature, first calculated over ``num_batches`` then propagated for the final
+          average, else array of length ``num_particle_features`` containing standard deviation W1
+          scores for each feature.
 
     """
     assert len(jets1.shape) == 3 and len(jets2.shape) == 3, "input jets format is incorrect"
@@ -405,16 +421,21 @@ def w1m(
     Get 1-Wasserstein distance between masses of ``jets1`` and ``jets2``.
 
     Args:
-        jets1 (Union[Tensor, np.ndarray]): Tensor or array of jets, of shape ``[num_jets, num_particles, num_features]`` with features in order ``[eta, phi, pt, (optional) mass]``
+        jets1 (Union[Tensor, np.ndarray]): Tensor or array of jets, of shape
+          ``[num_jets, num_particles, num_features]`` with features in order
+          ``[eta, phi, pt, (optional) mass]``
         jets2 (Union[Tensor, np.ndarray]): Tensor or array of jets, of same format as ``jets1``.
-        num_eval_samples (int): Number of jets out of the total to use for W1 measurement. Defaults to 10000.
+        num_eval_samples (int): Number of jets out of the total to use for W1 measurement.
+          Defaults to 10000.
         num_batches (int): Number of different batches to average W1 scores over. Defaults to 5.
-        return_std (bool): Return the standard deviation as well of the W1 scores over the ``num_batches`` batches. Defaults to True.
+        return_std (bool): Return the standard deviation as well of the W1 scores over the
+          ``num_batches`` batches. Defaults to True.
 
     Returns:
         Tuple[float, float]:
         - **float**: W1 mass score, averaged over ``num_batches``.
-        - **float** `(optional, only if ``return_std`` is True)`: standard deviation of W1 mass scores over ``num_batches``.
+        - **float** `(optional, only if ``return_std`` is True)`: standard deviation of W1 mass
+          scores over ``num_batches``.
 
     """
     assert len(jets1.shape) == 3 and len(jets2.shape) == 3, "input jets format is incorrect"
@@ -454,27 +475,40 @@ def w1efp(
     efp_jobs: int = None,
 ):
     """
-    Get 1-Wasserstein distances between Energy Flow Polynomials (Komiske et al. 2017 https://arxiv.org/abs/1712.07124) of ``jets1`` and ``jets2``.
+    Get 1-Wasserstein distances between Energy Flow Polynomials
+    (Komiske et al. 2017 https://arxiv.org/abs/1712.07124) of ``jets1`` and ``jets2``.
 
     Args:
-        jets1 (Union[Tensor, np.ndarray]): Tensor or array of jets of shape ``[num_jets, num_particles, num_features]``, with features in order ``[eta, phi, pt, (optional) mass]``.
-          If no particle masses given (``particle_masses`` should be False), they are assumed to be 0.
+        jets1 (Union[Tensor, np.ndarray]): Tensor or array of jets of shape
+          ``[num_jets, num_particles, num_features]``, with features in order
+          ``[eta, phi, pt, (optional) mass]``. If no particle masses given
+          (``particle_masses`` should be False), they are assumed to be 0.
         jets2 (Union[Tensor, np.ndarray]): Tensor or array of jets, of same format as ``jets1``.
-        use_particle_masses (bool): Whether ``jets1`` and ``jets2`` have particle masses as their 4th particle features. Defaults to False.
-        efpset_args (List): Args for the energyflow.efpset function to specify which EFPs to use, as defined here https://energyflow.network/docs/efp/#efpset.
+        use_particle_masses (bool): Whether ``jets1`` and ``jets2`` have particle masses as their
+          4th particle features. Defaults to False.
+        efpset_args (List): Args for the energyflow.efpset function to specify which EFPs to use,
+          as defined here https://energyflow.network/docs/efp/#efpset.
           Defaults to the n=4, d=5, prime EFPs.
-        num_eval_samples (int): Number of jets out of the total to use for W1 measurement. Defaults to 10000.
+        num_eval_samples (int): Number of jets out of the total to use for W1 measurement.
+          Defaults to 10000.
         num_batches (int): Number of different batches to average W1 scores over. Defaults to 5.
-        average_over_efps (bool): Average over the EFPs to return a single W1-EFP score. Defaults to True.
-        return_std (bool): Return the standard deviation as well of the W1 scores over the ``num_batches`` batches. Defaults to True.
-        efp_jobs (int): number of jobs to use for energyflow's EFP batch computation. None means as many processes as there are CPUs.
+        average_over_efps (bool): Average over the EFPs to return a single W1-EFP score.
+          Defaults to True.
+        return_std (bool): Return the standard deviation as well of the W1 scores over the
+          ``num_batches`` batches. Defaults to True.
+        efp_jobs (int): number of jobs to use for energyflow's EFP batch computation.
+          None means as many processes as there are CPUs.
 
     Returns:
         Tuple[Union[float, np.ndarray], Union[float, np.ndarray]]:
-        - **Union[float, np.ndarray]**: if ``average_over_features`` is True, float of average W1 scores for each particle feature, first averaged over ``num_batches``,
-          else array of length ``num_particle_features`` containing average W1 scores for each feature
-        - **Union[float, np.ndarray]** `(optional, only if ``return_std`` is True)`: if ``average_over_features`` is True, float of standard deviation of all W1 scores for each particle feature,
-          first calculated over ``num_batches`` then propagated for the final average, else array of length ``num_particle_features`` containing standard deviation W1 scores for each feature
+        - **Union[float, np.ndarray]**: if ``average_over_features`` is True, float of average W1
+          scores for each particle feature, first averaged over ``num_batches``, else array of
+          length ``num_particle_features`` containing average W1 scores for each feature.
+        - **Union[float, np.ndarray]** `(optional, only if ``return_std`` is True)`: if
+          ``average_over_features`` is True, float of standard deviation of all W1 scores for each
+          particle feature, first calculated over ``num_batches`` then propagated for the final
+          average, else array of length ``num_particle_features`` containing standard deviation W1
+          scores for each feature.
 
     """
 
@@ -526,14 +560,20 @@ def cov_mmd(
     use_tqdm: bool = True,
 ) -> Tuple[float, float]:
     """
-    Calculate coverage and MMD between real and generated jets, using the Energy Mover's Distance as the distance metric.
+    Calculate coverage and MMD between real and generated jets,
+    using the Energy Mover's Distance as the distance metric.
 
     Args:
-        real_jets (Union[Tensor, np.ndarray]): Tensor or array of jets, of shape ``[num_jets, num_particles, num_features]`` with features in order ``[eta, phi, pt]``
-        gen_jets (Union[Tensor, np.ndarray]): tensor or array of generated jets, same format as real_jets.
-        num_eval_samples (int): number of jets out of the real and gen jets each between which to evaluate COV and MMD. Defaults to 100.
-        num_batches (int): number of different batches to calculate COV and MMD and average over. Defaults to 100.
-        use_tqdm (bool): use tqdm bar while calculating over ``num_batches`` batches. Defaults to True.
+        real_jets (Union[Tensor, np.ndarray]): Tensor or array of jets, of shape
+          ``[num_jets, num_particles, num_features]`` with features in order ``[eta, phi, pt]``
+        gen_jets (Union[Tensor, np.ndarray]): tensor or array of generated jets,
+          same format as real_jets.
+        num_eval_samples (int): number of jets out of the real and gen jets each between which to
+          evaluate COV and MMD. Defaults to 100.
+        num_batches (int): number of different batches to calculate COV and MMD and average over.
+          Defaults to 100.
+        use_tqdm (bool): use tqdm bar while calculating over ``num_batches`` batches.
+          Defaults to True.
 
     Returns:
         Tuple[float, float]:
@@ -579,7 +619,8 @@ def cov_mmd(
         # for MMD, for each gen jet find the closest real jet and average EMDs
         mmds.append(np.mean(np.min(dists, axis=0)))
 
-        # for coverage, for each real jet find the closest gen jet and get the number of unique matchings
+        # for coverage, for each real jet find the closest gen jet
+        # and get the number of unique matchings
         covs.append(np.unique(np.argmin(dists, axis=1)).size / num_eval_samples)
 
     return np.mean(covs), np.mean(mmds)

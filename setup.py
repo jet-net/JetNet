@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+import re
 
 install_requires = [
     "numpy >= 1.21.0",
@@ -19,9 +20,13 @@ def readme():
         return f.read()
 
 
+with open("jetnet/__init__.py", "r") as f:
+    __version__ = re.search(r'__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read()).group(1)
+
+
 setup(
     name="jetnet",
-    version="0.0.3post1",
+    version=__version__,
     description="Jets + ML integration",
     long_description=readme(),
     long_description_content_type="text/markdown",

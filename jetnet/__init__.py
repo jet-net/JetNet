@@ -5,3 +5,6 @@ import jetnet.evaluation
 import jetnet.datasets
 import jetnet.losses
 import jetnet.utils
+
+
+__version__ = "0.0.3.post3"

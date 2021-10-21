@@ -2,7 +2,8 @@ from typing import Dict, Union
 
 import numpy as np
 
-# for calculating jet features quickly, TODO: replace with vector library when summing over axis feature is implemented
+# for calculating jet features quickly,
+# TODO: replace with vector library when summing over axis feature is implemented
 import awkward as ak
 from coffea.nanoevents.methods import vector
 
@@ -23,11 +24,13 @@ def jet_features(jets: np.ndarray) -> Dict[str, Union[float, np.ndarray]]:
 
     Returns:
         Dict[str, Union[float, np.ndarray]]: dict of float (if inputted single jet) or
-          1D arrays of length ``num_jets`` (if inputted multiple jets) with 'mass', 'pt', and 'eta' keys.
+          1D arrays of length ``num_jets`` (if inputted multiple jets)
+          with 'mass', 'pt', and 'eta' keys.
 
     """
 
     assert len(jets.shape) == 2 or len(jets.shape) == 3, "jets dimensions are incorrect"
+    assert jets.shape[-1] >= 3, "missing particle features"
 
     if len(jets.shape) == 2:
         vecs = ak.zip(
@@ -86,7 +89,8 @@ def efps(
           None means as many processes as there are CPUs.
 
     Returns:
-        np.ndarray: 1D (if inputted single jet) or 2D array of shape [num_jets, num_efps] of EFPs per jet
+        np.ndarray: 1D (if inputted single jet) or 2D array of shape ``[num_jets, num_efps]`` of
+          EFPs per jet
 
     """
 
