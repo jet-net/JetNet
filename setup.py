@@ -30,7 +30,7 @@ setup(
     description="Jets + ML integration",
     long_description=readme(),
     long_description_content_type="text/markdown",
-    url="http://github.com/rkansal47/JetNet",
+    url="http://github.com/jet-net/JetNet",
     author="Raghav Kansal",
     author_email="rkansal@cern.ch",
     license="MIT",

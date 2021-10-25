@@ -7,4 +7,4 @@ import jetnet.losses
 import jetnet.utils
 
 
-__version__ = "0.0.3.post3"
+__version__ = "0.0.4a"
