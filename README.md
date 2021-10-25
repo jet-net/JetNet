@@ -3,7 +3,7 @@
 
 A library for developing and reproducing jet-based machine learning (ML) projects.
 
-JetNet provides common standardized PyTorch-based datasets, evaluation metrics, and loss functions for working with jets using ML. Currently supports the flagship JetNet dataset, and the Fréchet ParticleNet Distance (FPND), Wasserstein-1 (W1), coverage and minimum matching distance (MMD) metrics all introduced in Ref. [[1](#References)], as well as jet utilities and differentiable implementation of the energy mover's distance [[2](#References)] for use as a loss function. Additional functionality is currently under development.
+JetNet provides common standardized PyTorch-based datasets, evaluation metrics, and loss functions for working with jets using ML. Currently supports the flagship JetNet dataset, and the Fréchet ParticleNet Distance (FPND), Wasserstein-1 (W1), coverage and minimum matching distance (MMD) metrics all introduced in Ref. [[1](#references)], as well as jet utilities and differentiable implementation of the energy mover's distance [[2](#references)] for use as a loss function. Additional functionality is currently under development.
 
 
 ## Installation
@@ -54,9 +54,12 @@ More detailed information about each dataset can (or will) be found at [jet-net.
 
 *Tutorials for datasets and functions are coming soon.*
 
+## Citation
 
-### References
+If you find this library useful for your research, please cite our original paper which introduces it [[1](#references)].
 
-[1] R. Kansal et al. *Particle Cloud Generation with Message Passing Generative Adversarial Networks* (2021) [[2106.11535](https://arxiv.org/abs/2106.11535)]
+## References
+
+[1] R. Kansal et al. *Particle Cloud Generation with Message Passing Generative Adversarial Networks* (NeurIPS 2021) [[2106.11535](https://arxiv.org/abs/2106.11535)]
 
 [2] P. T. Komiske, E. M. Metodiev, and J. Thaler, _The Metric Space of Collider Events_, [Phys. Rev. Lett. __123__ (2019) 041801](https://doi.org/10.1103/PhysRevLett.123.041801) [[1902.02346](https://arxiv.org/abs/1902.02346)].
