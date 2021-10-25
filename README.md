@@ -56,7 +56,24 @@ More detailed information about each dataset can (or will) be found at [jet-net.
 
 ## Citation
 
-If you find this library useful for your research, please cite our original paper which introduces it [[1](#references)].
+If you find this library useful for your research, please consider citing our original paper which introduces it [[1](#references)].
+
+<!-- 
+```latex
+@inproceedings{kansal21,
+ author = {Raghav Kansal and Javier Duarte and Hao Su and Breno Orzari and Thiago Tomei and Maurizio Pierini and Mary Touranakou and Jean-Roch Vlimant and Dimitrios Gunopulos},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {H. Larochelle and M. Ranzato and R. Hadsell and M. F. Balcan and H. Lin},
+ pages = {1--12},
+ publisher = {Curran Associates, Inc.},
+ title = {Particle Cloud Generation with Message Passing Generative Adversarial Networks},
+ url = {https://proceedings.neurips.cc/paper/2020/file/0004d0b59e19461ff126e3a08a814c33-Paper.pdf},
+ volume = {33},
+ year = {2020}
+}
+``` -->
+
+Additionally, if you use our EMD loss implementation, please cite the respective [qpth](https://locuslab.github.io/qpth/) or [cvxpy](https://github.com/cvxpy/cvxpy) libraries, depending on the method used (`qpth` by default). 
 
 ## References
 
