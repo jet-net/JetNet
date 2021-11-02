@@ -82,6 +82,7 @@ If you find this library useful for your research, please consider citing our or
 
 Additionally, if you use our EMD loss implementation, please cite the respective [qpth](https://locuslab.github.io/qpth/) or [cvxpy](https://github.com/cvxpy/cvxpy) libraries, depending on the method used (`qpth` by default). 
 
+
 ## References
 
 [1] R. Kansal et al. *Particle Cloud Generation with Message Passing Generative Adversarial Networks* (NeurIPS 2021) [[2106.11535](https://arxiv.org/abs/2106.11535)]
