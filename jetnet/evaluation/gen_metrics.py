@@ -612,9 +612,8 @@ def cov_mmd(
         real_rand_sample = real_jets[real_rand]
         gen_rand_sample = gen_jets[gen_rand]
 
-        dists = emds(
-            gen_rand_sample, real_rand_sample
-        )  # 2D array of emds, with shape (len(gen_rand_sample), len(real_rand_sample))
+        # 2D array of emds, with shape (len(gen_rand_sample), len(real_rand_sample))
+        dists = emds(gen_rand_sample, real_rand_sample)
 
         # for MMD, for each gen jet find the closest real jet and average EMDs
         mmds.append(np.mean(np.min(dists, axis=0)))
