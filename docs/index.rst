@@ -1,5 +1,5 @@
 .. image:: _static/images/jetnetlogo.pdf
-   :width: 37%
+   :width: 75%
    :alt: JetNet logo
 
 Welcome to JetNet!
