@@ -13,13 +13,17 @@ from os.path import exists
 
 class JetNet(torch.utils.data.Dataset):
     """
-    PyTorch ``torch.utils.data.Dataset`` class for the JetNet dataset, shape is
-      ``[num_jets, num_particles, num_features]``.
+    PyTorch ``torch.utils.data.Dataset`` class for the JetNet dataset.
 
     Features, in order: ``[eta, phi, pt, mask]``.
 
+    Will produce an iteratable of either the dataset alone, of shape
+    ``[num_jets, num_particles, num_features]``, or a tuple of the dataset and jet-level features
+    of each jet. Currently only the number of (non-zero-padded) particles per jet is available as
+    a jet feature.
+
     Dataset is downloaded from https://zenodo.org/record/5502543
-      if pt or csv file is not found in the ``data_dir`` directory.
+    if pt or csv file is not found in the ``data_dir`` directory.
 
     Args:
         jet_type (str): 'g' (gluon), 't' (top quarks), or 'q' (light quarks).
@@ -33,10 +37,10 @@ class JetNet(torch.utils.data.Dataset):
           Defaults to True.
         feature_norms (Union[float, List[float]]): max value to scale each feature to.
           Can either be a single float for all features, or a list of length ``num_features``.
-            Defaults to 1.0.
+          Defaults to 1.0.
         feature_shifts (Union[float, List[float]]): after scaling, value to shift feature by.
           Can either be a single float for all features, or a list of length ``num_features``.
-            Defaults to 0.0.
+          Defaults to 0.0.
         use_mask (bool): Defaults to True.
         train (bool): whether for training or testing. Defaults to True.
         train_fraction (float): fraction of data to use as training - rest is for testing.
@@ -44,7 +48,7 @@ class JetNet(torch.utils.data.Dataset):
         num_pad_particles (int): how many out of ``num_particles`` should be zero-padded.
           Defaults to 0.
         use_num_particles_jet_feature (bool): Store the # of particles in each jet as a
-          jet-level feature. Only works if using mask. Defaults to True.
+          jet-level feature. *Only works if using mask* i.e. if ``use_mask=True``. Defaults to True.
         noise_padding (bool): instead of 0s, pad extra particles with Gaussian noise.
           Only works if using mask. Defaults to False.
     """
@@ -78,7 +82,7 @@ class JetNet(torch.utils.data.Dataset):
         self.feature_shifts = feature_shifts
         self.use_mask = use_mask
         # in the future there'll be more jet features such as jet pT and eta
-        self.use_jet_features = (use_num_particles_jet_feature) and self.use_mask
+        self.use_jet_features = use_num_particles_jet_feature and self.use_mask
         self.noise_padding = noise_padding and self.use_masks
         self.normalize = normalize
 
@@ -273,7 +277,7 @@ class JetNet(torch.utils.data.Dataset):
 
         Returns:
             Optional[List]: if ``fpnd`` is False, returns list of length ``num_features``
-              of max absolute values for each feature. Used for unnormalizing features.
+            of max absolute values for each feature. Used for unnormalizing features.
 
         """
         num_features = dataset.shape[2]
