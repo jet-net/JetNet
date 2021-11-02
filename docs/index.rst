@@ -1,12 +1,11 @@
-.. JetNet documentation master file, created by
-   sphinx-quickstart on Fri Sep 17 14:18:19 2021.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. image:: _static/images/jetnetlogo.pdf
+   :width: 37%
+   :alt: JetNet logo
 
-JetNet
-==================================
+Welcome to JetNet!
+==================
 
-API reference for the JetNet library.
+This is the API reference for the JetNet library.
 
 .. contents:: Contents
   :local:

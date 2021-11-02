@@ -201,9 +201,9 @@ def fpnd(
 
     ``jets`` are passed through our pretrained ParticleNet module and activations are compared
     with the cached activations from real jets.
-    The recommended and max number of jets is 50,000
+    The recommended and max number of jets is 50,000.
 
-    **torch_geometric must be installed separately for running inference with ParticleNet**
+    **torch_geometric must be installed separately for running inference with ParticleNet.**
 
     Currently FPND only supported for the JetNet dataset with 30 particles, but functionality for
     other datasets + ability for users to use their own version is in development.
