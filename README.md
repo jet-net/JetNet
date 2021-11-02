@@ -1,3 +1,5 @@
+<img alt="jetnetlogo" width="234" src="https://raw.githubusercontent.com/rkansal47/JetNet/main/docs/_static/images/jetnetlogo.png"/>
+
 # JetNet
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5598104.svg)](https://doi.org/10.5281/zenodo.5598104)
