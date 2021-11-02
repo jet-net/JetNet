@@ -1,4 +1,6 @@
-<img alt="jetnetlogo" width="234" src="https://raw.githubusercontent.com/jet-net/JetNet/main/docs/_static/images/jetnetlogo.png"/>
+<p align="center">
+  <img width="400" src="https://raw.githubusercontent.com/rkansal47/JetNet/main/docs/_static/images/jetnetlogo.png" />
+</p>
 
 # JetNet
 
