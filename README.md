@@ -1,4 +1,6 @@
-<img alt="jetnetlogo" width="234" src="https://raw.githubusercontent.com/rkansal47/JetNet/main/docs/_static/images/jetnetlogo.png"/>
+<p align="center">
+  <img width="400" src="https://raw.githubusercontent.com/rkansal47/JetNet/main/docs/_static/images/jetnetlogo.png" />
+</p>
 
 # JetNet
 
@@ -79,6 +81,7 @@ If you find this library useful for your research, please consider citing our or
 ``` -->
 
 Additionally, if you use our EMD loss implementation, please cite the respective [qpth](https://locuslab.github.io/qpth/) or [cvxpy](https://github.com/cvxpy/cvxpy) libraries, depending on the method used (`qpth` by default). 
+
 
 ## References
 
