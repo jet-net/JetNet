@@ -157,7 +157,7 @@ def get_polar(
     return_4vec: bool = False
 ) -> np.ndarray or torch.Tensor:
     """
-    Convert 3- or 4-vector features in Cartesian coordiantes to polar coordinates:
+    Converts 3- or 4-vector features in Cartesian coordiantes to polar coordinates:
     :math:`(p_x, p_y, p_z)` or :math:`(|\mathbf{p}|, p_x, p_y, p_z)`
     :math:`\longrightarrow`
     :math:`(\eta, \phi, p_\mathrm{T})` or :math:`(|\mathbf{p}|, \eta, \phi, \mathrm{p}_T)`.
@@ -231,7 +231,7 @@ def get_cartesian(
     return_4vec: bool = False
 ) -> np.ndarray or torch.Tensor:
     """
-    Convert 3- or 4-vector features in polar coordiantes to cartesian coordinates:
+    Converts 3- or 4-vector features in polar coordiantes to cartesian coordinates:
     :math:`(\eta, \phi, p_\mathrm{T})` or :math:`(|\mathbf{p}|, \eta, \phi, \mathrm{p}_T)`
     :math:`\longrightarrow` :math:`(p_x, p_y, p_z)` or :math:`(|\mathbf{p}|, p_x, p_y, p_z)`
 
@@ -295,7 +295,7 @@ def get_polar_rel(
     input_cartesian: bool = False
 ) -> np.ndarray or torch.Tensor:
     """
-    Convert 3- or 4-vector features to relative polar coordinates.
+    Converts 3- or 4-vector features to relative polar coordinates.
     Given jet feautures :math:`J = (J_\eta, J_\phi, J_{p_\mathrm{T}})` and particle features :math:`p = (\eta, \phi, p_\mathrm{T})`,
     the relative coordinates are given by
         .. math::
