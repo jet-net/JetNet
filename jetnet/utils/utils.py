@@ -171,7 +171,7 @@ def get_polar(
             If True, and ``num_features`` is 3, :math:`|\mathbf{p}|` will be calculated by :math:`| \mathbf{p} | = \sqrt{p_x^2 + p_y^2 + p_z^2}`.
 
     Returns:
-        type(jet): Array/tensor of shape in polar coordinates :math:`(\eta, \phi, p_\mathrm{T})` (if ``return_4vec`` is False) \
+        type(jet): 2D (if inputted single jet) or 3D array/tensor of shape in polar coordinates :math:`(\eta, \phi, p_\mathrm{T})` (if ``return_4vec`` is False) \
             or :math:`(|\mathbf{p}|, \eta, \phi, p_\mathrm{T})` (if ``return_4vec`` is True).
 
     Raises:
@@ -243,7 +243,7 @@ def get_cartesian(
             If True, and ``num_features`` is 3, :math:`|\mathbf{p}|` will be calculated by :math:`| \mathbf{p} | = p_\mathrm{T} \cosh\eta`.
 
     Returns:
-        type(jet): Array/tensor in cartesian coordinates :math:`(p_x, p_y, p_z)` (if ``return_4vec`` is False) \
+        type(jet): 2D (if inputted single jet) or 3D in cartesian coordinates :math:`(p_x, p_y, p_z)` (if ``return_4vec`` is False) \
         or :math:`(|\mathbf{p}|, p_x, p_y, p_z)` (if ``return_4vec`` is False).
 
     Raises:
@@ -310,7 +310,7 @@ def get_polar_rel(
           Default to False.
 
     Returns:
-        type(jet): Features in relative polar coordinates.
+        type(jet): 2D (if inputted single jet) or 3D arrays/tensors of features in relative polar coordinates.
 
     Raises:
         NotImplementedError: If jet is not a numpy.ndarray or torch.Tensor.
