@@ -1,6 +1,7 @@
 from typing import Dict, Union
 
 import numpy as np
+import torch
 
 # for calculating jet features quickly,
 # TODO: replace with vector library when summing over axis feature is implemented
@@ -148,3 +149,199 @@ def to_image(
             jet_image[phi, eta] += pt
 
     return jet_image
+
+
+    def get_polar(
+        jet: np.ndarray or torch.Tensor,
+        eps: float = 1e-12,
+        return_4vec: bool = False
+    ) -> np.ndarray or torch.Tensor:
+        """
+        Convert 3- or 4-vector features in Cartesian coordiantes to polar coordinates.
+        (|p|, px, py, pz) or (px, py, pz)-> (|p|, eta, phi, pt) or (eta, phi, pt)
+
+
+        Args:
+            jet (np.ndarray or torch.Tensor): array or tensor of a single jet of shape ``[num_particles, num_features]``
+              or multiple jets in Cartesian coordinates of shape ``[num_jets, num_particles, num_features]``.
+            eps (float): epsilon used in the calculation. Default to 1e-12.
+            return_4vec (bool): Whether to return a for vector with zero-th component being |p|. Default to False.
+
+        Returns:
+            type(jet): 2D (if jet contains a single jet) or 3D (if jet contains multiple jets) array/tensor of shape
+              ``[num_particles, num_features]`` in polar coordinates (eta, phi, pt) or (|p|, eta, phi, pt).
+
+        Raises:
+            ValueError if the last dimension is not 3 or 4.
+            NotImplementedError if jet is not a numpy.ndarray or torch.Tensor.
+
+        """
+        if jet.shape[-1] == 4:  # (E, px, py, pz)
+            idx_px, idx_py, idx_pz = 1, 2, 3
+        elif jet.shape[-1] == 3:  # (px, py, pz)
+            idx_px, idx_py, idx_pz = 0, 1, 2
+        else:
+            raise ValueError(f'Wrong last dimension of jet. Should be 3 or 4 but found: {jet.shape[-1]}.')
+
+        px = jet[..., idx_px]
+        py = jet[..., idx_py]
+        pz = jet[..., idx_pz]
+
+        if isinstance(jet, np.ndarray):
+            pt = np.sqrt(px ** 2 + py ** 2 + eps)
+            eta = np.arcsinh(pz / (pt + eps))
+            phi = np.arctan2(py + eps, px + eps)
+
+            if return_4vec:
+                if jet.shape[-1] == 4:
+                    E = jet[..., 0]
+                else:
+                    E = np.sqrt(np.sum(np.power(jet, 2), axis=-1))
+                return np.stack((E, eta, phi, pt), axis=-1)
+            return np.stack((eta, phi, pt), axis=-1)
+
+        if isinstance(jet, torch.Tensor):
+            pt = torch.sqrt(px ** 2 + py ** 2 + eps)
+            try:
+                eta = torch.asinh(pz / (pt + eps))
+            except AttributeError:  # older version of torch
+                eta = arcsinh(jet)
+            phi = torch.atan2(py + eps, px + eps)
+            if return_4vec:
+                if jet.shape[-1] == 4:
+                    E = jet[..., 0]
+                else:
+                    E = torch.sqrt(torch.sum(torch.pow(jet, 2), dim=-1) + eps)
+                return torch.stack((E, eta, phi, pt), dim=-1)
+            return torch.stack((eta, phi, pt), dim=-1)
+
+        raise NotImplementedError(f'Current type {jet.type} not supported. Supported types are numpy.ndarray and torch.Tensor.')
+
+
+    def arcsinh(z: torch.Tensor) -> torch.Tensor:
+        """Self-defined arcsinh function."""
+        return torch.log(z + torch.sqrt(1 + torch.pow(z, 2)))
+
+
+    def get_cartesian(
+        jet: np.ndarray or torch.Tensor,
+        return_4vec: bool = False
+    ) -> np.ndarray or torch.Tensor:
+        """
+        Convert 3- or 4-vector features in polar coordiantes to cartesian coordinates.
+        (eta, phi, pt) or (|p|, eta, phi, pt) -> (px, py, pz) or (|p|, px, py, pz)
+
+
+        Args:
+            jet (np.ndarray or torch.Tensor): array or tensor of a single jet of shape ``[num_particles, num_features]``
+              or multiple jets in polar coordinates of shape ``[num_jets, num_particles, num_features]``.
+            return_4vec (bool): Whether to return a for vector with zero-th component being |p|. Default to False.
+
+        Returns:
+            type(jet): 2D (if jet contains a single jet) or 3D (if jet contains multiple jets) array/tensor of shape
+              ``[num_particles, num_features]`` in cartesian coordinates (px, py, pz) or (|jet|, px, py, pz).
+
+        Raises:
+            ValueError if the last dimension is not 3 or 4.
+            NotImplementedError if jet is not a numpy.ndarray or torch.Tensor.
+
+        """
+        if jet.shape[-1] == 4:
+            idx_eta, idx_phi, idx_pt = 1, 2, 3
+        elif jet.shape[-1] == 3:
+            idx_eta, idx_phi, idx_pt = 0, 1, 2
+        else:
+            raise ValueError(f'Wrong last dimension of jet. Should be 3 or 4 but found: {jet.shape[-1]}.')
+
+        pt = jet[..., idx_pt]
+        eta = jet[..., idx_eta]
+        phi = jet[..., idx_phi]
+
+        if isinstance(jet, np.ndarray):
+            px = pt * np.cos(phi)
+            py = pt * np.cos(phi)
+            pz = pt * np.sinh(eta)
+
+            if return_4vec:
+                if jet.shape[-1] == 4:
+                    E = jet[..., 0]
+                else:
+                    E = np.sqrt(px ** 2 + py ** 2 + pz ** 2)
+                return np.stack((E, px, py, pz), axis=-1)
+            return np.stack((px, py, pz), axis=-1)
+
+        if isinstance(jet, torch.Tensor):
+            px = pt * torch.cos(phi)
+            py = pt * torch.cos(phi)
+            pz = pt * torch.sinh(eta)
+            if return_4vec:
+                if jet.shape[-1] == 4:
+                    E = jet[..., 0]
+                else:
+                    E = torch.sqrt(px ** 2 + py ** 2 + pz ** 2)
+                return torch.stack((E, px, py, pz), dim=-1)
+            return torch.stack((px, py, pz), dim=-1)
+
+        raise NotImplementedError(f'Current type {jet.type} not supported. Supported types are numpy.ndarray and torch.Tensor.')
+
+
+    def get_polar_rel(
+        jet: np.ndarray or torch.Tensor,
+        input_cartesian: bool = False,
+        return_4vec: bool = False
+    ) -> np.ndarray or torch.Tensor:
+        """
+        Convert 3- or 4-vector features to relative polar coordinates.
+        Given jet feautures :math:`J = (J_\eta, J_\phi, J_{p_\mathrm{T}})` and particle features :math:`p = (\eta, \phi, p_\mathrm{T})`,
+        the relative coordinates are given by
+            .. math::
+                \eta_\mathrm{T}^\mathrm{rel} &= \eta - J_\eta, \\
+                \phi_\mathrm{T}^\mathrm{rel} &= \phi - J_\phi, \\
+                p_\mathrm{T}^\mathrm{rel} &= p_\mathrm{T} / J_{p_\mathrm{T}}
+
+        Args:
+            jet (np.ndarray or torch.Tensor): array or tensor of a single jet of shape ``[num_particles, num_features]``
+              or multiple jets in cartesian or polar coordinates of shape ``[num_jets, num_particles, num_features]``.
+            input_cartesian (bool): Whether jet is in Cartesian coordinate. False if jet is in polar coordinates.
+              Default to False.
+            return_4vec (bool): Whether to return a for vector with zero-th component being |p|. Default to False.
+
+        Returns:
+            type(jet): features in relative polar coordinates.
+
+        Raises:
+            NotImplementedError if jet is not a numpy.ndarray or torch.Tensor.
+
+        """
+        if input_cartesian:
+            jet = get_polar(jet)  # Convert to polar first
+            if isinstance(jet, torch.Tensor):
+                jet_features = jet.sum(dim=-2)
+            elif isinstance(jet, np.ndarray):
+                jet_features = jet.sum(axis=-2)
+            else:
+                raise NotImplementedError(f'Current type {jet.type} not supported. Supported types are numpy.ndarray and torch.Tensor.')
+        else:
+            if isinstance(jet, torch.Tensor):
+                jet_features = get_polar(get_cartesian(jet).sum(dim=-2))
+            elif isinstance(jet, np.ndarray):
+                jet_features = get_polar(get_cartesian(jet).sum(axis=-2))
+            else:
+                raise NotImplementedError(f'Current type {jet.type} not supported. Supported types are numpy.ndarray and torch.Tensor.')
+
+        idx_eta, idx_phi, idx_pt = 0, 1, 2
+        pt = jet[..., idx_pt]
+        eta = jet[..., idx_eta]
+        phi = jet[..., idx_phi]
+
+        num_particles = jet.shape[-2]
+        if isinstance(jet, np.ndarray):
+            pt /= np.repeat(np.expand_dims(jet_features[..., idx_pt], axis=-1), num_particles, axis=-1)
+            eta -= np.repeat(np.expand_dims(jet_features[..., idx_eta], axis=-1), num_particles, axis=-1)
+            phi -= np.repeat(np.expand_dims(jet_features[..., idx_phi], axis=-1), num_particles, axis=-1)
+            return np.stack((eta, phi, pt), axis=-1)
+
+        pt /= jet_features[..., idx_pt].unsqueeze(dim=-1).repeat(1, num_particles)
+        eta -= jet_features[..., idx_eta].unsqueeze(dim=-1).repeat(1, num_particles)
+        phi -= jet_features[..., idx_phi].unsqueeze(dim=-1).repeat(1, num_particles)
+        return torch.stack((eta, phi, pt), dim=-1)
