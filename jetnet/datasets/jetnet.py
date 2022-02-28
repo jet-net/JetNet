@@ -22,7 +22,7 @@ class JetNet(torch.utils.data.Dataset):
     of each jet. Currently only the number of (non-zero-padded) particles per jet is available as
     a jet feature.
 
-    If pt or csv files are not found in the ``data_dir`` directory then:
+    If pt or hdf5 files are not found in the ``data_dir`` directory then:
     If ``num_particles <= 30``, JetNet is downloaded from https://zenodo.org/record/6302454;
     Else, JetNet150 is downloaded from https://zenodo.org/record/6302240
 
@@ -30,7 +30,7 @@ class JetNet(torch.utils.data.Dataset):
         jet_type (str): 'g' (gluon), 't' (top quarks), or 'q' (light quarks).
         data_dir (str): directory which contains (or in which to download) dataset.
           Defaults to "./" i.e. the working directory.
-        download (bool): download the dataset, even if the csv file exists already.
+        download (bool): download the dataset, even if the hdf5 file exists already.
           Defaults to False.
         num_particles (int): number of particles to use, has to be less than or equal to 150.
           Defaults to 30.
@@ -188,7 +188,7 @@ class JetNet(torch.utils.data.Dataset):
 
     def hdf5_to_pt(self, data_dir: str, jet_type: str, hdf5_file: str, use_150: bool = False):
         """
-        Converts and saves downloaded csv file to pytorch tensor.
+        Converts and saves downloaded hdf5 file to pytorch tensor.
 
         Args:
             data_dir (str): directory in which to save file.
