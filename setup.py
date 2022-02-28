@@ -8,6 +8,7 @@ install_requires = [
     "scipy >= 1.6.2",
     "awkward >= 1.4.0",
     "coffea >= 0.7.0",
+    "h5py >= 3.0.0",
     "requests",
     "tqdm",
 ]

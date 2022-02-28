@@ -22,8 +22,9 @@ class JetNet(torch.utils.data.Dataset):
     of each jet. Currently only the number of (non-zero-padded) particles per jet is available as
     a jet feature.
 
-    Dataset is downloaded from https://zenodo.org/record/5502543
-    if pt or csv file is not found in the ``data_dir`` directory.
+    If pt or csv files are not found in the ``data_dir`` directory then:
+    If ``num_particles <= 30``, JetNet is downloaded from https://zenodo.org/record/6302454;
+    Else, JetNet150 is downloaded from https://zenodo.org/record/6302240
 
     Args:
         jet_type (str): 'g' (gluon), 't' (top quarks), or 'q' (light quarks).
@@ -31,8 +32,8 @@ class JetNet(torch.utils.data.Dataset):
           Defaults to "./" i.e. the working directory.
         download (bool): download the dataset, even if the csv file exists already.
           Defaults to False.
-        num_particles (int): number of particles to use, has to be less than the total in JetNet
-          (30). 0 means use all. Defaults to 0.
+        num_particles (int): number of particles to use, has to be less than or equal to 150.
+          Defaults to 30.
         normalize (bool): normalize features for training or not, using parameters defined below.
           Defaults to True.
         feature_norms (Union[float, List[float]]): max value to scale each feature to.
@@ -65,7 +66,7 @@ class JetNet(torch.utils.data.Dataset):
         jet_type: str,
         data_dir: str = "./",
         download: bool = False,
-        num_particles: int = 0,
+        num_particles: int = 30,
         normalize: bool = True,
         feature_norms: List[float] = [1.0, 1.0, 1.0, 1.0],
         feature_shifts: List[float] = [0.0, 0.0, -0.5, -0.5],
@@ -86,10 +87,12 @@ class JetNet(torch.utils.data.Dataset):
         self.noise_padding = noise_padding and self.use_masks
         self.normalize = normalize
 
-        pt_file = f"{data_dir}/{jet_type}_jets.pt"
+        # Use JetNet150 if ``num_particles`` > 30
+        use_150 = num_particles > 30
+        pt_file = f"{data_dir}/{jet_type}{'150' if use_150 else ''}.pt"
 
         if not exists(pt_file) or download:
-            self.download_and_convert_to_pt(data_dir, jet_type)
+            self.download_and_convert_to_pt(data_dir, jet_type, use_150)
 
         logging.info("Loading dataset")
         dataset = self.load_dataset(pt_file, num_particles, num_pad_particles, use_mask)
@@ -114,49 +117,52 @@ class JetNet(torch.utils.data.Dataset):
 
         logging.info("Dataset processed")
 
-    def download_and_convert_to_pt(self, data_dir: str, jet_type: str):
+    def download_and_convert_to_pt(self, data_dir: str, jet_type: str, use_150: bool = False):
         """
-        Download jet dataset and convert and save to pytorch tensor
+        Download jet dataset and convert and save to pytorch tensor.
 
         Args:
             data_dir (str): directory in which to save file.
             jet_type (str): jet type to download, out of ``['g', 't', 'q']``.
+            use_150 (bool): download JetNet150 or JetNet. Defaults to False.
 
         """
         import os
 
         os.system(f"mkdir -p {data_dir}")
-        csv_file = f"{data_dir}/{jet_type}_jets.csv"
+        hdf5_file = f"{data_dir}/{jet_type}{'150' if use_150 else ''}.hdf5"
 
-        if not exists(csv_file):
-            logging.info(f"Downloading {jet_type} jets csv")
-            self.download(jet_type, csv_file)
+        if not exists(hdf5_file):
+            logging.info(f"Downloading {jet_type} jets hdf5")
+            self.download(jet_type, hdf5_file, use_150)
 
-        logging.info(f"Converting {jet_type} jets csv to pt")
-        self.csv_to_pt(data_dir, jet_type, csv_file)
+        logging.info(f"Converting {jet_type} jets hdf5 to pt")
+        self.hdf5_to_pt(data_dir, jet_type, hdf5_file, use_150)
 
-    def download(self, jet_type: str, csv_file: str):
+    def download(self, jet_type: str, hdf5_file: str, use_150: bool = False):
         """
-        Downloads the ``jet_type`` jet csv from Zenodo and saves it as ``csv_file``.
+        Downloads the ``jet_type`` jet hdf5 from Zenodo and saves it as ``hdf5_file``.
 
         Args:
             jet_type (str): jet type to download, out of ``['g', 't', 'q']``.
-            csv_file (str): path to save csv file.
+            hdf5_file (str): path to save hdf5 file.
+            use_150 (bool): download JetNet150 or JetNet. Defaults to False.
 
         """
         import requests
         import sys
 
-        records_url = "https://zenodo.org/api/records/5502543"
+        record_id = 6302240 if use_150 else 6302454
+        records_url = f"https://zenodo.org/api/records/{record_id}"
         r = requests.get(records_url).json()
-        key = f"{jet_type}_jets.csv"
-        file_url = next(item for item in r["files"] if item["key"] == key)["links"][
-            "self"
-        ]  # finding the url for the particular jet type dataset
+        key = f"{jet_type}{'150' if use_150 else ''}.hdf5"
+
+        # finding the url for the particular jet type dataset
+        file_url = next(item for item in r["files"] if item["key"] == key)["links"]["self"]
         logging.info(f"{file_url = }")
 
         # modified from https://sumit-ghosh.com/articles/python-download-progress-bar/
-        with open(csv_file, "wb") as f:
+        with open(hdf5_file, "wb") as f:
             response = requests.get(file_url, stream=True)
             total = response.headers.get("content-length")
 
@@ -180,18 +186,23 @@ class JetNet(torch.utils.data.Dataset):
 
         sys.stdout.write("\n")
 
-    def csv_to_pt(self, data_dir: str, jet_type: str, csv_file: str):
+    def hdf5_to_pt(self, data_dir: str, jet_type: str, hdf5_file: str, use_150: bool = False):
         """
         Converts and saves downloaded csv file to pytorch tensor.
 
         Args:
             data_dir (str): directory in which to save file.
             jet_type (str): jet type to download, out of ``['g', 't', 'q']``.
-            csv_file (str): path to csv file.
+            hdf5_file (str): path to hdf5 file.
+            use_150 (bool): download JetNet150 or JetNet. Defaults to False.
 
         """
-        pt_file = f"{data_dir}/{jet_type}_jets.pt"
-        torch.save(Tensor(np.loadtxt(csv_file).reshape(-1, 30, 4)), pt_file)
+        import h5py
+
+        pt_file = f"{data_dir}/{jet_type}{'150' if use_150 else ''}.pt"
+
+        with h5py.File(hdf5_file, "r") as f:
+            torch.save(Tensor(np.array(f["particle_features"])), pt_file)
 
     def load_dataset(
         self, pt_file: str, num_particles: int, num_pad_particles: int = 0, use_mask: bool = True
