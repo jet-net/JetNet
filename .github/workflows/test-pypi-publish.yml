@@ -12,6 +12,8 @@ on: push
 
 jobs:
   deploy:
+    if: github.repository_owner == 'jet-net'
+
     runs-on: ubuntu-latest
 
     steps:
