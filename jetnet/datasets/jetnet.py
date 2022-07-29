@@ -384,7 +384,9 @@ class JetNet(torch.utils.data.Dataset):
 
         mask = (dataset[:, :, -1] + 0.5).bool()
         noise_padding[mask] = 0  # only adding noise to zero-masked particles
-        dataset += torch.cat((noise_padding, torch.zeros((len(dataset), self.num_particles, 1))), dim=2)
+        dataset += torch.cat(
+            (noise_padding, torch.zeros((len(dataset), self.num_particles, 1))), dim=2
+        )
 
         return dataset
 
