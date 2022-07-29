@@ -112,7 +112,8 @@ class JetNet(torch.utils.data.Dataset):
         tcut = int(len(dataset) * train_fraction)
 
         self.data = dataset[:tcut] if train else dataset[tcut:]
-        if self.use_jet_features:            self.jet_features = jet_features[:tcut] if train else jet_features[tcut:]
+        if self.use_jet_features:
+            self.jet_features = jet_features[:tcut] if train else jet_features[tcut:]
 
         logging.info("Dataset processed")
 
@@ -317,7 +318,8 @@ class JetNet(torch.utils.data.Dataset):
             if feature_shifts[i] is not None and feature_shifts[i] != 0:
                 dataset[:, :, i] += feature_shifts[i]
 
-        if not fpnd:            return feature_maxes
+        if not fpnd:
+            return feature_maxes
 
     def unnormalize_features(
         self,
