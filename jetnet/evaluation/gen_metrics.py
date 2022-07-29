@@ -133,7 +133,7 @@ def _get_fpnd_real_mu_sigma(
     # run inference and store activations
     jets_loaded = DataLoader(jets, batch_size)
 
-    logging.info(f"Calculating ParticleNet activations on real jets with {batch_size = }")
+    logging.info(f"Calculating ParticleNet activations on real jets with batch size {batch_size}")
     activations = []
     for i, jets_batch in _optional_tqdm(
         enumerate(jets_loaded), use_tqdm, total=len(jets_loaded), desc="Running ParticleNet"
@@ -272,7 +272,7 @@ def fpnd(
     # run inference and store activations
     jets_loaded = DataLoader(jets[:, :, : _eval_module.fpnd_dict["NUM_SAMPLES"]], batch_size)
 
-    logging.info(f"Calculating ParticleNet activations with {batch_size = }")
+    logging.info(f"Calculating ParticleNet activations with batch size: {batch_size}")
     activations = []
     for i, jets_batch in _optional_tqdm(
         enumerate(jets_loaded), use_tqdm, total=len(jets_loaded), desc="Running ParticleNet"

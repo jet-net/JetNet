@@ -101,7 +101,7 @@ class JetNet(torch.utils.data.Dataset):
         if self.use_jet_features:
             jet_features = self.get_jet_features(dataset, use_num_particles_jet_feature)
 
-        logging.info(f"Loaded dataset {dataset.shape = }")
+        logging.info(f"Loaded dataset with shape {dataset.shape}")
         if normalize:
             logging.info("Normalizing features")
             self.feature_maxes = self.normalize_features(dataset, feature_norms, feature_shifts)
@@ -159,7 +159,7 @@ class JetNet(torch.utils.data.Dataset):
 
         # finding the url for the particular jet type dataset
         file_url = next(item for item in r["files"] if item["key"] == key)["links"]["self"]
-        logging.info(f"{file_url = }")
+        logging.info(f"file url: {file_url}")
 
         # modified from https://sumit-ghosh.com/articles/python-download-progress-bar/
         with open(hdf5_file, "wb") as f:
@@ -254,7 +254,7 @@ class JetNet(torch.utils.data.Dataset):
 
         """
         jet_num_particles = (torch.sum(dataset[:, :, -1], dim=1) / self.num_particles).unsqueeze(1)
-        logging.debug("{num_particles = }")
+        logging.debug(f"# particles: {self.num_particles}")
         return jet_num_particles
 
     @classmethod
@@ -308,7 +308,7 @@ class JetNet(torch.utils.data.Dataset):
         if isinstance(feature_shifts, float):
             feature_shifts = np.full(num_features, feature_shifts)
 
-        logging.debug(f"{feature_maxes = }")
+        logging.debug(f"feature maxes: {feature_maxes}")
 
         for i in range(num_features):
             if feature_norms[i] is not None:
