@@ -17,8 +17,7 @@ extras_require = {"emdloss": ["qpth", "cvxpy"]}
 
 
 def readme():
-    with open("README.md") as f:
-        return f.read()
+    with open("README.md") as f:        return f.read()
 
 
 with open("jetnet/__init__.py", "r") as f:
