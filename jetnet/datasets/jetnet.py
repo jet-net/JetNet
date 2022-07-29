@@ -368,8 +368,7 @@ class JetNet(torch.utils.data.Dataset):
         if not is_real_data and zero_mask_particles and self.use_mask:
             dataset[~mask] = 0
 
-        if not is_real_data and zero_neg_pt:
-            dataset[:, :, 2][dataset[:, :, 2] < 0] = 0
+        if not is_real_data and zero_neg_pt:  dataset[:, :, 2][dataset[:, :, 2] < 0] = 0
 
         return dataset[:, :, : self._num_non_mask_features], mask if ret_mask_separate else dataset
 
