@@ -112,8 +112,7 @@ class JetNet(torch.utils.data.Dataset):
         tcut = int(len(dataset) * train_fraction)
 
         self.data = dataset[:tcut] if train else dataset[tcut:]
-        if self.use_jet_features:
-            self.jet_features = jet_features[:tcut] if train else jet_features[tcut:]
+        if self.use_jet_features:            self.jet_features = jet_features[:tcut] if train else jet_features[tcut:]
 
         logging.info("Dataset processed")
 
