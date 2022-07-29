@@ -9,6 +9,7 @@
 [![Documentation Status](https://readthedocs.org/projects/jetnet/badge/?version=latest)](https://jetnet.readthedocs.io/en/latest/)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/jetnet)](https://pypi.org/project/jetnet/)
 [![Codestyle](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/jet-net/JetNet/main.svg)](https://results.pre-commit.ci/latest/github/jet-net/JetNet/main)
 
 A library for developing and reproducing jet-based machine learning (ML) projects.
 

@@ -1,9 +1,9 @@
 .DS_Store
 **/.DS_Store
 docs/_build
-build
+/build
 **/__pycache__
-dist
+/dist
 *egg-info
 *test*.py
-datasets
+/datasets

@@ -12,17 +12,28 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../'))
-autodoc_mock_imports = ['energyflow', 'awkward', 'coffea', 'tqdm', 'scipy', 'torch_geometric', 'torch', 'cvxpy', 'qpth']
+
+sys.path.insert(0, os.path.abspath("../"))
+autodoc_mock_imports = [
+    "energyflow",
+    "awkward",
+    "coffea",
+    "tqdm",
+    "scipy",
+    "torch_geometric",
+    "torch",
+    "cvxpy",
+    "qpth",
+]
 
 # -- Project information -----------------------------------------------------
 
-project = 'JetNet'
-copyright = '2021, Raghav Kansal'
-author = 'Raghav Kansal'
+project = "JetNet"
+copyright = "2021, Raghav Kansal"
+author = "Raghav Kansal"
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1b'
+release = "0.0.1b"
 
 
 # -- General configuration ---------------------------------------------------
@@ -31,20 +42,20 @@ release = '0.0.1b'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.napoleon',
-    'autodocsumm',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.napoleon",
+    "autodocsumm",
 ]
 autosummary_generate = True  # Turn on sphinx.ext.autosummary
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -54,10 +65,10 @@ import sphinx_rtd_theme
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = "sphinx_rtd_theme"
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
