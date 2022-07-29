@@ -133,7 +133,8 @@ class EMDLoss(nn.Module):
                 .to(self.device)
             )
             p = distance_matrix.view(nbatch, nelement_distmatrix).double()
-        else: raise ValueError("Unkown form")
+        else:
+            raise ValueError("Unkown form")
 
         # h = [0 ... 0 w1 w2]
         h_1 = torch.zeros(nbatch, nelement_distmatrix).double().to(self.device)
