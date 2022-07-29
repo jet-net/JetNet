@@ -106,8 +106,7 @@ class JetNet(torch.utils.data.Dataset):
             logging.info("Normalizing features")
             self.feature_maxes = self.normalize_features(dataset, feature_norms, feature_shifts)
 
-        if self.noise_padding:
-            dataset = self.add_noise_padding(dataset)
+        if self.noise_padding:            dataset = self.add_noise_padding(dataset)
 
         tcut = int(len(dataset) * train_fraction)
 
