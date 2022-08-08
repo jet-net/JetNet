@@ -77,7 +77,7 @@ class JetNet(torch.utils.data.Dataset):
         use_num_particles_jet_feature: bool = True,
         noise_padding: bool = False,
     ):
-        assert jet_type in ["g", "t", "q"], "Invalid jet type"
+        assert jet_type in ["g", "t", "q", "w", "z"], "Invalid jet type"
 
         self.feature_norms = feature_norms
         self.feature_shifts = feature_shifts
@@ -152,7 +152,7 @@ class JetNet(torch.utils.data.Dataset):
         import requests
         import sys
 
-        record_id = 6302240 if use_150 else 6302454
+        record_id = 6302240 if use_150 else 6975118
         records_url = f"https://zenodo.org/api/records/{record_id}"
         r = requests.get(records_url).json()
         key = f"{jet_type}{'150' if use_150 else ''}.hdf5"
@@ -394,4 +394,4 @@ class JetNet(torch.utils.data.Dataset):
         return len(self.data)
 
     def __getitem__(self, idx):
-        return self.data[idx], self.jet_features[idx] if self.use_jet_features else self.data[idx]
+        return (self.data[idx], self.jet_features[idx]) if self.use_jet_features else self.data[idx]
