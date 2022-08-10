@@ -1,4 +1,4 @@
-from runningTop  import TopTagging
+from TopTagging  import TopTagging
 
 jets = TopTagging('qcd', data_dir='datasets')
 
