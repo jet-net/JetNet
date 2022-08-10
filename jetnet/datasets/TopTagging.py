@@ -92,7 +92,7 @@ class TopTagging(torch.utils.data.Dataset) :
             logging.info(f"Converting {dataset_type} jets h5 to pt")
             self.h5_to_pt(data_dir, dataset_type, h5_file)
 
-
+    #download function
     def download(self, dataset_type: str, h5_file: str):
         """
         Downloads the ``jet_type`` jet hdf5 from Zenodo and saves it as ``hdf5_file``.
