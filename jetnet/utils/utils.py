@@ -1,4 +1,5 @@
-from typing import Dict, Union
+from typing import Dict, Union, Tuple
+from numpy.typing import ArrayLike
 
 import numpy as np
 
@@ -148,3 +149,42 @@ def to_image(
             jet_image[phi, eta] += pt
 
     return jet_image
+
+
+def gen_jet_corrections(
+    jets: ArrayLike,
+    ret_mask_separate: bool = True,
+    zero_mask_particles: bool = True,
+    zero_neg_pt: bool = True,
+    pt_index: int = 2,
+) -> Union[ArrayLike, Tuple[ArrayLike, ArrayLike]]:
+    """
+    Zero's masked particles and negative pTs.
+
+    Args:
+        jets (ArrayLike): jets to recorrect.
+        ret_mask_separate (bool, optional): return the jet and mask separately. Defaults to True.
+        zero_mask_particles (bool, optional): set features of zero-masked particles to 0. Defaults
+            to True.
+        zero_neg_pt (bool, optional): set pT to 0 for particles with negative pt. Defaults to True.
+        pt_index (int, optional): index of the pT feature. Defaults to 2.
+
+    Returns:
+        Jets of same type as input, of shape
+        ``[num_jets, num_particles, num_features (including mask)]`` if ``ret_mask_separate``
+        is False, else a tuple with a tensor/array of shape
+        ``[num_jets, num_particles, num_features (excluding mask)]`` and another binary mask
+        tensor/array of shape ``[num_jets, num_particles, 1]``.
+    """
+
+    use_mask = ret_mask_separate or zero_mask_particles
+
+    mask = jets[:, :, -1] >= 0.5 if use_mask else None
+
+    if zero_mask_particles and use_mask:
+        jets[~mask] = 0
+
+    if zero_neg_pt:
+        jets[:, :, pt_index][jets[:, :, pt_index] < 0] = 0
+
+    return jets[:, :, :-1], mask if ret_mask_separate else jets

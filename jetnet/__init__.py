@@ -7,5 +7,7 @@ import jetnet.datasets
 import jetnet.losses
 import jetnet.utils
 
+import jetnet.datasets.utils
+import jetnet.datasets.normalisations
 
-__version__ = "0.1.2"
+__version__ = "0.2.0a"
