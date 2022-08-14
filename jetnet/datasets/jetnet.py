@@ -25,7 +25,7 @@ from .normalisations import FeaturewiseLinearBounded, NormaliseABC
 
 
 class JetNet(JetDataset):
-    _zenodo_record_ids = {"30": 6975118, "150": 6302240}
+    _zenodo_record_ids = {"30": 6975118, "150": 6975117}
 
     jet_types = ["g", "t", "q", "w", "z"]
     particle_features_order = ["etarel", "phirel", "ptrel", "mask"]
@@ -40,8 +40,8 @@ class JetNet(JetDataset):
     # normalisation used for ParticleNet training for FPND, as defined in arXiv:2106.11535
     fpnd_norm = FeaturewiseLinearBounded(
         feature_norms=1.0,
-        feature_shifts=[0.0, 0.0, -0.5, 0.0],
-        feature_maxes=[1.6211985349655151, 0.520724892616272, 0.8934717178344727, 1.0],
+        feature_shifts=[0.0, 0.0, -0.5],
+        feature_maxes=[1.6211985349655151, 0.520724892616272, 0.8934717178344727],
     )
 
     def __init__(

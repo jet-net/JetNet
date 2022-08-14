@@ -8,6 +8,7 @@ from typing import List, Union, Optional, Tuple
 from abc import ABC, abstractmethod
 
 import numpy as np
+import torch
 
 
 class NormaliseABC(ABC):
@@ -116,7 +117,10 @@ class FeaturewiseLinear(NormaliseABC):
         ), "Number of features in input does not equal length of ``normalise_features``"
 
         if not inplace:
-            x = np.copy(x)
+            if isinstance(x, torch.Tensor):
+                x = torch.clone(x)
+            else:
+                x = np.copy(x)
 
         if not inverse:
             for i in range(num_features):
@@ -223,7 +227,10 @@ class FeaturewiseLinearBounded(NormaliseABC):
         ), "Number of features in input does not equal number of specified feature norms"
 
         if not inplace:
-            x = np.copy(x)
+            if isinstance(x, torch.Tensor):
+                x = torch.clone(x)
+            else:
+                x = np.copy(x)
 
         if not inverse:
             for i in range(num_features):
