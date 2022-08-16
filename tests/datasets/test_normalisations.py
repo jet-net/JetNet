@@ -72,6 +72,11 @@ def test_FeaturewiseLinearBoundedErrors(data):
     with pytest.raises(AssertionError):
         norm(data)
 
+    norm = FeaturewiseLinearBounded(normalise_features=[True, False])
+    norm.derive_dataset_features(data)
+    with pytest.raises(AssertionError):
+        norm(data)
+
 
 @pytest.mark.parametrize(
     "data",
@@ -110,13 +115,15 @@ def test_FeaturewiseLinearBoundedNones(data):
     ],
 )
 def test_FeaturewiseLinearBoundedCustom(data):
-    norm = FeaturewiseLinearBounded(feature_norms=[3, 8, -1], feature_shifts=[2, 0, 3])
+    norm = FeaturewiseLinearBounded(
+        feature_norms=[3, 8, -1], feature_shifts=[2, 0, 3], normalise_features=[True, False, True]
+    )
     norm.derive_dataset_features(data)
 
     normed = norm(data)
     assert normed.shape == data.shape
     assert np.all(normed[..., 0] == approx(data[..., 0] / np.max(np.abs(data[..., 0])) * 3 + 2))
-    assert np.all(normed[..., 1] == approx(data[..., 1] / np.max(np.abs(data[..., 1])) * 8))
+    assert np.all(normed[..., 1] == normed[..., 1])
     assert np.all(normed[..., 2] == approx(data[..., 2] / np.max(np.abs(data[..., 2])) * (-1) + 3))
 
     unnormed = norm(normed, inverse=True)

@@ -52,28 +52,29 @@ class JetDataset(torch.utils.data.Dataset):
                 self.particle_normalisation.derive_dataset_features(self.particle_data)
                 self.particle_data = self.particle_normalisation(self.particle_data)
 
-            self.particle_data = Tensor(self.particle_data)
-
         if self.use_jet_features:
             if self.jet_normalisation is not None:
                 self.jet_normalisation.derive_dataset_features(self.jet_data)
                 self.jet_data = self.jet_normalisation(self.jet_data)
 
-            self.jet_data = Tensor(self.jet_data)
-
-    @staticmethod
+    @classmethod
     def getData(**opts) -> Any:
-        """Static method to download and return numpy arrays of the data"""
+        """Class method to download and return numpy arrays of the data"""
         raise NotImplementedError
 
-    def __getitem__(self, index: int) -> Any:
+    def __getitem__(self, index) -> Tuple[Optional[Tensor], Optional[Tensor]]:
         """
         Args:
             index (int): Index
+
         Returns:
-            (Any): particle and/or jet data
+            (Tuple[Optional[Tensor], Optional[Tensor]]): particle, jet data
         """
-        raise NotImplementedError
+        particle_data_index = (
+            Tensor(self.particle_data[index]) if self.use_particle_features else []
+        )
+        jet_data_index = Tensor(self.jet_data[index]) if self.use_jet_features else []
+        return particle_data_index, jet_data_index
 
     def __len__(self) -> int:
         return len(firstNotNoneElement(self.particle_data, self.jet_data))

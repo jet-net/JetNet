@@ -101,6 +101,8 @@ class FeaturewiseLinear(NormaliseABC):
 
         if self.normalise_features is None:
             normalise_features = np.full(num_features, True)
+        elif isinstance(self.normalise_features, bool):
+            normalise_features = np.full(num_features, self.normalise_features)
         else:
             normalise_features = self.normalise_features
 
@@ -164,6 +166,9 @@ class FeaturewiseLinearBounded(NormaliseABC):
             Defaults to 0.0.
         feature_maxes (List[float], optional): max pre-scaling absolute value of each feature, used
             for scaling to the norm and inverting.
+        normalise_features (Optional[List[bool]], optional): if only some features need to be
+            normalised, can input here a list of booleans of length ``num_features`` with ``True``
+            meaning normalise and ``False`` meaning to ignore. Defaults to None i.e. normalise all.
 
     """
 
@@ -175,12 +180,14 @@ class FeaturewiseLinearBounded(NormaliseABC):
         feature_norms: Union[float, List[float]] = 1.0,
         feature_shifts: Union[float, List[float]] = 0.0,
         feature_maxes: List[float] = None,
+        normalise_features: Optional[List[bool]] = None,
     ):
         super().__init__()
 
         self.feature_norms = feature_norms
         self.feature_shifts = feature_shifts
         self.feature_maxes = feature_maxes
+        self.normalise_features = normalise_features
 
     def derive_dataset_features(self, x: ArrayLike) -> np.ndarray:
         """
@@ -218,6 +225,13 @@ class FeaturewiseLinearBounded(NormaliseABC):
         else:
             feature_shifts = self.feature_shifts
 
+        if self.normalise_features is None:
+            normalise_features = np.full(num_features, True)
+        elif isinstance(self.normalise_features, bool):
+            normalise_features = np.full(num_features, self.normalise_features)
+        else:
+            normalise_features = self.normalise_features
+
         assert (
             len(feature_shifts) == num_features
         ), "Number of features in input does not equal number of specified feature shifts"
@@ -225,6 +239,10 @@ class FeaturewiseLinearBounded(NormaliseABC):
         assert (
             len(feature_norms) == num_features
         ), "Number of features in input does not equal number of specified feature norms"
+
+        assert (
+            len(normalise_features) == num_features
+        ), "Number of features in input does not equal length of ``normalise_features``"
 
         if not inplace:
             if isinstance(x, torch.Tensor):
@@ -234,21 +252,23 @@ class FeaturewiseLinearBounded(NormaliseABC):
 
         if not inverse:
             for i in range(num_features):
-                if feature_norms[i] is not None:
-                    x[..., i] /= self.feature_maxes[i]
-                    x[..., i] *= feature_norms[i]
+                if normalise_features[i]:
+                    if feature_norms[i] is not None:
+                        x[..., i] /= self.feature_maxes[i]
+                        x[..., i] *= feature_norms[i]
 
-                if feature_shifts[i] is not None and feature_shifts[i] != 0:
-                    x[..., i] += feature_shifts[i]
+                    if feature_shifts[i] is not None:
+                        x[..., i] += feature_shifts[i]
 
         else:
             for i in range(num_features):
-                if feature_shifts[i] is not None and feature_shifts[i] != 0:
-                    x[..., i] -= feature_shifts[i]
+                if normalise_features[i]:
+                    if feature_shifts[i] is not None:
+                        x[..., i] -= feature_shifts[i]
 
-                if feature_norms[i] is not None:
-                    x[..., i] /= feature_norms[i]
-                    x[..., i] *= self.feature_maxes[i]
+                    if feature_norms[i] is not None:
+                        x[..., i] /= feature_norms[i]
+                        x[..., i] *= self.feature_maxes[i]
 
         return x
 

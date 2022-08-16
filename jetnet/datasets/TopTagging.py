@@ -1,230 +1,170 @@
-from typing import List, Union, Optional
-import torch
-import torchvision
+from typing import List, Set, Union, Optional, Tuple
 
-from torch import Tensor
 import numpy as np
 
 import logging
-from os.path import exists
+
+from .dataset import JetDataset
+from .utils import (
+    checkConvertElements,
+    checkDownloadZenodoDataset,
+    getOrderedFeatures,
+    checkStrToList,
+    checkListNotEmpty,
+)
+from .normalisations import NormaliseABC
 
 
-class TopTagging(torch.utils.data.Dataset):
+class TopTagging(JetDataset):
+    _zenodo_record_id = 2603256
+
+    jet_types = ["qcd", "top"]
+    particle_features_order = ["E", "px", "py", "pz"]
+    jet_features_order = ["type", "E", "px", "py", "pz"]
+    splits = ["train", "valid", "test"]
+    _split_key_mapping = {"train": "train", "valid": "val", "test": "test"}  # map to file name
+    total_particles = 200
+
     def __init__(
         self,
-        is_Quark: str,
+        jet_type: Union[str, Set[str]] = "all",
         data_dir: str = "./",
-        download: bool = False,
-        num_particles: int = 30,
-        normalize: bool = True,
-        feature_norms: List[float] = [1.0, 1.0, 1.0, 1.0],
-        feature_shifts: List[float] = [0.0, 0.0, -0.5, -0.5],
-        use_mask: bool = True,
-        # train: bool = True,
-        train_fraction: float = 0.7,
-        num_pad_particles: int = 0,
-        use_num_particles_jet_feature: bool = True,
-        noise_padding: bool = False,
+        particle_features: List[str] = particle_features_order,
+        jet_features: List[str] = jet_features_order,
+        particle_normalisation: NormaliseABC = None,
+        jet_normalisation: NormaliseABC = None,
+        num_particles: int = total_particles,
+        split: str = "train",
     ):
-        # pt_file = f"{data_dir}/{is_Quark}.pt"
-        assert is_Quark in ["top", "qcd"], "Invalid jet type"
-        dataset_type = input(
-            "Enter 'test' for testing data, 'train' for training data and 'val' for validation data: "
+        """
+        PyTorch ``torch.unit.data.Dataset`` class for the JetNet dataset.
+
+        If hdf5 files are not found in the ``data_dir`` directory then dataset will be downloaded
+        from Zenodo.
+
+        Args:
+            jet_type (Union[str, Set[str]], optional): individual type or set of types out of
+                'g' (gluon), 't' (top quarks), 'q' (light quarks), 'w' (W bosons), or 'z' (Z bosons).
+                "all" will get all types. Defaults to "all".
+            data_dir (str, optional): directory in which data is (to be) stored. Defaults to "./".
+            particle_features (List[str], optional): list of particle features to retrieve. If empty
+                or None, gets no particle features. Defaults to
+                ``["etarel", "phirel", "ptrel", "mask"]``.
+            jet_features (List[str], optional): list of jet features to retrieve.  If empty or None,
+                gets no particle features. Defaults to
+                ``["type", "pt", "eta", "mass", "num_particles"]``.
+            particle_normalisation (NormaliseABC, optional): optional normalisation to apply to
+                particle data. Defaults to a linear scaling of each feature.
+            jet_normalisation (NormaliseABC, optional): optional normalisation to apply to jet data.
+                Defaults to None.
+            num_particles (int, optional): number of particles to retain per jet, max of 150.
+                Defaults to 30.
+            split (str, optional): dataset split, out of {"train", "valid", "test", "all"}. Defaults
+                to "train".
+        """
+
+        self.particle_data, self.jet_data = self.getData(
+            jet_type, data_dir, particle_features, jet_features, num_particles, split
         )
-        if dataset_type == "test":
-            self.download_and_convert_to_pt(data_dir, dataset_type)
 
-        elif dataset_type == "train":
-            self.download_and_convert_to_pt(data_dir, dataset_type)
+        super().__init__(
+            data_dir=data_dir,
+            particle_features=particle_features,
+            jet_features=jet_features,
+            particle_normalisation=particle_normalisation,
+            jet_normalisation=jet_normalisation,
+        )
 
-        elif dataset_type == "val":
-            self.download_and_convert_to_pt(data_dir, dataset_type)
-
-        pt_file = f"{data_dir}/{dataset_type}.pt"
-        # pt_file = f"{dataset_type}.pt"
-
-        # self.feature_norms = feature_norms
-        # self.feature_shifts = feature_shifts
-        # self.use_mask = use_mask
-        # # in the future there will be more jet features such as jet pT and eta
-        # self.use_jet_features = use_num_particles_jet_feature and self.use_mask
-        # self.noise_padding = noise_padding and self.use_maskse
-        # self.normalize = normalizw
-
-        if not exists(pt_file) or download:
-            self.download_and_convert_to_pt(data_dir, dataset_type)
-
-        logging.info("Loading Dataset")
-        dataset = self.load_dataset(pt_file, num_particles)
-        self.num_particles = num_particles if num_particles > 0 else dataset.shape[1]
-
-        # if self.use_jet_features:
-        # jet_features = self.get_jet_features(dataset,use_num_particles_jet_feature)
-
-        logging.info(f"Loaded dataset {dataset.shape = }")
-        # if normalize:
-        # logging.info("Normalizing features")
-        # self.feature_maxes = self.normalize_features(dataset,feature_norms, feature_shifts)
-
-        # if self.noise_padding:
-        # dataset = self.add_noise_padding(dataset)
-
-        self.data = dataset_type
-
-    def download_and_convert_to_pt(self, data_dir: str, dataset_type: str):
-        """
-        Download jet dataset and convert and save to pytorch tensor.
-        Args:
-            data_dir (str): directory in which to save file.
-            is_Quark (str): jet type to download, out of ``['g', 't', 'q']``.
-            use_150 (bool): download JetNet150 or JetNet. Defaults to False.
-        """
-        import os
-
-        os.system(f"mkdir -p {data_dir}")
-        h5_file = f"{data_dir}/{dataset_type}.h5"
-
-        if not exists(h5_file):
-            logging.info(f"Downloading {dataset_type} quarks h5 file")
-            self.download(dataset_type, h5_file)
-
-        logging.info(f"Converting {dataset_type} jets h5 to pt")
-        self.h5_to_pt(data_dir, dataset_type, h5_file)
-
-    # download function
-    def download(self, dataset_type: str, h5_file: str):
-        """
-        Downloads the ``jet_type`` jet hdf5 from Zenodo and saves it as ``hdf5_file``.
-
-        Args:
-            is_Quark (str): jet type to download, out of ``['top', 'qcd']``.
-            h5_file (str): path to save hdf5 file.
-
-        """
-        import requests
-        import sys
-
-        record_id = 2603256
-        records_url = f"https://zenodo.org/api/records/{record_id}"
-        r = requests.get(records_url).json()
-        key = f"{dataset_type}.h5"
-
-        # finding the url for the particular jet type dataset
-        # print(r)
-        # print(key)
-
-        file_url = next(item for item in r["files"] if item["key"] == key)["links"]["self"]
-        logging.info(f"{file_url = }")
-
-        # modified from https://sumit-ghosh.com/articles/python-download-progress-bar/
-        with open(h5_file, "wb") as f:
-            response = requests.get(file_url, stream=True)
-            total = response.headers.get("content-length")
-
-            if total is None:
-                f.write(response.content)
-            else:
-                downloaded = 0
-                total = int(total)
-
-                print("Downloading dataset")
-                for data in response.iter_content(chunk_size=max(int(total / 1000), 1024 * 1024)):
-                    downloaded += len(data)
-                    f.write(data)
-                    done = int(50 * downloaded / total)
-                    sys.stdout.write(
-                        "\r[{}{}] {:.0f}%".format(
-                            "█" * done, "." * (50 - done), float(downloaded / total) * 100
-                        )
-                    )
-                    sys.stdout.flush()
-
-        sys.stdout.write("\n")
-
-    def h5_to_pt(self, data_dir: str, dataset_type: str, h5_file: str):
-        """
-        Converts and saves downloaded hdf5 file to pytorch tensor.
-
-        Args:
-            data_dir (str): directory in which to save file.
-            jet_type (str): jet type to download, out of ``['g', 't', 'q']``.
-            hdf5_file (str): path to hdf5 file.
-
-        """
-        # import h5py
-
-        pt_file = f"{data_dir}/{dataset_type}.pt"
-
-        # with h5py.File(h5_file, "r") as f:
-        # torch.save(Tensor(np.float64(f["table"]["_i_table"]["index"]["abounds"])), pt_file)
-
-        import pandas as pd
-        import torch
-
-        pdtable = pd.read_hdf(h5_file, key="table")
-
-        torch.save(Tensor(pdtable.values), pt_file)
-
-        # torch.tensor(pdtable.values)
-
-    def load_dataset(self, pt_file: str, num_particles: int) -> Tensor:
-
-        """
-        Load the dataset, optionally padding the particles.
-
-        Args:
-            pt_file (str): path to dataset .pt file.
-            num_particles (int): number of particles per jet to load
-              (has to be less than the number per jet in the dataset).
-            num_pad_particles (int): out of ``num_particles`` how many are to be zero-padded.
-              Defaults to 0.
-            use_mask (bool): keep or remove the mask feature. Defaults to True.
-
-        Returns:
-            Tensor: dataset tensor of shape ``[num_jets, num_particles, num_features]``.
-
-        """
-        dataset = torch.load(pt_file).float()
-        print(dataset)
-
-        # only retain up to ``num_particles``,
-        # subtracting ``num_pad_particles`` since they will be padded below
-        # print(num_particles)
-        # if 0 < num_particles < dataset.shape[1]:
-        # dataset = dataset[:, : num_particles, :]
-        dataset = dataset[:num_particles]
-
-        # pad with ``num_pad_particles`` particles
-        # if num_pad_particles > 0:
-        # dataset = torch.nn.functional.pad(dataset, (0, 0, 0, num_pad_particles), "constant", 0)
-
-        # if not use_mask:
-        # remove mask feature from dataset if not needed
-        # dataset = dataset[:, :, : self._num_non_mask_features]
-
-        return dataset[0:20]
-
-    def get_jet_features(self, dataset: Tensor, use_num_particles_jet_feature: bool) -> Tensor:
-        """
-        Returns jet-level features. `Will be expanded to include jet pT and eta.`
-
-        Args:
-            dataset (Tensor):  dataset tensor of shape [N, num_particles, num_features],
-              where the last feature is the mask.
-            use_num_particles_jet_feature (bool): `Currently does nothing,
-              in the future such bools will specify which jet features to use`.
-
-        Returns:
-            Tensor: jet features tensor of shape [N, num_jet_features].
-
-        """
-        jet_num_particles = (torch.sum(dataset[:, :, -1], dim=1) / self.num_particles).unsqueeze(1)
-        logging.debug("{num_particles = }")
-        return jet_num_particles
+        self.split = split
 
     @classmethod
-    def __len__(self):
-        return len(self.data)
+    def getData(
+        cls,
+        jet_type: Union[str, Set[str]] = "all",
+        data_dir: str = "./",
+        particle_features: List[str] = particle_features_order,
+        jet_features: List[str] = jet_features_order,
+        num_particles: int = total_particles,
+        split: str = "all",
+    ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
+        """
+        Downloads, if needed, and loads and returns JetNet data.
 
-    def __getitem__(self, idx):
-        return self.data[idx], self.jet_features[idx] if self.use_jet_features else self.data[idx]
+        Args:
+            jet_type (Union[str, Set[str]], optional): individual type or set of types out of
+                'g' (gluon), 't' (top quarks), 'q' (light quarks), 'w' (W bosons), or 'z' (Z bosons).
+                "all" will get all types. Defaults to "all".
+            data_dir (str, optional): directory in which data is (to be) stored. Defaults to "./".
+            particle_features (List[str], optional): list of particle features to retrieve. If empty
+                or None, gets no particle features. Defaults to
+                ``["etarel", "phirel", "ptrel", "mask"]``.
+            jet_features (List[str], optional): list of jet features to retrieve.  If empty or None,
+                gets no particle features. Defaults to
+                ``["type", "pt", "eta", "mass", "num_particles"]``.
+            num_particles (int, optional): number of particles to retain per jet, max of 150.
+                Defaults to 30.
+            split (str, optional): dataset split, out of {"train", "valid", "test", "all"}. Defaults
+                to "train".
+
+        Returns:
+            Tuple[Optional[np.ndarray], Optional[np.ndarray]]: particle data, jet data
+        """
+        import pandas as pd
+
+        jet_type = checkConvertElements(jet_type, cls.jet_types, ntype="jet type")
+        type_indices = [cls.jet_types.index(t) for t in jet_type]
+
+        particle_features, jet_features = checkStrToList(particle_features, jet_features)
+        use_particle_features, use_jet_features = checkListNotEmpty(particle_features, jet_features)
+        split = checkConvertElements(split, cls.splits, ntype="splitting")
+
+        particle_data = []
+        jet_data = []
+
+        for s in split:
+            hdf5_file = checkDownloadZenodoDataset(
+                data_dir,
+                dataset_name=cls._split_key_mapping[s],
+                record_id=cls._zenodo_record_id,
+                key=f"{cls._split_key_mapping[s]}.h5",
+            )
+
+            data = np.array(pd.read_hdf(hdf5_file, key="table"))
+
+            # select only specified types of jets (qcd or top or both)
+            jet_selector = np.sum([data[:, -1] == i for i in type_indices], axis=0).astype(bool)
+            data = data[jet_selector]
+
+            # exctract particle and jet features in the order specified by the class
+            # ``feature_order`` variables
+            total_particle_features = cls.total_particles * len(cls.particle_features_order)
+
+            if use_particle_features:
+                pf = data[:, :total_particle_features].reshape(
+                    -1, cls.total_particles, len(cls.particle_features_order)
+                )[:, :num_particles]
+
+                # reorder if needed
+                pf = getOrderedFeatures(pf, particle_features, cls.particle_features_order)
+                particle_data.append(pf)
+
+            if use_jet_features:
+                jf = np.concatenate(
+                    (data[:, -1:], data[:, total_particle_features : total_particle_features + 4]),
+                    axis=-1,
+                )
+
+                # reorder if needed
+                jf = getOrderedFeatures(jf, jet_features, cls.jet_features_order)
+                jet_data.append(jf)
+
+        particle_data = np.concatenate(particle_data, axis=0) if use_particle_features else None
+        jet_data = np.concatenate(jet_data, axis=0) if use_jet_features else None
+
+        return particle_data, jet_data
+
+    def extra_repr(self) -> str:
+        if self.split == "all":
+            return ""
+        else:
+            return f"Split into {self.split} data out of {self.splits} possible splits"

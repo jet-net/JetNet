@@ -1,24 +1,18 @@
 from typing import List, Set, Union, Optional, Tuple
-from numpy.typing import ArrayLike
 
 import torch
-from torch import Tensor
 import numpy as np
 
 import logging
-from inspect import cleandoc
-
-import os
-from os.path import exists
 
 from .dataset import JetDataset
 from .utils import (
-    download_progress_bar,
-    getZenodoFileURL,
+    checkConvertElements,
+    checkDownloadZenodoDataset,
+    firstNotNoneElement,
     getOrderedFeatures,
     checkStrToList,
     checkListNotEmpty,
-    firstNotNoneElement,
     getSplitting,
 )
 from .normalisations import FeaturewiseLinearBounded, NormaliseABC
@@ -31,11 +25,6 @@ class JetNet(JetDataset):
     particle_features_order = ["etarel", "phirel", "ptrel", "mask"]
     jet_features_order = ["type", "pt", "eta", "mass", "num_particles"]
     splits = ["train", "valid", "test", "all"]
-
-    # as used for arXiv:2106.11535
-    _default_particle_norm = FeaturewiseLinearBounded(
-        feature_norms=1.0, feature_shifts=[0.0, 0.0, -0.5, -0.5]
-    )
 
     # normalisation used for ParticleNet training for FPND, as defined in arXiv:2106.11535
     fpnd_norm = FeaturewiseLinearBounded(
@@ -50,7 +39,7 @@ class JetNet(JetDataset):
         data_dir: str = "./",
         particle_features: List[str] = particle_features_order,
         jet_features: List[str] = jet_features_order,
-        particle_normalisation: NormaliseABC = _default_particle_norm,
+        particle_normalisation: NormaliseABC = None,
         jet_normalisation: NormaliseABC = None,
         num_particles: int = 30,
         split: str = "train",
@@ -88,8 +77,15 @@ class JetNet(JetDataset):
                 dataset splittings. Defaults to 42.
         """
 
-        self.particle_data, self.jet_data = JetNet.getData(
-            jet_type, data_dir, particle_features, jet_features, num_particles
+        self.particle_data, self.jet_data = self.getData(
+            jet_type,
+            data_dir,
+            particle_features,
+            jet_features,
+            num_particles,
+            split,
+            split_fraction,
+            seed,
         )
 
         super().__init__(
@@ -103,24 +99,17 @@ class JetNet(JetDataset):
         self.split = split
         self.split_fraction = split_fraction
 
-        # shuffling and splitting into training and test
-        lcut, rcut = getSplitting(len(self), self.split, self.splits, self.split_fraction)
-        torch.manual_seed(seed)
-        randperm = torch.randperm(len(self))
-
-        if self.use_particle_features:
-            self.particle_data = self.particle_data[randperm][lcut:rcut]
-
-        if self.use_jet_features:
-            self.jet_data = self.jet_data[randperm][lcut:rcut]
-
-    @staticmethod
+    @classmethod
     def getData(
+        cls: JetDataset,
         jet_type: Union[str, Set[str]] = "all",
         data_dir: str = "./",
         particle_features: List[str] = particle_features_order,
         jet_features: List[str] = jet_features_order,
         num_particles: int = 30,
+        split: str = "all",
+        split_fraction: List[float] = [0.7, 0.15, 0.15],
+        seed: int = 42,
     ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
         """
         Downloads, if needed, and loads and returns JetNet data.
@@ -138,23 +127,19 @@ class JetNet(JetDataset):
                 ``["type", "pt", "eta", "mass", "num_particles"]``.
             num_particles (int, optional): number of particles to retain per jet, max of 150.
                 Defaults to 30.
+            split (str, optional): dataset split, out of {"train", "valid", "test", "all"}. Defaults
+                to "train".
+            split_fraction (List[float], optional): splitting fraction of training, validation,
+                testing data respectively. Defaults to [0.7, 0.15, 0.15].
+            seed (int, optional): PyTorch manual seed - important to use the same seed for all
+                dataset splittings. Defaults to 42.
 
         Returns:
             Tuple[Optional[np.ndarray], Optional[np.ndarray]]: particle data, jet data
         """
         import h5py
 
-        if jet_type != "all":
-            jet_type = checkStrToList(jet_type, to_set=True)
-
-            for j in jet_type:
-                assert (
-                    j in JetNet.jet_types
-                ), f"{j} is not a valid jet type, must be one of {JetNet.jet_types}"
-
-        else:
-            jet_type = JetNet.jet_types
-
+        jet_type = checkConvertElements(jet_type, cls.jet_types, ntype="jet type")
         particle_features, jet_features = checkStrToList(particle_features, jet_features)
         use_particle_features, use_jet_features = checkListNotEmpty(particle_features, jet_features)
 
@@ -165,7 +150,14 @@ class JetNet(JetDataset):
         jet_data = []
 
         for j in jet_type:
-            hdf5_file = JetNet._check_download_dataset(data_dir, j, use_150)
+            dname = f"{j}{'150' if use_150 else ''}"
+
+            hdf5_file = checkDownloadZenodoDataset(
+                data_dir,
+                dataset_name=dname,
+                record_id=cls._zenodo_record_ids["150" if use_150 else "30"],
+                key=f"{dname}.hdf5",
+            )
 
             with h5py.File(hdf5_file, "r") as f:
                 pf = (
@@ -181,8 +173,16 @@ class JetNet(JetDataset):
 
             if use_jet_features:
                 # add class index as first jet feature
-                class_index = JetNet.jet_types.index(j)
-                jf = np.concatenate((np.full([len(jf), 1], class_index), jf), axis=1)
+                class_index = cls.jet_types.index(j)
+                jf = np.concatenate(
+                    (
+                        np.full([len(jf), 1], class_index),
+                        jf[:, :3],
+                        # max particles should be num particles
+                        np.minimum(jf[:, 3:], num_particles),
+                    ),
+                    axis=1,
+                )
                 # reorder if needed
                 jf = getOrderedFeatures(jf, jet_features, JetNet.jet_features_order)
 
@@ -192,29 +192,21 @@ class JetNet(JetDataset):
         particle_data = np.concatenate(particle_data, axis=0) if use_particle_features else None
         jet_data = np.concatenate(jet_data, axis=0) if use_jet_features else None
 
+        length = len(firstNotNoneElement(particle_data, jet_data))
+
+        # shuffling and splitting into training and test
+        lcut, rcut = getSplitting(length, split, cls.splits, split_fraction)
+
+        np.random.seed(seed)
+        randperm = np.random.permutation(length)
+
+        if use_particle_features:
+            particle_data = particle_data[randperm][lcut:rcut]
+
+        if use_jet_features:
+            jet_data = jet_data[randperm][lcut:rcut]
+
         return particle_data, jet_data
-
-    @staticmethod
-    def _check_download_dataset(data_dir: str, jet_type: str, use_150: bool = False) -> str:
-        """Checks if dataset exists, if not downloads it from Zenodo, and returns the file path"""
-        dname = f"{jet_type}{'150' if use_150 else ''}"
-        key = f"{dname}.hdf5"
-        hdf5_file = f"{data_dir}/{key}"
-
-        if not exists(hdf5_file):
-            os.system(f"mkdir -p {data_dir}")
-            record_id = JetNet._zenodo_record_ids["150" if use_150 else "30"]
-            file_url = getZenodoFileURL(record_id, key)
-
-            logging.info(f"Downloading {dname} dataset to {hdf5_file}")
-            download_progress_bar(file_url, hdf5_file)
-
-        return hdf5_file
-
-    def __getitem__(self, index) -> Tuple[Optional[Tensor], Optional[Tensor]]:
-        particle_data_index = self.particle_data[index] if self.use_particle_features else None
-        jet_data_index = self.jet_data[index] if self.use_jet_features else None
-        return particle_data_index, jet_data_index
 
     def extra_repr(self) -> str:
         if self.split == "all":

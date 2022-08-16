@@ -7,8 +7,12 @@ from numpy.typing import ArrayLike
 
 import requests
 import sys
+import os
+from os.path import exists
 
 import numpy as np
+
+import logging
 
 
 def download_progress_bar(file_url: str, file_dest: str):
@@ -44,6 +48,19 @@ def download_progress_bar(file_url: str, file_dest: str):
                 sys.stdout.flush()
 
     sys.stdout.write("\n")
+
+
+def checkDownloadZenodoDataset(data_dir: str, dataset_name: str, record_id: int, key: str):
+    """Checks if dataset exists, if not downloads it from Zenodo, and returns the file path"""
+    file_path = f"{data_dir}/{key}"
+    if not exists(file_path):
+        os.system(f"mkdir -p {data_dir}")
+        file_url = getZenodoFileURL(record_id, key)
+
+        print(f"Downloading {dataset_name} dataset to {file_path}")
+        download_progress_bar(file_url, file_path)
+
+    return file_path
 
 
 def getZenodoFileURL(record_id: int, file_name: str) -> str:
@@ -112,6 +129,22 @@ def firstNotNoneElement(*inputs: List[Any]) -> Any:
     for inp in inputs:
         if inp is not None:
             return inp
+
+
+def checkConvertElements(
+    elem: Union[str, List[str]], valid_types: List[str], ntype: str = "element"
+):
+    """Checks if elem(s) are valid and if needed converts into a list"""
+    if elem != "all":
+        elem = checkStrToList(elem, to_set=True)
+
+        for j in elem:
+            assert j in valid_types, f"{j} is not a valid {ntype}, must be one of {valid_types}"
+
+    else:
+        elem = valid_types
+
+    return elem
 
 
 def getSplitting(

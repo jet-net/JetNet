@@ -9,6 +9,8 @@ install_requires = [
     "awkward >= 1.4.0",
     "coffea >= 0.7.0",
     "h5py >= 3.0.0",
+    "pandas",
+    "tables",
     "requests",
     "tqdm",
 ]
