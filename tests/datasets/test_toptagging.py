@@ -14,6 +14,7 @@ data_dir = "./datasets/toptagging"
 total_length = 2018000
 valid_length = 403000
 DataClass = TopTagging
+num_particles = 200
 
 
 @pytest.mark.parametrize(
@@ -30,38 +31,30 @@ DataClass = TopTagging
         ("all", "all", total_length, None),
     ],
 )
-@pytest.mark.parametrize("num_particles", [30, 200])
 def test_getData(jet_types, split, num_particles, expected_length, class_id):
-    pf, jf = DataClass.getData(jet_types, data_dir, num_particles=num_particles, split=split)
+    pf, jf = DataClass.getData(jet_types, data_dir, split=split)
     assert pf.shape == (expected_length, num_particles, 4)
     assert jf.shape == (expected_length, 5)
     if class_id is not None:
         assert np.all(jf[:, 0] == class_id)
 
 
-num_particles = 200
-
-
 def test_getDataFeatures():
-    pf, jf = DataClass.getData(
-        data_dir=data_dir, num_particles=num_particles, jet_features=["E", "type"]
-    )
+    pf, jf = DataClass.getData(data_dir=data_dir, jet_features=["E", "type"])
     assert pf.shape == (total_length, num_particles, 4)
     assert jf.shape == (total_length, 2)
-    assert np.max(jf[:, 0], axis=0) == approx(3000, rel=0.2)
+    assert np.max(jf[:, 0], axis=0) == approx(4000, rel=0.2)
     assert np.max(jf[:, 1], axis=0) == 1
 
-    pf, jf = DataClass.getData(data_dir=data_dir, num_particles=num_particles, jet_features=None)
+    pf, jf = DataClass.getData(data_dir=data_dir, jet_features=None)
     assert pf.shape == (total_length, num_particles, 4)
     assert jf is None
 
-    pf, jf = DataClass.getData(
-        data_dir=data_dir, num_particles=num_particles, particle_features=["px", "E"]
-    )
-    assert pf.shape == (total_length, num_particles, 2)
+    pf, jf = DataClass.getData(data_dir=data_dir, particle_features=["px", "E"], num_particles=30)
+    assert pf.shape == (total_length, 30, 2)
     assert jf.shape == (total_length, 5)
     assert np.max(pf[:, :, 0], axis=0) == approx(700, rel=0.2)
-    assert np.max(pf[:, :, 0], axis=0) == approx(2000, rel=0.1)
+    assert np.max(pf[:, :, 0], axis=0) == approx(2000, rel=0.2)
 
 
 def test_getDataErrors():
@@ -84,10 +77,10 @@ split = "valid"
 
 
 def test_DataClass(num_particles):
-    X = DataClass(data_dir=data_dir, num_particles=num_particles, split="all")
+    X = DataClass(data_dir=data_dir, split="all")
     assert len(X) == total_length
 
-    X = DataClass(data_dir=data_dir, num_particles=num_particles, split=split)
+    X = DataClass(data_dir=data_dir, split=split)
     assert len(X) == valid_length
 
     X_loaded = DataLoader(X)
@@ -107,9 +100,7 @@ def test_DataClass(num_particles):
     assert pf.shape == (1, num_particles, 2)
     assert jf == []
 
-    X = DataClass(
-        data_dir=data_dir, num_particles=num_particles, particle_features=None, split=split
-    )
+    X = DataClass(data_dir=data_dir, particle_features=None, split=split)
     X_loaded = DataLoader(X)
     pf, jf = next(iter(X_loaded))
     assert pf == []
