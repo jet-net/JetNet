@@ -1,4 +1,4 @@
-from typing import List, Set, Union, Optional, Tuple
+from typing import Callable, List, Set, Union, Optional, Tuple
 
 import numpy as np
 
@@ -16,6 +16,34 @@ from .normalisations import NormaliseABC
 
 
 class TopTagging(JetDataset):
+    """
+    PyTorch ``torch.unit.data.Dataset`` class for the Top Quark Tagging Reference dataset.
+
+    If hdf5 files are not found in the ``data_dir`` directory then dataset will be downloaded
+    from Zenodo (https://zenodo.org/record/2603256).
+
+    Args:
+        jet_type (Union[str, Set[str]], optional): individual type or set of types out of 'qcd' and
+            'top'. Defaults to "all".
+        data_dir (str, optional): directory in which data is (to be) stored. Defaults to "./".
+        particle_features (List[str], optional): list of particle features to retrieve. If empty
+            or None, gets no particle features. Defaults to ``["E", "px", "py", "pz"]``.
+        jet_features (List[str], optional): list of jet features to retrieve.  If empty or None,
+            gets no particle features. Defaults to ``["type", "E", "px", "py", "pz"]``.
+        particle_normalisation (NormaliseABC, optional): optional normalisation to apply to
+            particle data. Defaults to None.
+        jet_normalisation (NormaliseABC, optional): optional normalisation to apply to jet data.
+            Defaults to None.
+        particle_transform (callable, optional): A function/transform that takes in the particle
+            data tensor and transforms it. Defaults to None.
+        jet_transform (callable, optional): A function/transform that takes in the jet
+            data tensor and transforms it. Defaults to None.
+        num_particles (int, optional): number of particles to retain per jet, max of 200. Defaults
+            to 200.
+        split (str, optional): dataset split, out of {"train", "valid", "test", "all"}. Defaults
+            to "train".
+    """
+
     _zenodo_record_id = 2603256
 
     jet_types = ["qcd", "top"]
@@ -31,38 +59,13 @@ class TopTagging(JetDataset):
         data_dir: str = "./",
         particle_features: List[str] = particle_features_order,
         jet_features: List[str] = jet_features_order,
-        particle_normalisation: NormaliseABC = None,
-        jet_normalisation: NormaliseABC = None,
+        particle_normalisation: Optional[NormaliseABC] = None,
+        jet_normalisation: Optional[NormaliseABC] = None,
+        particle_transform: Optional[Callable] = None,
+        jet_transform: Optional[Callable] = None,
         num_particles: int = total_particles,
         split: str = "train",
     ):
-        """
-        PyTorch ``torch.unit.data.Dataset`` class for the JetNet dataset.
-
-        If hdf5 files are not found in the ``data_dir`` directory then dataset will be downloaded
-        from Zenodo.
-
-        Args:
-            jet_type (Union[str, Set[str]], optional): individual type or set of types out of
-                'g' (gluon), 't' (top quarks), 'q' (light quarks), 'w' (W bosons), or 'z' (Z bosons).
-                "all" will get all types. Defaults to "all".
-            data_dir (str, optional): directory in which data is (to be) stored. Defaults to "./".
-            particle_features (List[str], optional): list of particle features to retrieve. If empty
-                or None, gets no particle features. Defaults to
-                ``["etarel", "phirel", "ptrel", "mask"]``.
-            jet_features (List[str], optional): list of jet features to retrieve.  If empty or None,
-                gets no particle features. Defaults to
-                ``["type", "pt", "eta", "mass", "num_particles"]``.
-            particle_normalisation (NormaliseABC, optional): optional normalisation to apply to
-                particle data. Defaults to a linear scaling of each feature.
-            jet_normalisation (NormaliseABC, optional): optional normalisation to apply to jet data.
-                Defaults to None.
-            num_particles (int, optional): number of particles to retain per jet, max of 150.
-                Defaults to 30.
-            split (str, optional): dataset split, out of {"train", "valid", "test", "all"}. Defaults
-                to "train".
-        """
-
         self.particle_data, self.jet_data = self.getData(
             jet_type, data_dir, particle_features, jet_features, num_particles, split
         )
@@ -73,6 +76,8 @@ class TopTagging(JetDataset):
             jet_features=jet_features,
             particle_normalisation=particle_normalisation,
             jet_normalisation=jet_normalisation,
+            particle_transform=particle_transform,
+            jet_transform=jet_transform,
         )
 
         self.split = split
@@ -88,23 +93,20 @@ class TopTagging(JetDataset):
         split: str = "all",
     ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
         """
-        Downloads, if needed, and loads and returns JetNet data.
+        Downloads, if needed, and loads and returns Top Quark Tagging data.
 
         Args:
-            jet_type (Union[str, Set[str]], optional): individual type or set of types out of
-                'g' (gluon), 't' (top quarks), 'q' (light quarks), 'w' (W bosons), or 'z' (Z bosons).
-                "all" will get all types. Defaults to "all".
-            data_dir (str, optional): directory in which data is (to be) stored. Defaults to "./".
-            particle_features (List[str], optional): list of particle features to retrieve. If empty
-                or None, gets no particle features. Defaults to
-                ``["etarel", "phirel", "ptrel", "mask"]``.
-            jet_features (List[str], optional): list of jet features to retrieve.  If empty or None,
-                gets no particle features. Defaults to
-                ``["type", "pt", "eta", "mass", "num_particles"]``.
-            num_particles (int, optional): number of particles to retain per jet, max of 150.
-                Defaults to 30.
-            split (str, optional): dataset split, out of {"train", "valid", "test", "all"}. Defaults
-                to "train".
+        jet_type (Union[str, Set[str]], optional): individual type or set of types out of 'qcd' and
+            'top'. Defaults to "all".
+        data_dir (str, optional): directory in which data is (to be) stored. Defaults to "./".
+        particle_features (List[str], optional): list of particle features to retrieve. If empty
+            or None, gets no particle features. Defaults to ``["E", "px", "py", "pz"]``.
+        jet_features (List[str], optional): list of jet features to retrieve.  If empty or None,
+            gets no particle features. Defaults to ``["type", "E", "px", "py", "pz"]``.
+        num_particles (int, optional): number of particles to retain per jet, max of 200. Defaults
+            to 200.
+        split (str, optional): dataset split, out of {"train", "valid", "test", "all"}. Defaults
+            to "all".
 
         Returns:
             Tuple[Optional[np.ndarray], Optional[np.ndarray]]: particle data, jet data

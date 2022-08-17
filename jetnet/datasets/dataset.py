@@ -5,7 +5,7 @@ Base classes for JetNet datasets.
 import torch
 from torch import Tensor
 
-from typing import List, Optional, Tuple, Any
+from typing import List, Optional, Tuple, Any, Callable
 
 from .normalisations import NormaliseABC
 from .utils import checkStrToList, checkListNotEmpty, firstNotNoneElement
@@ -18,10 +18,18 @@ class JetDataset(torch.utils.data.Dataset):
 
     Args:
         data_dir (str): directory where dataset is or will be stored.
+        particle_features (List[str], optional): list of particle features to retrieve. If empty
+            or None, gets no particle features. Should default to all.
+        jet_features (List[str], optional): list of jet features to retrieve.  If empty or None,
+            gets no particle features. Should default to all.
         particle_normalisation (Optional[NormaliseABC], optional): optional normalisation for
             particle-level features. Defaults to None.
         jet_normalisation (Optional[NormaliseABC], optional): optional normalisation for jet-level
             features. Defaults to None.
+        particle_transform (callable, optional): A function/transform that takes in the particle
+            data tensor and transforms it. Defaults to None.
+        jet_transform (callable, optional): A function/transform that takes in the jet
+            data tensor and transforms it. Defaults to None.
     """
 
     _repr_indent = 4
@@ -36,6 +44,8 @@ class JetDataset(torch.utils.data.Dataset):
         jet_features: Optional[List[str]] = None,
         particle_normalisation: Optional[NormaliseABC] = None,
         jet_normalisation: Optional[NormaliseABC] = None,
+        particle_transform: Optional[Callable] = None,
+        jet_transform: Optional[Callable] = None,
     ):
         self.data_dir = data_dir
 
@@ -57,6 +67,9 @@ class JetDataset(torch.utils.data.Dataset):
                 self.jet_normalisation.derive_dataset_features(self.jet_data)
                 self.jet_data = self.jet_normalisation(self.jet_data)
 
+        self.particle_transform = particle_transform
+        self.jet_transform = jet_transform
+
     @classmethod
     def getData(**opts) -> Any:
         """Class method to download and return numpy arrays of the data"""
@@ -64,17 +77,30 @@ class JetDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, index) -> Tuple[Optional[Tensor], Optional[Tensor]]:
         """
+        Gets data and if needed transforms it.
+
         Args:
             index (int): Index
 
         Returns:
             (Tuple[Optional[Tensor], Optional[Tensor]]): particle, jet data
         """
-        particle_data_index = (
-            Tensor(self.particle_data[index]) if self.use_particle_features else []
-        )
-        jet_data_index = Tensor(self.jet_data[index]) if self.use_jet_features else []
-        return particle_data_index, jet_data_index
+
+        if self.use_particle_features:
+            particle_data = Tensor(self.particle_data[index])
+            if self.particle_transform is not None:
+                particle_data = self.particle_transform(particle_data)
+        else:
+            particle_data = []
+
+        if self.use_jet_features:
+            jet_data = Tensor(self.jet_data[index])
+            if self.jet_transform is not None:
+                jet_data = self.jet_transform(jet_data)
+        else:
+            jet_data = []
+
+        return particle_data, jet_data
 
     def __len__(self) -> int:
         return len(firstNotNoneElement(self.particle_data, self.jet_data))
