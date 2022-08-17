@@ -2,18 +2,56 @@
   <img width="400" src="https://raw.githubusercontent.com/rkansal47/JetNet/main/docs/_static/images/jetnetlogo.png" />
 </p>
 
-# JetNet
+<p align="center">
+<b>For developing and reproducing ML + HEP projects.</b>
+</p>
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5598104.svg)](https://doi.org/10.5281/zenodo.5598104) 
-[![PyPI Version](https://badge.fury.io/py/jetnet.svg)](https://pypi.org/project/jetnet/)
+______________________________________________________________________
+
+<p align="center">
+  <a href="#jetnet">JetNet</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#quickstart">Quickstart</a> •
+  <a href="https://jetnet.readthedocs.io">Docs</a> •
+  <a href="#citation">Citation</a> •
+  <a href="#references">References</a>
+</p>
+
+______________________________________________________________________
+
+
+
+![CI](https://github.com/jet-net/jetnet/actions/workflows/ci.yml/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/jetnet/badge/?version=latest)](https://jetnet.readthedocs.io/en/latest/)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/jetnet)](https://pypi.org/project/jetnet/)
 [![Codestyle](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/jet-net/JetNet/main.svg)](https://results.pre-commit.ci/latest/github/jet-net/JetNet/main)
 
-A library for developing and reproducing jet-based machine learning (ML) projects.
+[![PyPI Version](https://badge.fury.io/py/jetnet.svg)](https://pypi.org/project/jetnet/)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/jetnet)](https://pypi.org/project/jetnet/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5598104.svg)](https://doi.org/10.5281/zenodo.5598104) 
 
-JetNet provides common standardized PyTorch-based datasets, evaluation metrics, and loss functions for working with jets using ML. Currently supports the flagship JetNet dataset, and the Fréchet ParticleNet Distance (FPND), Wasserstein-1 (W1), coverage and minimum matching distance (MMD) metrics all introduced in Ref. [[1](#references)], as well as jet utilities and differentiable implementation of the energy mover's distance [[2](#references)] for use as a loss function. Additional functionality is currently under development.
+
+
+______________________________________________________________________
+
+## JetNet
+
+JetNet is an effort to increase accessibility and reproducibility in jet-based machine learning. 
+
+Currently we provide:
+- Easy-to-access and standardised interfaces for the following datasets:
+  - [JetNet](https://zenodo.org/record/6975118)
+  - [TopTagging](https://zenodo.org/record/2603256)
+- Standard implementations of generative evaluation metrics (Ref. [[1](#references)]):
+  - Fréchet ParticleNet Distance (FPND)
+  - Wasserstein-1 (W1)
+  - coverage and minimum matching distance (MMD)
+- Loss functions:
+  - Differentiable implementation of the energy mover's distance [[2](#references)]
+- And more general jet utilities.
+
+
+Additional functionality is under development, and please reach out if you're interested in contributing!
 
 
 ## Installation
@@ -35,10 +73,14 @@ Finally, [PyTorch Geometric](https://github.com/pyg-team/pytorch_geometric) must
 
 ## Quickstart
 
-Datasets can be loaded quickly with, for example:
+Datasets can be downloaded and accessed quickly, for example:
 
 ```python
-dataset = jetnet.datasets.JetNet(jet_type='g')
+from jetnet.datasets import JetNet, TopTagging
+# as numpy arrays:
+particle_data, jet_data = JetNet.getData(jet_type=["g", "q"], data_dir="./datasets/jetnet/")
+# or as a PyTorch dataset:
+dataset = TopTagging(jet_type="all", , data_dir="./datasets/toptagging/", split="train")
 ```
 
 Evaluation metrics can be used as such:
@@ -58,7 +100,7 @@ loss.backward()
 
 ## Documentation
 
-Full API reference is available at [jetnet.readthedocs.io](https://jetnet.readthedocs.io/en/latest/).
+The full API reference is available at [jetnet.readthedocs.io](https://jetnet.readthedocs.io/en/latest/).
 
 More detailed information about each dataset can (or will) be found at [jet-net.github.io](https://jet-net.github.io/).
 
