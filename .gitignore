@@ -7,3 +7,7 @@ docs/_build
 *egg-info
 *test*.py
 /datasets
+.vscode
+
+!tests
+!tests/**/*.py

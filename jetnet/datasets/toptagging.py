@@ -1,0 +1,172 @@
+from typing import Callable, List, Set, Union, Optional, Tuple
+
+import numpy as np
+
+import logging
+
+from .dataset import JetDataset
+from .utils import (
+    checkConvertElements,
+    checkDownloadZenodoDataset,
+    getOrderedFeatures,
+    checkStrToList,
+    checkListNotEmpty,
+)
+from .normalisations import NormaliseABC
+
+
+class TopTagging(JetDataset):
+    """
+    PyTorch ``torch.unit.data.Dataset`` class for the Top Quark Tagging Reference dataset.
+
+    If hdf5 files are not found in the ``data_dir`` directory then dataset will be downloaded
+    from Zenodo (https://zenodo.org/record/2603256).
+
+    Args:
+        jet_type (Union[str, Set[str]], optional): individual type or set of types out of 'qcd' and
+            'top'. Defaults to "all".
+        data_dir (str, optional): directory in which data is (to be) stored. Defaults to "./".
+        particle_features (List[str], optional): list of particle features to retrieve. If empty
+            or None, gets no particle features. Defaults to ``["E", "px", "py", "pz"]``.
+        jet_features (List[str], optional): list of jet features to retrieve.  If empty or None,
+            gets no particle features. Defaults to ``["type", "E", "px", "py", "pz"]``.
+        particle_normalisation (NormaliseABC, optional): optional normalisation to apply to
+            particle data. Defaults to None.
+        jet_normalisation (NormaliseABC, optional): optional normalisation to apply to jet data.
+            Defaults to None.
+        particle_transform (callable, optional): A function/transform that takes in the particle
+            data tensor and transforms it. Defaults to None.
+        jet_transform (callable, optional): A function/transform that takes in the jet
+            data tensor and transforms it. Defaults to None.
+        num_particles (int, optional): number of particles to retain per jet, max of 200. Defaults
+            to 200.
+        split (str, optional): dataset split, out of {"train", "valid", "test", "all"}. Defaults
+            to "train".
+    """
+
+    _zenodo_record_id = 2603256
+
+    jet_types = ["qcd", "top"]
+    particle_features_order = ["E", "px", "py", "pz"]
+    jet_features_order = ["type", "E", "px", "py", "pz"]
+    splits = ["train", "valid", "test"]
+    _split_key_mapping = {"train": "train", "valid": "val", "test": "test"}  # map to file name
+    total_particles = 200
+
+    def __init__(
+        self,
+        jet_type: Union[str, Set[str]] = "all",
+        data_dir: str = "./",
+        particle_features: List[str] = particle_features_order,
+        jet_features: List[str] = jet_features_order,
+        particle_normalisation: Optional[NormaliseABC] = None,
+        jet_normalisation: Optional[NormaliseABC] = None,
+        particle_transform: Optional[Callable] = None,
+        jet_transform: Optional[Callable] = None,
+        num_particles: int = total_particles,
+        split: str = "train",
+    ):
+        self.particle_data, self.jet_data = self.getData(
+            jet_type, data_dir, particle_features, jet_features, num_particles, split
+        )
+
+        super().__init__(
+            data_dir=data_dir,
+            particle_features=particle_features,
+            jet_features=jet_features,
+            particle_normalisation=particle_normalisation,
+            jet_normalisation=jet_normalisation,
+            particle_transform=particle_transform,
+            jet_transform=jet_transform,
+        )
+
+        self.split = split
+
+    @classmethod
+    def getData(
+        cls,
+        jet_type: Union[str, Set[str]] = "all",
+        data_dir: str = "./",
+        particle_features: List[str] = particle_features_order,
+        jet_features: List[str] = jet_features_order,
+        num_particles: int = total_particles,
+        split: str = "all",
+    ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
+        """
+        Downloads, if needed, and loads and returns Top Quark Tagging data.
+
+        Args:
+            jet_type (Union[str, Set[str]], optional): individual type or set of types out of 'qcd'
+                and 'top'. Defaults to "all".
+            data_dir (str, optional): directory in which data is (to be) stored. Defaults to "./".
+            particle_features (List[str], optional): list of particle features to retrieve. If empty
+                or None, gets no particle features. Defaults to ``["E", "px", "py", "pz"]``.
+            jet_features (List[str], optional): list of jet features to retrieve.  If empty or None,
+                gets no particle features. Defaults to ``["type", "E", "px", "py", "pz"]``.
+            num_particles (int, optional): number of particles to retain per jet, max of 200.
+                Defaults to 200.
+            split (str, optional): dataset split, out of {"train", "valid", "test", "all"}. Defaults
+                to "all".
+
+        Returns:
+            (Tuple[Optional[np.ndarray], Optional[np.ndarray]]): particle data, jet data
+        """
+        import pandas as pd
+
+        jet_type = checkConvertElements(jet_type, cls.jet_types, ntype="jet type")
+        type_indices = [cls.jet_types.index(t) for t in jet_type]
+
+        particle_features, jet_features = checkStrToList(particle_features, jet_features)
+        use_particle_features, use_jet_features = checkListNotEmpty(particle_features, jet_features)
+        split = checkConvertElements(split, cls.splits, ntype="splitting")
+
+        particle_data = []
+        jet_data = []
+
+        for s in split:
+            hdf5_file = checkDownloadZenodoDataset(
+                data_dir,
+                dataset_name=cls._split_key_mapping[s],
+                record_id=cls._zenodo_record_id,
+                key=f"{cls._split_key_mapping[s]}.h5",
+            )
+
+            data = np.array(pd.read_hdf(hdf5_file, key="table"))
+
+            # select only specified types of jets (qcd or top or both)
+            jet_selector = np.sum([data[:, -1] == i for i in type_indices], axis=0).astype(bool)
+            data = data[jet_selector]
+
+            # exctract particle and jet features in the order specified by the class
+            # ``feature_order`` variables
+            total_particle_features = cls.total_particles * len(cls.particle_features_order)
+
+            if use_particle_features:
+                pf = data[:, :total_particle_features].reshape(
+                    -1, cls.total_particles, len(cls.particle_features_order)
+                )[:, :num_particles]
+
+                # reorder if needed
+                pf = getOrderedFeatures(pf, particle_features, cls.particle_features_order)
+                particle_data.append(pf)
+
+            if use_jet_features:
+                jf = np.concatenate(
+                    (data[:, -1:], data[:, total_particle_features : total_particle_features + 4]),
+                    axis=-1,
+                )
+
+                # reorder if needed
+                jf = getOrderedFeatures(jf, jet_features, cls.jet_features_order)
+                jet_data.append(jf)
+
+        particle_data = np.concatenate(particle_data, axis=0) if use_particle_features else None
+        jet_data = np.concatenate(jet_data, axis=0) if use_jet_features else None
+
+        return particle_data, jet_data
+
+    def extra_repr(self) -> str:
+        if self.split == "all":
+            return ""
+        else:
+            return f"Split into {self.split} data out of {self.splits} possible splits"

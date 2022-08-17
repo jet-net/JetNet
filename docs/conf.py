@@ -33,7 +33,7 @@ copyright = "2021, Raghav Kansal"
 author = "Raghav Kansal"
 
 # The full version, including alpha/beta/rc tags
-release = "0.0.1b"
+release = "0.2.0a"
 
 
 # -- General configuration ---------------------------------------------------
@@ -46,8 +46,13 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "autodocsumm",
+    "m2r2",
 ]
 autosummary_generate = True  # Turn on sphinx.ext.autosummary
+
+autodoc_type_aliases = {"ArrayLike": "ArrayLike"}
+
+source_suffix = [".rst", ".md"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -57,6 +62,7 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
+master_doc = "contents"
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -72,3 +78,5 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+
+html_sidebars = {"**": ["globaltoc.html", "relations.html", "sourcelink.html", "searchbox.html"]}

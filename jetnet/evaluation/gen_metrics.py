@@ -17,8 +17,6 @@ from jetnet import utils
 from scipy import linalg
 from scipy.stats import wasserstein_distance
 
-# from .particlenet import ParticleNet
-
 from tqdm import tqdm
 
 import pathlib
@@ -122,10 +120,15 @@ def _get_fpnd_real_mu_sigma(
     pnet.eval()
 
     if dataset_name == "jetnet":
-        jets = JetNet(jet_type, data_dir, normalize=False, train=False, use_mask=False).data[
-            : _eval_module.fpnd_dict["NUM_SAMPLES"]
-        ]
-        JetNet.normalize_features(jets, fpnd=True)
+        jets = JetNet(
+            jet_type,
+            data_dir,
+            particle_normalisation=JetNet.fpnd_norm,
+            split="valid",
+            split_fraction=[0.7, 0.3, 0.0],
+            particle_features=["etarel", "phirel", "ptrel"],
+            jet_features=None,
+        ).data[: _eval_module.fpnd_dict["NUM_SAMPLES"]]
         # TODO other datasets
     else:
         raise RuntimeError("Only jetnet dataset implemented currently")
@@ -252,10 +255,10 @@ def fpnd(
     assert device == "cuda" or device == "cpu", "Invalid device type"
 
     if dataset_name == "jetnet":
-        JetNet.normalize_features(jets, fpnd=True)
+        JetNet.fpnd_norm(jets)
         # TODO other datasets
 
-    # ParticleNet module and the real mu's and sigma's are only loaded once
+    # ParticleNet module and the real mu's and sigma's are cached in memory after the first load
     if (
         dataset_name not in _eval_module.fpnd_dict
         or num_particles not in _eval_module.fpnd_dict[dataset_name]
@@ -412,7 +415,6 @@ def w1p(
 def w1m(
     jets1: Union[Tensor, np.ndarray],
     jets2: Union[Tensor, np.ndarray],
-    use_particle_masses: bool = False,
     num_eval_samples: int = 10000,
     num_batches: int = 5,
     return_std: bool = True,
