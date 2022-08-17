@@ -96,20 +96,20 @@ class TopTagging(JetDataset):
         Downloads, if needed, and loads and returns Top Quark Tagging data.
 
         Args:
-        jet_type (Union[str, Set[str]], optional): individual type or set of types out of 'qcd' and
-            'top'. Defaults to "all".
-        data_dir (str, optional): directory in which data is (to be) stored. Defaults to "./".
-        particle_features (List[str], optional): list of particle features to retrieve. If empty
-            or None, gets no particle features. Defaults to ``["E", "px", "py", "pz"]``.
-        jet_features (List[str], optional): list of jet features to retrieve.  If empty or None,
-            gets no particle features. Defaults to ``["type", "E", "px", "py", "pz"]``.
-        num_particles (int, optional): number of particles to retain per jet, max of 200. Defaults
-            to 200.
-        split (str, optional): dataset split, out of {"train", "valid", "test", "all"}. Defaults
-            to "all".
+            jet_type (Union[str, Set[str]], optional): individual type or set of types out of 'qcd'
+                and 'top'. Defaults to "all".
+            data_dir (str, optional): directory in which data is (to be) stored. Defaults to "./".
+            particle_features (List[str], optional): list of particle features to retrieve. If empty
+                or None, gets no particle features. Defaults to ``["E", "px", "py", "pz"]``.
+            jet_features (List[str], optional): list of jet features to retrieve.  If empty or None,
+                gets no particle features. Defaults to ``["type", "E", "px", "py", "pz"]``.
+            num_particles (int, optional): number of particles to retain per jet, max of 200.
+                Defaults to 200.
+            split (str, optional): dataset split, out of {"train", "valid", "test", "all"}. Defaults
+                to "all".
 
         Returns:
-            Tuple[Optional[np.ndarray], Optional[np.ndarray]]: particle data, jet data
+            (Tuple[Optional[np.ndarray], Optional[np.ndarray]]): particle data, jet data
         """
         import pandas as pd
 
