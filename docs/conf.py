@@ -14,6 +14,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath("../"))
+# sys.path.insert(0, os.path.abspath("../tutorials/"))
 autodoc_mock_imports = [
     "energyflow",
     "awkward",
@@ -47,6 +48,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "autodocsumm",
     "m2r2",
+    "nbsphinx",
 ]
 autosummary_generate = True  # Turn on sphinx.ext.autosummary
 
@@ -60,9 +62,9 @@ templates_path = ["_templates"]
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "README.md"]
 
-master_doc = "contents"
+master_doc = "pages/contents"
 
 # -- Options for HTML output -------------------------------------------------
 

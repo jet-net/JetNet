@@ -24,3 +24,11 @@ Normalisations
     :members:
     :noindex:
     :autosummary:
+
+Utility Functions
+******************
+
+.. automodule:: jetnet.datasets.utils
+    :members:
+    :noindex:
+    :autosummary:

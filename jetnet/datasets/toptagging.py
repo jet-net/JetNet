@@ -78,8 +78,10 @@ class TopTagging(JetDataset):
             jet_normalisation=jet_normalisation,
             particle_transform=particle_transform,
             jet_transform=jet_transform,
+            num_particles=num_particles,
         )
 
+        self.jet_type = jet_type
         self.split = split
 
     @classmethod
@@ -166,7 +168,11 @@ class TopTagging(JetDataset):
         return particle_data, jet_data
 
     def extra_repr(self) -> str:
+        ret = f"Including {self.jet_type} jets"
+
         if self.split == "all":
-            return ""
+            ret += f"\nUsing all data (no split)"
         else:
-            return f"Split into {self.split} data out of {self.splits} possible splits"
+            ret += f"\nSplit into {self.split} data out of {self.splits} possible splits"
+
+        return ret

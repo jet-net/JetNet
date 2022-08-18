@@ -1,7 +1,7 @@
 """
 Utility methods for datasets.
 """
-
+from __future__ import annotations
 from typing import Set, List, Tuple, Union, Any
 from numpy.typing import ArrayLike
 
