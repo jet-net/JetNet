@@ -30,6 +30,7 @@ class JetDataset(torch.utils.data.Dataset):
             data tensor and transforms it. Defaults to None.
         jet_transform (callable, optional): A function/transform that takes in the jet
             data tensor and transforms it. Defaults to None.
+        num_particles (int, optional): max number of particles to retain per jet. Defaults to None.
     """
 
     _repr_indent = 4
@@ -46,6 +47,7 @@ class JetDataset(torch.utils.data.Dataset):
         jet_normalisation: Optional[NormaliseABC] = None,
         particle_transform: Optional[Callable] = None,
         jet_transform: Optional[Callable] = None,
+        num_particles: Optional[int] = None,
     ):
         self.data_dir = data_dir
 
@@ -70,6 +72,8 @@ class JetDataset(torch.utils.data.Dataset):
         self.particle_transform = particle_transform
         self.jet_transform = jet_transform
 
+        self.num_particles = num_particles
+
     @classmethod
     def getData(**opts) -> Any:
         """Class method to download and return numpy arrays of the data"""
@@ -87,16 +91,22 @@ class JetDataset(torch.utils.data.Dataset):
         """
 
         if self.use_particle_features:
-            particle_data = Tensor(self.particle_data[index])
+            particle_data = self.particle_data[index]
+
             if self.particle_transform is not None:
                 particle_data = self.particle_transform(particle_data)
+
+            particle_data = Tensor(particle_data)
         else:
             particle_data = []
 
         if self.use_jet_features:
-            jet_data = Tensor(self.jet_data[index])
+            jet_data = self.jet_data[index]
+
             if self.jet_transform is not None:
                 jet_data = self.jet_transform(jet_data)
+
+            jet_data = Tensor(jet_data)
         else:
             jet_data = []
 
@@ -115,7 +125,11 @@ class JetDataset(torch.utils.data.Dataset):
         body += self.extra_repr().splitlines()
 
         if self.particle_features is not None:
-            body += [f"Particle features: {self.particle_features}"]
+            bstr = f"Particle features: {self.particle_features}"
+            if self.num_particles is not None:
+                bstr += f", max {self.num_particles} particles per jet"
+
+            body += [bstr]
 
         if self.jet_features is not None:
             body += [f"Jet features: {self.jet_features}"]
@@ -125,6 +139,12 @@ class JetDataset(torch.utils.data.Dataset):
 
         if self.jet_normalisation is not None:
             body += [f"Jet normalisation: {self.jet_normalisation}"]
+
+        if self.particle_transform is not None:
+            body += [f"Particle transform: {self.particle_transform}"]
+
+        if self.jet_transform is not None:
+            body += [f"Jet transform: {self.jet_transform}"]
 
         lines = [head] + [" " * self._repr_indent + line for line in body]
 

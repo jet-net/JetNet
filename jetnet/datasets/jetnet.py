@@ -27,7 +27,7 @@ class JetNet(JetDataset):
 
     Args:
         jet_type (Union[str, Set[str]], optional): individual type or set of types out of
-            'g' (gluon), 't' (top quarks), 'q' (light quarks), 'w' (W bosons), or 'z' (Z bosons).
+            'g' (gluon), 'q' (light quarks), 't' (top quarks), 'w' (W bosons), or 'z' (Z bosons).
             "all" will get all types. Defaults to "all".
         data_dir (str, optional): directory in which data is (to be) stored. Defaults to "./".
         particle_features (List[str], optional): list of particle features to retrieve. If empty
@@ -56,9 +56,9 @@ class JetNet(JetDataset):
 
     _zenodo_record_ids = {"30": 6975118, "150": 6975117}
 
-    jet_types = ["g", "t", "q", "w", "z"]
-    particle_features_order = ["etarel", "phirel", "ptrel", "mask"]
-    jet_features_order = ["type", "pt", "eta", "mass", "num_particles"]
+    jet_types = ["g", "q", "t", "w", "z"]
+    all_particle_features = ["etarel", "phirel", "ptrel", "mask"]
+    all_jet_features = ["type", "pt", "eta", "mass", "num_particles"]
     splits = ["train", "valid", "test", "all"]
 
     # normalisation used for ParticleNet training for FPND, as defined in arXiv:2106.11535
@@ -72,8 +72,8 @@ class JetNet(JetDataset):
         self,
         jet_type: Union[str, Set[str]] = "all",
         data_dir: str = "./",
-        particle_features: List[str] = particle_features_order,
-        jet_features: List[str] = jet_features_order,
+        particle_features: List[str] = all_particle_features,
+        jet_features: List[str] = all_jet_features,
         particle_normalisation: Optional[NormaliseABC] = None,
         jet_normalisation: Optional[NormaliseABC] = None,
         particle_transform: Optional[Callable] = None,
@@ -102,8 +102,10 @@ class JetNet(JetDataset):
             jet_normalisation=jet_normalisation,
             particle_transform=particle_transform,
             jet_transform=jet_transform,
+            num_particles=num_particles,
         )
 
+        self.jet_type = jet_type
         self.split = split
         self.split_fraction = split_fraction
 
@@ -112,8 +114,8 @@ class JetNet(JetDataset):
         cls: JetDataset,
         jet_type: Union[str, Set[str]] = "all",
         data_dir: str = "./",
-        particle_features: List[str] = particle_features_order,
-        jet_features: List[str] = jet_features_order,
+        particle_features: List[str] = all_particle_features,
+        jet_features: List[str] = all_jet_features,
         num_particles: int = 30,
         split: str = "all",
         split_fraction: List[float] = [0.7, 0.15, 0.15],
@@ -177,7 +179,7 @@ class JetNet(JetDataset):
 
             if use_particle_features:
                 # reorder if needed
-                pf = getOrderedFeatures(pf, particle_features, JetNet.particle_features_order)
+                pf = getOrderedFeatures(pf, particle_features, JetNet.all_particle_features)
 
             if use_jet_features:
                 # add class index as first jet feature
@@ -192,7 +194,7 @@ class JetNet(JetDataset):
                     axis=1,
                 )
                 # reorder if needed
-                jf = getOrderedFeatures(jf, jet_features, JetNet.jet_features_order)
+                jf = getOrderedFeatures(jf, jet_features, JetNet.all_jet_features)
 
             particle_data.append(pf)
             jet_data.append(jf)
@@ -217,10 +219,14 @@ class JetNet(JetDataset):
         return particle_data, jet_data
 
     def extra_repr(self) -> str:
+        ret = f"Including {self.jet_type} jets"
+
         if self.split == "all":
-            return ""
+            ret += f"\nUsing all data (no split)"
         else:
-            return (
-                f"Split into {self.split} data out of {self.splits} possible splits, "
+            ret += (
+                f"\nSplit into {self.split} data out of {self.splits} possible splits, "
                 f"with splitting fractions {self.split_fraction}"
             )
+
+        return ret

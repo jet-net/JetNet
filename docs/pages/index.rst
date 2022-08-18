@@ -1,4 +1,4 @@
 Welcome to JetNet!
 ==================
 
-.. mdinclude:: ../README.md
+.. mdinclude:: ../../README.md

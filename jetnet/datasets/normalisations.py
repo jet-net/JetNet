@@ -139,13 +139,16 @@ class FeaturewiseLinear(NormaliseABC):
         return x
 
     def __repr__(self) -> str:
-        ret = (
-            f"Linear scaling with feature norms {self.feature_norms}, "
-            f"feature shifts {self.feature_shifts}"
-        )
+        if self.normal:
+            ret = "Normalising features to zero mean and unit standard deviation"
+        else:
+            ret = (
+                f"Shift features by {self.feature_shifts} "
+                f"and then multiplying by {self.feature_scales}"
+            )
 
-        if self.feature_maxes is not None:
-            ret += f", feature maxes {self.feature_maxes}"
+        if self.normalise_features is not None and self.normalise_features is not True:
+            ret += f", normalising features: {self.normalise_features}"
 
         return ret
 
@@ -274,11 +277,14 @@ class FeaturewiseLinearBounded(NormaliseABC):
 
     def __repr__(self) -> str:
         ret = (
-            f"Linear scaling to feature norms {self.feature_norms} "
+            f"Linear scaling features to feature norms {self.feature_norms} "
             f" and (post-scaling) feature shifts {self.feature_shifts}"
         )
 
         if self.feature_maxes is not None:
             ret += f", with pre-scaling feature maxes {self.feature_maxes}"
+
+        if self.normalise_features is not None and self.normalise_features is not True:
+            ret += f", normalising features: {self.normalise_features}"
 
         return ret

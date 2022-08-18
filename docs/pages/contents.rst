@@ -1,4 +1,4 @@
-.. image:: _static/images/jetnetlogo.png
+.. image:: ../_static/images/jetnetlogo.png
    :width: 75%
    :alt: JetNet logo
 
@@ -20,9 +20,17 @@ Contents
    losses
    utils
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Tutorials
+
+   tutorials/01-data-access
+
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+
