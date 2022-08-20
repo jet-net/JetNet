@@ -12,7 +12,7 @@ ______________________________________________________________________
   <a href="#jetnet">JetNet</a> •
   <a href="#installation">Installation</a> •
   <a href="#quickstart">Quickstart</a> •
-  <a href="https://jetnet.readthedocs.io">Docs</a> •
+  <a href="#documentation">Documentation</a> •
   <a href="#citation">Citation</a> •
   <a href="#references">References</a>
 </p>
