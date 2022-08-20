@@ -100,9 +100,7 @@ loss.backward()
 
 ## Documentation
 
-The full API reference is available at [jetnet.readthedocs.io](https://jetnet.readthedocs.io/en/latest/).
-
-Tutorial notebooks are available on the [jetnet.readthedocs.io](https://jetnet.readthedocs.io/en/latest/) website, and in the [tutorials](tutorials) folder, with more to come. 
+The full API reference and tutorials are available at [jetnet.readthedocs.io](https://jetnet.readthedocs.io/en/latest/). Tutorial notebooks are in the [tutorials](tutorials) folder, with more to come. 
 
 More detailed information about each dataset can (or will) be found at [jet-net.github.io](https://jet-net.github.io/).
 
