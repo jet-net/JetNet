@@ -27,7 +27,7 @@ ______________________________________________________________________
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/jet-net/JetNet/main.svg)](https://results.pre-commit.ci/latest/github/jet-net/JetNet/main)
 
 [![PyPI Version](https://badge.fury.io/py/jetnet.svg)](https://pypi.org/project/jetnet/)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/jetnet)](https://pypi.org/project/jetnet/)
+[![PyPI Downloads](https://pepy.tech/badge/jetnet)](https://pepy.tech/project/jetnet)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5598104.svg)](https://doi.org/10.5281/zenodo.5598104) 
 
 
