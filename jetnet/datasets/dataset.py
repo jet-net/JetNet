@@ -37,6 +37,7 @@ class JetDataset(torch.utils.data.Dataset):
 
     particle_data = None
     jet_data = None
+    max_num_particles = None
 
     def __init__(
         self,

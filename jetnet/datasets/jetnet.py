@@ -55,6 +55,8 @@ class JetNet(JetDataset):
 
     _zenodo_record_ids = {"30": 6975118, "150": 6975117}
 
+    max_num_particles = 150
+
     jet_types = ["g", "q", "t", "w", "z"]
     all_particle_features = ["etarel", "phirel", "ptrel", "mask"]
     all_jet_features = ["type", "pt", "eta", "mass", "num_particles"]
@@ -146,11 +148,14 @@ class JetNet(JetDataset):
         Returns:
             Tuple[Optional[np.ndarray], Optional[np.ndarray]]: particle data, jet data
         """
-        import h5py
-
+        assert (
+            num_particles <= cls.max_num_particles
+        ), f"num_particles {num_particles} exceeds max number of particles in the dataset {cls.max_num_particles}"
         jet_type = checkConvertElements(jet_type, cls.jet_types, ntype="jet type")
         particle_features, jet_features = checkStrToList(particle_features, jet_features)
         use_particle_features, use_jet_features = checkListNotEmpty(particle_features, jet_features)
+
+        import h5py
 
         # Use JetNet150 if ``num_particles`` > 30
         use_150 = num_particles > 30
