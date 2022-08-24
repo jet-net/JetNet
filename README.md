@@ -42,6 +42,7 @@ Currently we provide:
 - Easy-to-access and standardised interfaces for the following datasets:
   - [JetNet](https://zenodo.org/record/6975118)
   - [TopTagging](https://zenodo.org/record/2603256)
+  - [QuarkGluon](https://zenodo.org/record/3164691)
 - Standard implementations of generative evaluation metrics (Ref. [[1](#references)]):
   - Fréchet ParticleNet Distance (FPND)
   - Wasserstein-1 (W1)
