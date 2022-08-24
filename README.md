@@ -12,7 +12,7 @@ ______________________________________________________________________
   <a href="#jetnet">JetNet</a> •
   <a href="#installation">Installation</a> •
   <a href="#quickstart">Quickstart</a> •
-  <a href="https://jetnet.readthedocs.io">Docs</a> •
+  <a href="#documentation">Documentation</a> •
   <a href="#citation">Citation</a> •
   <a href="#references">References</a>
 </p>
@@ -27,7 +27,7 @@ ______________________________________________________________________
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/jet-net/JetNet/main.svg)](https://results.pre-commit.ci/latest/github/jet-net/JetNet/main)
 
 [![PyPI Version](https://badge.fury.io/py/jetnet.svg)](https://pypi.org/project/jetnet/)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/jetnet)](https://pypi.org/project/jetnet/)
+[![PyPI Downloads](https://pepy.tech/badge/jetnet)](https://pepy.tech/project/jetnet)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5598104.svg)](https://doi.org/10.5281/zenodo.5598104) 
 
 
@@ -100,11 +100,9 @@ loss.backward()
 
 ## Documentation
 
-The full API reference is available at [jetnet.readthedocs.io](https://jetnet.readthedocs.io/en/latest/).
+The full API reference and tutorials are available at [jetnet.readthedocs.io](https://jetnet.readthedocs.io/en/latest/). Tutorial notebooks are in the [tutorials](tutorials) folder, with more to come. 
 
 More detailed information about each dataset can (or will) be found at [jet-net.github.io](https://jet-net.github.io/).
-
-*Tutorials for datasets and functions are coming soon.*
 
 ## Citation
 

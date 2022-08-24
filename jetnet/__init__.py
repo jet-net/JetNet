@@ -10,4 +10,4 @@ import jetnet.utils
 import jetnet.datasets.utils
 import jetnet.datasets.normalisations
 
-__version__ = "0.2.0a"
+__version__ = "0.2.0"
