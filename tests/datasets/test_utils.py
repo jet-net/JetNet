@@ -17,8 +17,10 @@ def features_order():
     "data,features,expected",
     [
         (test_data_2d, ["phi", "pt"], test_data_2d[:, 1:]),
+        (test_data_2d, ["phi"], test_data_2d[:, 1:2]),
         (test_data_2d, ["pt", "phi"], np.stack((test_data_2d[:, 2], test_data_2d[:, 1]), axis=-1)),
         (test_data_3d, ["phi", "pt"], test_data_3d[:, :, 1:]),
+        (test_data_3d, ["phi"], test_data_3d[:, :, 1:2]),
         (
             test_data_3d,
             ["pt", "phi"],

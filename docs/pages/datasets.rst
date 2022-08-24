@@ -17,6 +17,14 @@ TopTagging
   :autosummary:
   :noindex:
 
+QuarkGluon
+**************
+
+.. autoclass:: jetnet.datasets.QuarkGluon
+  :members:
+  :autosummary:
+  :noindex:
+
 Normalisations
 **************
 

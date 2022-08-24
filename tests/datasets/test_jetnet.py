@@ -11,17 +11,17 @@ from torch.utils.data import DataLoader
 
 
 data_dir = "./datasets/jetnet"
-total_length = 880000
 DataClass = JetNet
+jet_types = ["g", "q"]  # faster testing than using full dataset
+gq_length = 177252 + 170679
 
 
 @pytest.mark.parametrize(
     "jet_types,expected_length,class_id",
     [
         ("g", 177252, 0),
-        ("w", 177172, 3),
-        (["q", "z"], 170679 + 176952, None),
-        ("all", total_length, None),
+        ("q", 170679, 1),
+        (jet_types, gq_length, None),
     ],
 )
 @pytest.mark.parametrize("num_particles", [30, 75])
@@ -36,27 +36,31 @@ def test_getData(jet_types, num_particles, expected_length, class_id):
 @pytest.mark.parametrize("num_particles", [30, 75])
 def test_getDataFeatures(num_particles):
     pf, jf = DataClass.getData(
-        data_dir=data_dir, num_particles=num_particles, jet_features=["pt", "num_particles"]
+        jet_types,
+        data_dir=data_dir,
+        num_particles=num_particles,
+        jet_features=["pt", "num_particles"],
     )
-    assert pf.shape == (total_length, num_particles, 4)
-    assert jf.shape == (total_length, 2)
+    assert pf.shape == (gq_length, num_particles, 4)
+    assert jf.shape == (gq_length, 2)
     assert np.max(jf[:, 0], axis=0) == approx(3000, rel=0.1)
     assert np.max(jf[:, 1], axis=0) == num_particles
 
-    pf, jf = DataClass.getData(data_dir=data_dir, num_particles=num_particles, jet_features=None)
-    assert pf.shape == (total_length, num_particles, 4)
+    pf, jf = DataClass.getData(
+        jet_types, data_dir=data_dir, num_particles=num_particles, jet_features=None
+    )
+    assert pf.shape == (gq_length, num_particles, 4)
     assert jf is None
 
     pf, jf = DataClass.getData(
-        data_dir=data_dir, num_particles=num_particles, particle_features=["etarel", "mask"]
+        jet_types,
+        data_dir=data_dir,
+        num_particles=num_particles,
+        particle_features=["etarel", "mask"],
     )
-    assert pf.shape == (total_length, num_particles, 2)
-    assert jf.shape == (total_length, 5)
-    assert np.max(pf.reshape(-1, 2), axis=0) == approx([1, 1], rel=1e-3)
-
-
-jet_types = ["g", "q"]  # faster testing than using full dataset
-gq_length = 177252 + 170679
+    assert pf.shape == (gq_length, num_particles, 2)
+    assert jf.shape == (gq_length, 5)
+    assert np.max(pf.reshape(-1, 2), axis=0) == approx([1, 1], rel=1e-2)
 
 
 @pytest.mark.parametrize("num_particles", [30, 75])
@@ -158,4 +162,4 @@ def test_DataClassNormalisation(num_particles):
 
     assert np.all(np.max(np.abs(X.particle_data.reshape(-1, 4)), axis=0) == approx(1))
     assert np.all(np.max(np.abs(X.jet_data[:, 1:].reshape(-1, 4)), axis=0) == approx(1))
-    assert np.max(X.jet_data[:, 0]) == 2
+    assert np.all(np.sum([X.jet_data[:, 0] == 0, X.jet_data[:, 0] == 1], axis=-1))

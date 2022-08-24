@@ -8,33 +8,33 @@ from .dataset import JetDataset
 from .utils import (
     checkConvertElements,
     checkDownloadZenodoDataset,
-    firstNotNoneElement,
     getOrderedFeatures,
     checkStrToList,
     checkListNotEmpty,
     getSplitting,
 )
-from .normalisations import FeaturewiseLinearBounded, NormaliseABC
+from .normalisations import NormaliseABC
 
 
-class JetNet(JetDataset):
+class QuarkGluon(JetDataset):
     """
-    PyTorch ``torch.unit.data.Dataset`` class for the JetNet dataset.
+    PyTorch ``torch.unit.data.Dataset`` class for the Quark Gluon Jets dataset. Either jets with
+    or without bottom and charm quark jets can be selected (``with_bc`` flag).
 
-    If hdf5 files are not found in the ``data_dir`` directory then dataset will be downloaded
-    from Zenodo (https://zenodo.org/record/6975118 or https://zenodo.org/record/6975117).
+    If npz files are not found in the ``data_dir`` directory then dataset will be automatically
+    downloaded from Zenodo (https://zenodo.org/record/3164691).
 
     Args:
         jet_type (Union[str, Set[str]], optional): individual type or set of types out of
-            'g' (gluon), 'q' (light quarks), 't' (top quarks), 'w' (W bosons), or 'z' (Z bosons).
-            "all" will get all types. Defaults to "all".
+            'g' (gluon) and 'q' (light quarks). Defaults to "all".
         data_dir (str, optional): directory in which data is (to be) stored. Defaults to "./".
+        with_bc (bool, optional): with or without bottom and charm quark jets. Defaults to True.
         particle_features (List[str], optional): list of particle features to retrieve. If empty
             or None, gets no particle features. Defaults to
-            ``["etarel", "phirel", "ptrel", "mask"]``.
+            ``["pt", "eta", "phi", "pdgid"]``.
         jet_features (List[str], optional): list of jet features to retrieve.  If empty or None,
             gets no jet features. Defaults to
-            ``["type", "pt", "eta", "mass", "num_particles"]``.
+            ``["type"]``.
         particle_normalisation (NormaliseABC, optional): optional normalisation to apply to
             particle data. Defaults to None.
         jet_normalisation (NormaliseABC, optional): optional normalisation to apply to jet data.
@@ -43,56 +43,104 @@ class JetNet(JetDataset):
             data tensor and transforms it. Defaults to None.
         jet_transform (callable, optional): A function/transform that takes in the jet
             data tensor and transforms it. Defaults to None.
-        num_particles (int, optional): number of particles to retain per jet, max of 150.
-            Defaults to 30.
+        num_particles (int, optional): number of particles to retain per jet, max of 153.
+            Defaults to 153.
         split (str, optional): dataset split, out of {"train", "valid", "test", "all"}. Defaults
             to "train".
         split_fraction (List[float], optional): splitting fraction of training, validation,
             testing data respectively. Defaults to [0.7, 0.15, 0.15].
         seed (int, optional): PyTorch manual seed - important to use the same seed for all
             dataset splittings. Defaults to 42.
+        file_list (List[str], optional): list of files to load, if full dataset is not required.
+            Defaults to None (will load all files).
     """
 
-    _zenodo_record_ids = {"30": 6975118, "150": 6975117}
+    _zenodo_record_id = 3164691
 
-    max_num_particles = 150
+    # False - without bc, True - with bc
+    _file_list = {
+        False: [
+            "QG_jets.npz",
+            "QG_jets_1.npz",
+            "QG_jets_2.npz",
+            "QG_jets_3.npz",
+            "QG_jets_4.npz",
+            "QG_jets_5.npz",
+            "QG_jets_6.npz",
+            "QG_jets_7.npz",
+            "QG_jets_8.npz",
+            "QG_jets_9.npz",
+            "QG_jets_10.npz",
+            "QG_jets_11.npz",
+            "QG_jets_12.npz",
+            "QG_jets_13.npz",
+            "QG_jets_14.npz",
+            "QG_jets_15.npz",
+            "QG_jets_16.npz",
+            "QG_jets_17.npz",
+            "QG_jets_18.npz",
+            "QG_jets_19.npz",
+        ],
+        True: [
+            "QG_jets_withbc_0.npz",
+            "QG_jets_withbc_1.npz",
+            "QG_jets_withbc_2.npz",
+            "QG_jets_withbc_3.npz",
+            "QG_jets_withbc_3.npz",
+            "QG_jets_withbc_4.npz",
+            "QG_jets_withbc_5.npz",
+            "QG_jets_withbc_6.npz",
+            "QG_jets_withbc_7.npz",
+            "QG_jets_withbc_8.npz",
+            "QG_jets_withbc_9.npz",
+            "QG_jets_withbc_10.npz",
+            "QG_jets_withbc_11.npz",
+            "QG_jets_withbc_12.npz",
+            "QG_jets_withbc_13.npz",
+            "QG_jets_withbc_14.npz",
+            "QG_jets_withbc_15.npz",
+            "QG_jets_withbc_16.npz",
+            "QG_jets_withbc_17.npz",
+            "QG_jets_withbc_18.npz",
+            "QG_jets_withbc_19.npz",
+        ],
+    }
 
-    jet_types = ["g", "q", "t", "w", "z"]
-    all_particle_features = ["etarel", "phirel", "ptrel", "mask"]
-    all_jet_features = ["type", "pt", "eta", "mass", "num_particles"]
+    max_num_particles = 153
+
+    jet_types = ["g", "q"]
+    all_particle_features = ["pt", "eta", "phi", "pdgid"]
+    all_jet_features = ["type"]
     splits = ["train", "valid", "test", "all"]
-
-    # normalisation used for ParticleNet training for FPND, as defined in arXiv:2106.11535
-    fpnd_norm = FeaturewiseLinearBounded(
-        feature_norms=1.0,
-        feature_shifts=[0.0, 0.0, -0.5],
-        feature_maxes=[1.6211985349655151, 0.520724892616272, 0.8934717178344727],
-    )
 
     def __init__(
         self,
         jet_type: Union[str, Set[str]] = "all",
         data_dir: str = "./",
+        with_bc: bool = True,
         particle_features: List[str] = all_particle_features,
         jet_features: List[str] = all_jet_features,
         particle_normalisation: Optional[NormaliseABC] = None,
         jet_normalisation: Optional[NormaliseABC] = None,
         particle_transform: Optional[Callable] = None,
         jet_transform: Optional[Callable] = None,
-        num_particles: int = 30,
+        num_particles: int = max_num_particles,
         split: str = "train",
         split_fraction: List[float] = [0.7, 0.15, 0.15],
         seed: int = 42,
+        file_list: List[str] = None,
     ):
         self.particle_data, self.jet_data = self.getData(
             jet_type,
             data_dir,
+            with_bc,
             particle_features,
             jet_features,
             num_particles,
             split,
             split_fraction,
             seed,
+            file_list,
         )
 
         super().__init__(
@@ -115,110 +163,106 @@ class JetNet(JetDataset):
         cls: JetDataset,
         jet_type: Union[str, Set[str]] = "all",
         data_dir: str = "./",
+        with_bc: bool = True,
         particle_features: List[str] = all_particle_features,
         jet_features: List[str] = all_jet_features,
-        num_particles: int = 30,
+        num_particles: int = max_num_particles,
         split: str = "all",
         split_fraction: List[float] = [0.7, 0.15, 0.15],
         seed: int = 42,
+        file_list: List[str] = None,
     ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
         """
-        Downloads, if needed, and loads and returns JetNet data.
+        Downloads, if needed, and loads and returns Quark Gluon data.
 
         Args:
             jet_type (Union[str, Set[str]], optional): individual type or set of types out of
-                'g' (gluon), 't' (top quarks), 'q' (light quarks), 'w' (W bosons), or 'z' (Z bosons).
-                "all" will get all types. Defaults to "all".
+                'g' (gluon) and 'q' (light quarks). Defaults to "all".
             data_dir (str, optional): directory in which data is (to be) stored. Defaults to "./".
+            with_bc (bool, optional): with or without bottom and charm quark jets. Defaults to True.
             particle_features (List[str], optional): list of particle features to retrieve. If empty
                 or None, gets no particle features. Defaults to
-                ``["etarel", "phirel", "ptrel", "mask"]``.
+                ``["pt", "eta", "phi", "pdgid"]``.
             jet_features (List[str], optional): list of jet features to retrieve.  If empty or None,
                 gets no jet features. Defaults to
-                ``["type", "pt", "eta", "mass", "num_particles"]``.
-            num_particles (int, optional): number of particles to retain per jet, max of 150.
-                Defaults to 30.
+                ``["type"]``.
+            num_particles (int, optional): number of particles to retain per jet, max of 153.
+                Defaults to 153.
             split (str, optional): dataset split, out of {"train", "valid", "test", "all"}. Defaults
                 to "train".
             split_fraction (List[float], optional): splitting fraction of training, validation,
                 testing data respectively. Defaults to [0.7, 0.15, 0.15].
             seed (int, optional): PyTorch manual seed - important to use the same seed for all
                 dataset splittings. Defaults to 42.
+            file_list (List[str], optional): list of files to load, if full dataset is not required.
+                Defaults to None (will load all files).
 
         Returns:
             Tuple[Optional[np.ndarray], Optional[np.ndarray]]: particle data, jet data
         """
+
         assert (
             num_particles <= cls.max_num_particles
         ), f"num_particles {num_particles} exceeds max number of particles in the dataset {cls.max_num_particles}"
+
         jet_type = checkConvertElements(jet_type, cls.jet_types, ntype="jet type")
+        type_indices = [cls.jet_types.index(t) for t in jet_type]
+
         particle_features, jet_features = checkStrToList(particle_features, jet_features)
         use_particle_features, use_jet_features = checkListNotEmpty(particle_features, jet_features)
-
-        import h5py
-
-        # Use JetNet150 if ``num_particles`` > 30
-        use_150 = num_particles > 30
 
         particle_data = []
         jet_data = []
 
-        for j in jet_type:
-            dname = f"{j}{'150' if use_150 else ''}"
+        file_list = cls._file_list[with_bc] if file_list is None else file_list
 
-            hdf5_file = checkDownloadZenodoDataset(
+        for file_name in file_list:
+            npz_file = checkDownloadZenodoDataset(
                 data_dir,
-                dataset_name=dname,
-                record_id=cls._zenodo_record_ids["150" if use_150 else "30"],
-                key=f"{dname}.hdf5",
+                dataset_name=file_name,
+                record_id=cls._zenodo_record_id,
+                key=file_name,
             )
 
-            with h5py.File(hdf5_file, "r") as f:
-                pf = (
-                    np.array(f["particle_features"])[:, :num_particles]
-                    if use_particle_features
-                    else None
-                )
-                jf = np.array(f["jet_features"]) if use_jet_features else None
+            print(f"Loading {file_name}")
+            data = np.load(npz_file)
+
+            # select only specified types of jets (qcd or top or both)
+            jet_selector = np.sum([data["y"] == i for i in type_indices], axis=0).astype(bool)
 
             if use_particle_features:
+                pf = data["X"][jet_selector][:, :num_particles]
+
+                # zero-pad if needed (datasets have different numbers of max particles)
+                pf_np = pf.shape[1]
+                if pf_np < num_particles:
+                    pf = np.pad(pf, ((0, 0), (0, num_particles - pf_np), (0, 0)), constant_values=0)
+
                 # reorder if needed
                 pf = getOrderedFeatures(pf, particle_features, cls.all_particle_features)
 
             if use_jet_features:
-                # add class index as first jet feature
-                class_index = cls.jet_types.index(j)
-                jf = np.concatenate(
-                    (
-                        np.full([len(jf), 1], class_index),
-                        jf[:, :3],
-                        # max particles should be num particles
-                        np.minimum(jf[:, 3:], num_particles),
-                    ),
-                    axis=1,
-                )
-                # reorder if needed
+                jf = data["y"][jet_selector].reshape(-1, 1)
                 jf = getOrderedFeatures(jf, jet_features, cls.all_jet_features)
 
-            particle_data.append(pf)
-            jet_data.append(jf)
+            length = np.sum(jet_selector)
+
+            # shuffling and splitting into training and test
+            lcut, rcut = getSplitting(length, split, cls.splits, split_fraction)
+
+            np.random.seed(seed)
+            randperm = np.random.permutation(length)
+
+            if use_particle_features:
+                pf = pf[randperm][lcut:rcut]
+                particle_data.append(pf)
+
+            if use_jet_features:
+                jf = jf[randperm][lcut:rcut]
+                jet_data.append(jf)
 
         particle_data = np.concatenate(particle_data, axis=0) if use_particle_features else None
         jet_data = np.concatenate(jet_data, axis=0) if use_jet_features else None
-
-        length = len(firstNotNoneElement(particle_data, jet_data))
-
-        # shuffling and splitting into training and test
-        lcut, rcut = getSplitting(length, split, cls.splits, split_fraction)
-
-        np.random.seed(seed)
-        randperm = np.random.permutation(length)
-
-        if use_particle_features:
-            particle_data = particle_data[randperm][lcut:rcut]
-
-        if use_jet_features:
-            jet_data = jet_data[randperm][lcut:rcut]
 
         return particle_data, jet_data
 
