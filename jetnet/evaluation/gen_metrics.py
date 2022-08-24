@@ -255,7 +255,7 @@ def fpnd(
     assert device == "cuda" or device == "cpu", "Invalid device type"
 
     if dataset_name == "jetnet":
-        JetNet.fpnd_norm(jets)
+        jets = JetNet.fpnd_norm(jets)
         # TODO other datasets
 
     # ParticleNet module and the real mu's and sigma's are cached in memory after the first load
