@@ -29,7 +29,7 @@ class TopTagging(JetDataset):
         particle_features (List[str], optional): list of particle features to retrieve. If empty
             or None, gets no particle features. Defaults to ``["E", "px", "py", "pz"]``.
         jet_features (List[str], optional): list of jet features to retrieve.  If empty or None,
-            gets no particle features. Defaults to ``["type", "E", "px", "py", "pz"]``.
+            gets no jet features. Defaults to ``["type", "E", "px", "py", "pz"]``.
         particle_normalisation (NormaliseABC, optional): optional normalisation to apply to
             particle data. Defaults to None.
         jet_normalisation (NormaliseABC, optional): optional normalisation to apply to jet data.
@@ -47,8 +47,8 @@ class TopTagging(JetDataset):
     _zenodo_record_id = 2603256
 
     jet_types = ["qcd", "top"]
-    particle_features_order = ["E", "px", "py", "pz"]
-    jet_features_order = ["type", "E", "px", "py", "pz"]
+    all_particle_features = ["E", "px", "py", "pz"]
+    all_jet_features = ["type", "E", "px", "py", "pz"]
     splits = ["train", "valid", "test"]
     _split_key_mapping = {"train": "train", "valid": "val", "test": "test"}  # map to file name
     total_particles = 200
@@ -57,8 +57,8 @@ class TopTagging(JetDataset):
         self,
         jet_type: Union[str, Set[str]] = "all",
         data_dir: str = "./",
-        particle_features: List[str] = particle_features_order,
-        jet_features: List[str] = jet_features_order,
+        particle_features: List[str] = all_particle_features,
+        jet_features: List[str] = all_jet_features,
         particle_normalisation: Optional[NormaliseABC] = None,
         jet_normalisation: Optional[NormaliseABC] = None,
         particle_transform: Optional[Callable] = None,
@@ -89,8 +89,8 @@ class TopTagging(JetDataset):
         cls,
         jet_type: Union[str, Set[str]] = "all",
         data_dir: str = "./",
-        particle_features: List[str] = particle_features_order,
-        jet_features: List[str] = jet_features_order,
+        particle_features: List[str] = all_particle_features,
+        jet_features: List[str] = all_jet_features,
         num_particles: int = total_particles,
         split: str = "all",
     ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
@@ -104,7 +104,7 @@ class TopTagging(JetDataset):
             particle_features (List[str], optional): list of particle features to retrieve. If empty
                 or None, gets no particle features. Defaults to ``["E", "px", "py", "pz"]``.
             jet_features (List[str], optional): list of jet features to retrieve.  If empty or None,
-                gets no particle features. Defaults to ``["type", "E", "px", "py", "pz"]``.
+                gets no jet features. Defaults to ``["type", "E", "px", "py", "pz"]``.
             num_particles (int, optional): number of particles to retain per jet, max of 200.
                 Defaults to 200.
             split (str, optional): dataset split, out of {"train", "valid", "test", "all"}. Defaults
@@ -141,15 +141,15 @@ class TopTagging(JetDataset):
 
             # exctract particle and jet features in the order specified by the class
             # ``feature_order`` variables
-            total_particle_features = cls.total_particles * len(cls.particle_features_order)
+            total_particle_features = cls.total_particles * len(cls.all_particle_features)
 
             if use_particle_features:
                 pf = data[:, :total_particle_features].reshape(
-                    -1, cls.total_particles, len(cls.particle_features_order)
+                    -1, cls.total_particles, len(cls.all_particle_features)
                 )[:, :num_particles]
 
                 # reorder if needed
-                pf = getOrderedFeatures(pf, particle_features, cls.particle_features_order)
+                pf = getOrderedFeatures(pf, particle_features, cls.all_particle_features)
                 particle_data.append(pf)
 
             if use_jet_features:
@@ -159,7 +159,7 @@ class TopTagging(JetDataset):
                 )
 
                 # reorder if needed
-                jf = getOrderedFeatures(jf, jet_features, cls.jet_features_order)
+                jf = getOrderedFeatures(jf, jet_features, cls.all_jet_features)
                 jet_data.append(jf)
 
         particle_data = np.concatenate(particle_data, axis=0) if use_particle_features else None
