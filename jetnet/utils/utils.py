@@ -188,4 +188,4 @@ def gen_jet_corrections(
     if zero_neg_pt:
         jets[:, :, pt_index][jets[:, :, pt_index] < 0] = 0
 
-    return jets[:, :, :-1], mask if ret_mask_separate else jets
+    return (jets[:, :, :-1], mask) if ret_mask_separate else jets

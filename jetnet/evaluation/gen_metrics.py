@@ -273,7 +273,7 @@ def fpnd(
     sigma1 = _eval_module.fpnd_dict[dataset_name][num_particles][jet_type]["sigma"]
 
     # run inference and store activations
-    jets_loaded = DataLoader(jets[:, :, : _eval_module.fpnd_dict["NUM_SAMPLES"]], batch_size)
+    jets_loaded = DataLoader(jets[: _eval_module.fpnd_dict["NUM_SAMPLES"]], batch_size)
 
     logging.info(f"Calculating ParticleNet activations with batch size: {batch_size}")
     activations = []
