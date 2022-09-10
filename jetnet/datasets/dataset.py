@@ -62,12 +62,14 @@ class JetDataset(torch.utils.data.Dataset):
 
         if self.use_particle_features:
             if self.particle_normalisation is not None:
-                self.particle_normalisation.derive_dataset_features(self.particle_data)
+                if self.particle_normalisation.features_need_deriving():
+                    self.particle_normalisation.derive_dataset_features(self.particle_data)
                 self.particle_data = self.particle_normalisation(self.particle_data)
 
         if self.use_jet_features:
             if self.jet_normalisation is not None:
-                self.jet_normalisation.derive_dataset_features(self.jet_data)
+                if self.jet_normalisation.features_need_deriving():
+                    self.jet_normalisation.derive_dataset_features(self.jet_data)
                 self.jet_data = self.jet_normalisation(self.jet_data)
 
         self.particle_transform = particle_transform
