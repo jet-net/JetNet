@@ -16,6 +16,10 @@ class NormaliseABC(ABC):
     ABC for generalised normalisation class.
     """
 
+    def features_need_deriving(self) -> bool:
+        """Checks if any dataset values or features need to be derived"""
+        return False
+
     def derive_dataset_features(self, x: ArrayLike):
         """Derive features from dataset needed for normalisation if needed"""
         pass
@@ -86,7 +90,15 @@ class FeaturewiseLinear(NormaliseABC):
             self.feature_scales = 1.0 / np.std(x.reshape(-1, num_features), axis=0)
             return self.feature_shifts, self.feature_scales
 
+    def features_need_deriving(self) -> bool:
+        """Checks if any dataset values or features need to be derived"""
+        return (self.feature_shifts is None) or (self.feature_scales is None)
+
     def __call__(self, x: ArrayLike, inverse: bool = False, inplace: bool = False) -> ArrayLike:
+        assert (
+            not self.features_need_deriving()
+        ), "Feature means and stds have not been specified, you need to either set or derive them first"
+
         num_features = x.shape[-1]
 
         if isinstance(self.feature_shifts, float):
@@ -175,9 +187,6 @@ class FeaturewiseLinearBounded(NormaliseABC):
 
     """
 
-    # stores pre-scaled max absolute value of each feature for normalising and inverting
-    feature_maxes = None
-
     def __init__(
         self,
         feature_norms: Union[float, List[float]] = 1.0,
@@ -207,9 +216,13 @@ class FeaturewiseLinearBounded(NormaliseABC):
         self.feature_maxes = np.max(np.abs(x.reshape(-1, num_features)), axis=0)
         return self.feature_maxes
 
+    def features_need_deriving(self) -> bool:
+        """Checks if any dataset values or features need to be derived"""
+        return self.feature_maxes is None
+
     def __call__(self, x: ArrayLike, inverse: bool = False, inplace: bool = False) -> ArrayLike:
         assert (
-            self.feature_maxes is not None
+            not self.features_need_deriving()
         ), "Feature maxes have not been specified, you need to either set or derive them first"
 
         num_features = x.shape[-1]
