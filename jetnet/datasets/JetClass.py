@@ -1,23 +1,12 @@
 from typing import Callable, List, Set, Union, Optional, Tuple
-
 import numpy as np
-
 import logging
-
-from .dataset import JetDataset
-from .utils import (
-    checkConvertElements,
-    checkDownloadZenodoDataset,
-    firstNotNoneElement,
-    getOrderedFeatures,
-    checkStrToList,
-    checkListNotEmpty,
-    getSplitting,
-)
-from .normalisations import FeaturewiseLinearBounded, NormaliseABC
+import uproot
+from utils import *
 
 
-class JetNet(JetDataset):
+
+class JetClass:
     """
     PyTorch ``torch.unit.data.Dataset`` class for the JetNet dataset.
     If hdf5 files are not found in the ``data_dir`` directory then dataset will be downloaded
@@ -59,13 +48,6 @@ class JetNet(JetDataset):
     all_particle_features = ["etarel", "phirel", "ptrel", "mask"]
     all_jet_features = ["type", "pt", "eta", "mass", "num_particles"]
     splits = ["train", "valid", "test", "all"]
-
-    # normalisation used for ParticleNet training for FPND, as defined in arXiv:2106.11535
-    fpnd_norm = FeaturewiseLinearBounded(
-        feature_norms=1.0,
-        feature_shifts=[0.0, 0.0, -0.5],
-        feature_maxes=[1.6211985349655151, 0.520724892616272, 0.8934717178344727],
-    )
 
     def __init__(
         self,
@@ -217,16 +199,3 @@ class JetNet(JetDataset):
             jet_data = jet_data[randperm][lcut:rcut]
 
         return particle_data, jet_data
-
-    def extra_repr(self) -> str:
-        ret = f"Including {self.jet_type} jets"
-
-        if self.split == "all":
-            ret += f"\nUsing all data (no split)"
-        else:
-            ret += (
-                f"\nSplit into {self.split} data out of {self.splits} possible splits, "
-                f"with splitting fractions {self.split_fraction}"
-            )
-
-        return ret
