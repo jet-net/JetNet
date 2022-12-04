@@ -1,2 +1,2 @@
-from coord_transform import *
+from .coord_transform import *
 from .utils import *
