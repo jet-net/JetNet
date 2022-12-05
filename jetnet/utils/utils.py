@@ -25,7 +25,8 @@ def jet_features(jets: np.ndarray) -> Dict[str, Union[float, np.ndarray]]:
           they are assumed to be 0.
 
     Returns:
-        Dict[str, Union[float, np.ndarray]]: dict of float (if inputted single jet) or
+        Dict[str, Union[float, np.ndarray]]:
+          dict of float (if inputted single jet) or
           1D arrays of length ``num_jets`` (if inputted multiple jets)
           with 'mass', 'pt', and 'eta' keys.
 
@@ -91,8 +92,8 @@ def efps(
           None means as many processes as there are CPUs.
 
     Returns:
-        np.ndarray: 1D (if inputted single jet) or 2D array of shape ``[num_jets, num_efps]`` of
-          EFPs per jet
+        np.ndarray:
+          1D (if inputted single jet) or 2D array of shape ``[num_jets, num_efps]`` of EFPs per jet
 
     """
 
