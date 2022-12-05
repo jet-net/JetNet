@@ -24,7 +24,7 @@ Contents
    :maxdepth: 2
    :caption: Tutorials
 
-   tutorials/01-data-access
+   tutorials/pyhep-data-access
 
 Indices and tables
 ==================
