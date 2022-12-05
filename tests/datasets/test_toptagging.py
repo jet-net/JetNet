@@ -18,6 +18,7 @@ num_particles = 200
 split = "valid"  # for faster testing
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     "jet_types,split,expected_length,class_id",
     [
@@ -41,6 +42,7 @@ def test_getData(jet_types, split, expected_length, class_id):
         assert np.all(jf[:, 0] == class_id)
 
 
+@pytest.mark.slow
 def test_getDataFeatures():
     pf, jf = DataClass.getData(data_dir=data_dir, jet_features=["E", "type"], split=split)
     assert pf.shape == (valid_length, num_particles, 4)
@@ -61,53 +63,7 @@ def test_getDataFeatures():
     assert np.max(pf[:, :, 1]) == approx(2000, rel=0.2)
 
 
-def test_getDataErrors():
-    with pytest.raises(AssertionError):
-        DataClass.getData(jet_type="f", split=split)
-
-    with pytest.raises(AssertionError):
-        DataClass.getData(jet_type={"qcd", "f"}, split=split)
-
-    with pytest.raises(AssertionError):
-        DataClass.getData(data_dir=data_dir, particle_features="foo", split=split)
-
-    with pytest.raises(AssertionError):
-        DataClass.getData(data_dir=data_dir, jet_features=["eta", "mask"], split=split)
-
-
-# Don't need to repeat JetNet's tests
-
-# def test_DataClass():
-#     # X = DataClass(data_dir=data_dir, split="all")
-#     # assert len(X) == total_length
-
-#     X = DataClass(data_dir=data_dir, split=split)
-#     assert len(X) == valid_length
-
-#     X_loaded = DataLoader(X)
-#     pf, jf = next(iter(X_loaded))
-#     assert pf.shape == (1, num_particles, 4)
-#     assert jf.shape == (1, 5)
-
-#     X = DataClass(
-#         data_dir=data_dir,
-#         num_particles=num_particles,
-#         particle_features=["px", "E"],
-#         jet_features=None,
-#         split=split,
-#     )
-#     X_loaded = DataLoader(X)
-#     pf, jf = next(iter(X_loaded))
-#     assert pf.shape == (1, num_particles, 2)
-#     assert jf == []
-
-#     X = DataClass(data_dir=data_dir, particle_features=None, split=split)
-#     X_loaded = DataLoader(X)
-#     pf, jf = next(iter(X_loaded))
-#     assert pf == []
-#     assert jf.shape == (1, 5)
-
-
+@pytest.mark.slow
 def test_DataClassNormalisation():
     X = DataClass(
         data_dir=data_dir,
@@ -122,3 +78,18 @@ def test_DataClassNormalisation():
     assert np.all(np.max(np.abs(X.particle_data.reshape(-1, 4)), axis=0) == approx(1))
     assert np.all(np.max(np.abs(X.jet_data[:, 1:].reshape(-1, 4)), axis=0) == approx(1))
     assert np.max(X.jet_data[:, 0]) == 1
+
+
+@pytest.mark.slow
+def test_getDataErrors():
+    with pytest.raises(AssertionError):
+        DataClass.getData(jet_type="f", split=split)
+
+    with pytest.raises(AssertionError):
+        DataClass.getData(jet_type={"qcd", "f"}, split=split)
+
+    with pytest.raises(AssertionError):
+        DataClass.getData(data_dir=data_dir, particle_features="foo", split=split)
+
+    with pytest.raises(AssertionError):
+        DataClass.getData(data_dir=data_dir, jet_features=["eta", "mask"], split=split)
