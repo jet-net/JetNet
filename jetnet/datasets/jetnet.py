@@ -1,20 +1,18 @@
-from typing import Callable, List, Set, Union, Optional, Tuple
+from typing import Callable, List, Optional, Set, Tuple, Union
 
 import numpy as np
 
-import logging
-
 from .dataset import JetDataset
+from .normalisations import FeaturewiseLinearBounded, NormaliseABC
 from .utils import (
     checkConvertElements,
     checkDownloadZenodoDataset,
+    checkListNotEmpty,
+    checkStrToList,
     firstNotNoneElement,
     getOrderedFeatures,
-    checkStrToList,
-    checkListNotEmpty,
     getSplitting,
 )
-from .normalisations import FeaturewiseLinearBounded, NormaliseABC
 
 
 class JetNet(JetDataset):
@@ -174,11 +172,7 @@ class JetNet(JetDataset):
             )
 
             with h5py.File(hdf5_file, "r") as f:
-                pf = (
-                    np.array(f["particle_features"])[:, :num_particles]
-                    if use_particle_features
-                    else None
-                )
+                pf = np.array(f["particle_features"])[:, :num_particles] if use_particle_features else None
                 jf = np.array(f["jet_features"]) if use_jet_features else None
 
             if use_particle_features:
@@ -226,7 +220,7 @@ class JetNet(JetDataset):
         ret = f"Including {self.jet_type} jets"
 
         if self.split == "all":
-            ret += f"\nUsing all data (no split)"
+            ret += "\nUsing all data (no split)"
         else:
             ret += (
                 f"\nSplit into {self.split} data out of {self.splits} possible splits, "

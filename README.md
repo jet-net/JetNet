@@ -28,7 +28,7 @@ ______________________________________________________________________
 
 [![PyPI Version](https://badge.fury.io/py/jetnet.svg)](https://pypi.org/project/jetnet/)
 [![PyPI Downloads](https://pepy.tech/badge/jetnet)](https://pepy.tech/project/jetnet)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5598104.svg)](https://doi.org/10.5281/zenodo.5598104) 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5598104.svg)](https://doi.org/10.5281/zenodo.5598104)
 
 
 
@@ -36,7 +36,7 @@ ______________________________________________________________________
 
 ## JetNet
 
-JetNet is an effort to increase accessibility and reproducibility in jet-based machine learning. 
+JetNet is an effort to increase accessibility and reproducibility in jet-based machine learning.
 
 Currently we provide:
 - Easy-to-access and standardised interfaces for the following datasets:
@@ -101,7 +101,7 @@ loss.backward()
 
 ## Documentation
 
-The full API reference and tutorials are available at [jetnet.readthedocs.io](https://jetnet.readthedocs.io/en/latest/). Tutorial notebooks are in the [tutorials](tutorials) folder, with more to come. 
+The full API reference and tutorials are available at [jetnet.readthedocs.io](https://jetnet.readthedocs.io/en/latest/). Tutorial notebooks are in the [tutorials](tutorials) folder, with more to come.
 
 More detailed information about each dataset can (or will) be found at [jet-net.github.io](https://jet-net.github.io/).
 
@@ -109,7 +109,7 @@ More detailed information about each dataset can (or will) be found at [jet-net.
 
 If you find this library useful for your research, please consider citing our original paper which introduces it [[1](#references)].
 
-<!-- 
+<!--
 ```latex
 @inproceedings{kansal21,
  author = {Raghav Kansal and Javier Duarte and Hao Su and Breno Orzari and Thiago Tomei and Maurizio Pierini and Mary Touranakou and Jean-Roch Vlimant and Dimitrios Gunopulos},
@@ -124,7 +124,7 @@ If you find this library useful for your research, please consider citing our or
 }
 ``` -->
 
-Additionally, if you use our EMD loss implementation, please cite the respective [qpth](https://locuslab.github.io/qpth/) or [cvxpy](https://github.com/cvxpy/cvxpy) libraries, depending on the method used (`qpth` by default). 
+Additionally, if you use our EMD loss implementation, please cite the respective [qpth](https://locuslab.github.io/qpth/) or [cvxpy](https://github.com/cvxpy/cvxpy) libraries, depending on the method used (`qpth` by default).
 
 
 ## References

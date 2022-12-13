@@ -1,18 +1,16 @@
-from typing import Callable, List, Set, Union, Optional, Tuple
+from typing import Callable, List, Optional, Set, Tuple, Union
 
 import numpy as np
 
-import logging
-
 from .dataset import JetDataset
+from .normalisations import NormaliseABC
 from .utils import (
     checkConvertElements,
     checkDownloadZenodoDataset,
-    getOrderedFeatures,
-    checkStrToList,
     checkListNotEmpty,
+    checkStrToList,
+    getOrderedFeatures,
 )
-from .normalisations import NormaliseABC
 
 
 class TopTagging(JetDataset):
@@ -148,9 +146,9 @@ class TopTagging(JetDataset):
             total_particle_features = cls.max_num_particles * len(cls.all_particle_features)
 
             if use_particle_features:
-                pf = data[:, :total_particle_features].reshape(
-                    -1, cls.max_num_particles, len(cls.all_particle_features)
-                )[:, :num_particles]
+                pf = data[:, :total_particle_features].reshape(-1, cls.max_num_particles, len(cls.all_particle_features))[
+                    :, :num_particles
+                ]
 
                 # reorder if needed
                 pf = getOrderedFeatures(pf, particle_features, cls.all_particle_features)
@@ -175,7 +173,7 @@ class TopTagging(JetDataset):
         ret = f"Including {self.jet_type} jets"
 
         if self.split == "all":
-            ret += f"\nUsing all data (no split)"
+            ret += "\nUsing all data (no split)"
         else:
             ret += f"\nSplit into {self.split} data out of {self.splits} possible splits"
 

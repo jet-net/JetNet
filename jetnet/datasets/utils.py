@@ -2,17 +2,15 @@
 Utility methods for datasets.
 """
 from __future__ import annotations
-from typing import Set, List, Tuple, Union, Any
-from numpy.typing import ArrayLike
 
-import requests
-import sys
 import os
+import sys
 from os.path import exists
+from typing import Any, List, Set, Tuple, Union
 
 import numpy as np
-
-import logging
+import requests
+from numpy.typing import ArrayLike
 
 
 def download_progress_bar(file_url: str, file_dest: str):
@@ -40,11 +38,7 @@ def download_progress_bar(file_url: str, file_dest: str):
                 downloaded += len(data)
                 f.write(data)
                 done = int(50 * downloaded / total)
-                sys.stdout.write(
-                    "\r[{}{}] {:.0f}%".format(
-                        "█" * done, "." * (50 - done), float(downloaded / total) * 100
-                    )
-                )
+                sys.stdout.write("\r[{}{}] {:.0f}%".format("█" * done, "." * (50 - done), float(downloaded / total) * 100))
                 sys.stdout.flush()
 
     sys.stdout.write("\n")
@@ -74,9 +68,7 @@ def getZenodoFileURL(record_id: int, file_name: str) -> str:
     return file_url
 
 
-def getOrderedFeatures(
-    data: ArrayLike, features: List[str], features_order: List[str]
-) -> np.ndarray:
+def getOrderedFeatures(data: ArrayLike, features: List[str], features_order: List[str]) -> np.ndarray:
     """Returns data with features in the order specified by ``features``.
 
     Args:
@@ -131,9 +123,7 @@ def firstNotNoneElement(*inputs: List[Any]) -> Any:
             return inp
 
 
-def checkConvertElements(
-    elem: Union[str, List[str]], valid_types: List[str], ntype: str = "element"
-):
+def checkConvertElements(elem: Union[str, List[str]], valid_types: List[str], ntype: str = "element"):
     """Checks if elem(s) are valid and if needed converts into a list"""
     if elem != "all":
         elem = checkStrToList(elem, to_set=True)
@@ -147,9 +137,7 @@ def checkConvertElements(
     return elem
 
 
-def getSplitting(
-    length: int, split: str, splits: List[str], split_fraction: List[float]
-) -> Tuple[int, int]:
+def getSplitting(length: int, split: str, splits: List[str], split_fraction: List[float]) -> Tuple[int, int]:
     """
     Returns starting and ending index for splitting a dataset of length ``length`` according to
     the input ``split`` out of the total possible ``splits`` and a given ``split_fraction``.
@@ -169,7 +157,7 @@ def getSplitting(
         if split == "all":
             return 0, length
         else:
-            assert splits[-1] == "all", f"'all' must be last entry in ``splits`` array"
+            assert splits[-1] == "all", "'all' must be last entry in ``splits`` array"
             splits = splits[:-1]
 
     assert np.sum(split_fraction) <= 1.0, "sum of split fractions must be ≤ 1"

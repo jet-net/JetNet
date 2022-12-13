@@ -1,11 +1,9 @@
-from jetnet.datasets import JetNet, normalisations
 import numpy as np
-
 import pytest
 from pytest import approx
-
 from torch.utils.data import DataLoader
 
+from jetnet.datasets import JetNet, normalisations
 
 # TODO: use checksum for downloaded files
 
@@ -46,9 +44,7 @@ def test_getDataFeatures(num_particles):
     assert np.max(jf[:, 0], axis=0) == approx(3000, rel=0.1)
     assert np.max(jf[:, 1], axis=0) == num_particles
 
-    pf, jf = DataClass.getData(
-        jet_types, data_dir=data_dir, num_particles=num_particles, jet_features=None
-    )
+    pf, jf = DataClass.getData(jet_types, data_dir=data_dir, num_particles=num_particles, jet_features=None)
     assert pf.shape == (gq_length, num_particles, 4)
     assert jf is None
 
@@ -75,9 +71,7 @@ def test_getDataSplitting(num_particles):
     assert len(pf) == int(gq_length * 0.6)
     assert len(jf) == int(gq_length * 0.6)
 
-    pf, jf = DataClass.getData(
-        jet_type=jet_types, data_dir=data_dir, num_particles=num_particles, split="all"
-    )
+    pf, jf = DataClass.getData(jet_type=jet_types, data_dir=data_dir, num_particles=num_particles, split="all")
     assert len(pf) == int(gq_length)
     assert len(jf) == int(gq_length)
 
@@ -138,9 +132,7 @@ def test_DataClass(num_particles):
     assert pf.shape == (1, num_particles, 2)
     assert jf == []
 
-    X = DataClass(
-        jet_type=jet_types, data_dir=data_dir, num_particles=num_particles, particle_features=None
-    )
+    X = DataClass(jet_type=jet_types, data_dir=data_dir, num_particles=num_particles, particle_features=None)
     X_loaded = DataLoader(X)
     pf, jf = next(iter(X_loaded))
     assert pf == []
@@ -154,9 +146,7 @@ def test_DataClassNormalisation(num_particles):
         data_dir=data_dir,
         num_particles=num_particles,
         particle_normalisation=normalisations.FeaturewiseLinearBounded(),
-        jet_normalisation=normalisations.FeaturewiseLinearBounded(
-            normalise_features=[False, True, True, True, True]
-        ),
+        jet_normalisation=normalisations.FeaturewiseLinearBounded(normalise_features=[False, True, True, True, True]),
         split="all",
     )
 

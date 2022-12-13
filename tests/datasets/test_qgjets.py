@@ -1,11 +1,8 @@
-from jetnet.datasets import QuarkGluon, normalisations
 import numpy as np
-
 import pytest
 from pytest import approx
 
-from torch.utils.data import DataLoader
-
+from jetnet.datasets import QuarkGluon
 
 # TODO: use checksum for downloaded files
 

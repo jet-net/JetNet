@@ -1,15 +1,14 @@
 from __future__ import annotations  # for ArrayLike type in docs
-from typing import Dict, Union, Tuple
-from numpy.typing import ArrayLike
 
-import numpy as np
+from typing import Dict, Tuple, Union
 
 # for calculating jet features quickly,
 # TODO: replace with vector library when summing over axis feature is implemented
 import awkward as ak
+import numpy as np
 from coffea.nanoevents.methods import vector
-
 from energyflow import EFPSet
+from numpy.typing import ArrayLike
 
 ak.behavior.update(vector.behavior)
 
@@ -114,15 +113,13 @@ def efps(
     return efps
 
 
-def to_image(
-    jets: np.ndarray, im_size: int, mask: np.ndarray = None, maxR: float = 1.0
-) -> np.ndarray:
+def to_image(jets: np.ndarray, im_size: int, mask: np.ndarray = None, maxR: float = 1.0) -> np.ndarray:
     """
     Convert jet(s) into 2D ``im_size`` x ``im_size`` or  3D ``num_jets`` x ``im_size`` x ``im_size`` image arrays.
 
     Args:
-        jets (np.ndarray): array of jet(s) of shape ``[num_particles, num_features]`` or ``[num_jets, num_particles, num_features]``
-          with features in order ``[eta, phi, pt]``.
+        jets (np.ndarray): array of jet(s) of shape ``[num_particles, num_features]`` or
+          ``[num_jets, num_particles, num_features]`` with features in order ``[eta, phi, pt]``.
         im_size (int): number of pixels per row and column.
         mask (np.ndarray): optional binary array of masks of shape ``[num_particles]`` or ``[num_jets, num_particles]``.
         maxR (float): max radius of the jet. Defaults to 1.0.

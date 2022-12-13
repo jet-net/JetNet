@@ -2,13 +2,13 @@
 Suite of common ways to normalise data.
 """
 from __future__ import annotations
-from numpy.typing import ArrayLike
-from typing import List, Union, Optional, Tuple
 
 from abc import ABC, abstractmethod
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 import torch
+from numpy.typing import ArrayLike
 
 
 class NormaliseABC(ABC):
@@ -154,10 +154,7 @@ class FeaturewiseLinear(NormaliseABC):
         if self.normal:
             ret = "Normalising features to zero mean and unit standard deviation"
         else:
-            ret = (
-                f"Shift features by {self.feature_shifts} "
-                f"and then multiplying by {self.feature_scales}"
-            )
+            ret = f"Shift features by {self.feature_shifts} " f"and then multiplying by {self.feature_scales}"
 
         if self.normalise_features is not None and self.normalise_features is not True:
             ret += f", normalising features: {self.normalise_features}"

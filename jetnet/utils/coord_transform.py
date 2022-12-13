@@ -1,6 +1,7 @@
+from typing import Iterable, Union
+
 import numpy as np
 import torch
-from typing import Union, Iterable
 
 
 def cartesian_to_EtaPhiPtE(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
@@ -103,9 +104,7 @@ def YPhiPtE_to_cartesian(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarra
     return __stack([p0, px, py, pz], axis=-1)
 
 
-def cartesian_to_relEtaPhiPt(
-    p4: Union[np.ndarray, torch.Tensor]
-) -> Union[np.ndarray, torch.Tensor]:
+def cartesian_to_relEtaPhiPt(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
     r"""
     Get particle features in relative polar coordinates from 4-momenta in Cartesian coordinates.
 
@@ -139,9 +138,7 @@ def cartesian_to_relEtaPhiPt(
     return __stack([eta_rel, phi_rel, pt_rel], axis=-1)
 
 
-def EtaPhiPtE_to_relEtaPhiPt(
-    p4: Union[np.ndarray, torch.Tensor]
-) -> Union[np.ndarray, torch.Tensor]:
+def EtaPhiPtE_to_relEtaPhiPt(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
     r"""
     Get particle features in relative polar coordinates from 4-momenta in polar coordinates.
 
@@ -188,7 +185,8 @@ def relEtaPhiPt_to_EtaPhiPt(
     Args:
         p_polarrel (np.ndarray or torch.Tensor): array of particle features in relative polar coordinates,
           of shape ``[..., 3]``. The last axis should be in order
-          :math:`(\eta^\mathrm{rel}, \phi^\mathrm{rel}, p_\mathrm{T}^\mathrm{rel})`, where :math:`\eta` is the pseudorapidity.
+          :math:`(\eta^\mathrm{rel}, \phi^\mathrm{rel}, p_\mathrm{T}^\mathrm{rel})`,
+          where :math:`\eta` is the pseudorapidity.
         jet_features (np.ndarray or torch.Tensor): array of jet features in polar coordinates,
           of shape ``[..., 4]``. The coordinates are specified by ``jet_coord``.
         jet_coord (str): coordinate system of jet features. Can be either "cartesian" or "polar".
@@ -234,7 +232,8 @@ def relEtaPhiPt_to_cartesian(
     Args:
         p_polarrel (np.ndarray or torch.Tensor): array of particle features in relative polar coordinates,
           of shape ``[..., 3]``. The last axis should be in order
-          :math:`(\eta^\mathrm{rel}, \phi^\mathrm{rel}, p_\mathrm{T}^\mathrm{rel})`, where :math:`\eta` is the pseudorapidity.
+          :math:`(\eta^\mathrm{rel}, \phi^\mathrm{rel}, p_\mathrm{T}^\mathrm{rel})`,
+          where :math:`\eta` is the pseudorapidity.
         jet_features (np.ndarray or torch.Tensor): array of jet features in polar coordinates,
           of shape ``[..., 4]``. The coordinates are specified by ``jet_coord``.
         jet_coord (str): coordinate system of jet features. Can be either "cartesian" or "polar".
@@ -261,9 +260,7 @@ def __unbind(x: Union[np.ndarray, torch.Tensor], axis: int) -> Union[np.ndarray,
         raise TypeError(f"x must be either a numpy array or a torch tensor, not {type(x)}")
 
 
-def __stack(
-    x: Iterable[Union[np.ndarray, torch.Tensor]], axis: int
-) -> Union[np.ndarray, torch.Tensor]:
+def __stack(x: Iterable[Union[np.ndarray, torch.Tensor]], axis: int) -> Union[np.ndarray, torch.Tensor]:
     """Stack an iterable of np.ndarray or torch.Tensor along a given axis."""
     if not isinstance(x, Iterable):
         raise TypeError("x must be an iterable.")
@@ -336,9 +333,7 @@ def __log(x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]
         raise TypeError(f"x must be either a numpy array or a torch tensor, not {type(x)}")
 
 
-def __arctan2(
-    y: Union[np.ndarray, torch.Tensor], x: Union[np.ndarray, torch.Tensor]
-) -> Union[np.ndarray, torch.Tensor]:
+def __arctan2(y: Union[np.ndarray, torch.Tensor], x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
     """Arctangent function that works with np.ndarray and torch.Tensor."""
     if isinstance(y, torch.Tensor):
         return torch.atan2(y, x)
@@ -358,9 +353,7 @@ def __sqrt(x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor
         raise TypeError(f"x must be either a numpy array or a torch tensor, not {type(x)}")
 
 
-def __sum(
-    x: Union[np.ndarray, torch.Tensor], axis: int, keepdims: bool = False
-) -> Union[np.ndarray, torch.Tensor]:
+def __sum(x: Union[np.ndarray, torch.Tensor], axis: int, keepdims: bool = False) -> Union[np.ndarray, torch.Tensor]:
     """Sum function that works with np.ndarray and torch.Tensor."""
     if isinstance(x, torch.Tensor):
         return x.sum(axis, keepdim=keepdims)
