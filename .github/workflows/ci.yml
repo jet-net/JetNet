@@ -32,7 +32,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.7", "3.10"]
-        pytest-file: ["tests/datasets/test_jetnet.py", "tests/datasets/test_normalisations.py", "tests/datasets/test_qgjets.py", "tests/datasets/test_toptagging.py", "tests/datasets/test_utils.py", "tests/utils/test_image.py"]
+        pytest-file: ["tests/datasets/test_jetnet.py", "tests/datasets/test_normalisations.py", "tests/datasets/test_utils.py", "tests/utils/test_image.py"]
 
     steps:
       - uses: actions/checkout@v3
