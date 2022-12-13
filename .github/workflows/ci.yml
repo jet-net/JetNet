@@ -32,6 +32,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.7", "3.10"]
+        pytest-file: ["tests/datasets/test_jetnet.py", "tests/datasets/test_normalisations.py", "tests/datasets/test_qgjets.py", "tests/datasets/test_toptagging.py", "tests/datasets/test_utils.py", "tests/utils/test_image.py"]
 
     steps:
       - uses: actions/checkout@v3
@@ -42,9 +43,9 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest
+          pip install pytest pytest-xdist
           pip install -e .
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Test with pytest
         run: |
-          pytest -v -m "not slow"
+          pytest -n auto -v -m "not slow" -k ${{ matrix.pytest-file }}
