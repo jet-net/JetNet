@@ -115,42 +115,55 @@ def efps(
 
 
 def to_image(
-    jet: np.ndarray, im_size: int, mask: np.ndarray = None, maxR: float = 1.0
+    jets: np.ndarray, im_size: int, mask: np.ndarray = None, maxR: float = 1.0
 ) -> np.ndarray:
     """
-    Convert a single jet into a 2D ``im_size`` x ``im_size`` array.
+    Convert jet(s) into 2D ``im_size`` x ``im_size`` or  3D ``num_jets`` x ``im_size`` x ``im_size`` image arrays.
 
     Args:
-        jet (np.ndarray): array of a single jet of shape ``[num_particles, num_features]``
+        jets (np.ndarray): array of jet(s) of shape ``[num_particles, num_features]`` or ``[num_jets, num_particles, num_features]``
           with features in order ``[eta, phi, pt]``.
         im_size (int): number of pixels per row and column.
-        mask (np.ndarray): optional binary array of masks of shape ``[num_particles]``.
+        mask (np.ndarray): optional binary array of masks of shape ``[num_particles]`` or ``[num_jets, num_particles]``.
         maxR (float): max radius of the jet. Defaults to 1.0.
 
     Returns:
-        np.ndarray: 2D array of shape ``[im_size, im_size]``.
+        np.ndarray: 2D or 3D array of shape ``[im_size, im_size]`` or ``[num_jets, im_size, im_size]``.
 
     """
-    assert len(jet.shape) == 2, "jets dimensions are incorrect"
-    assert jet.shape[-1] >= 3, "particle feature format is incorrect"
+    assert len(jets.shape) == 2 or len(jets.shape) == 3, "jets dimensions are incorrect"
+    assert jets.shape[-1] >= 3, "particle feature format is incorrect"
 
-    bins = np.linspace(-maxR, maxR, im_size + 1)
-    binned_eta = np.digitize(jet[:, 0], bins) - 1
-    binned_phi = np.digitize(jet[:, 1], bins) - 1
-    pt = jet[:, 2]
+    eta = jets[..., 0]
+    phi = jets[..., 1]
+    pt = jets[..., 2]
+    if len(jets.shape) == 2:
+        num_jets = 1
+    else:
+        num_jets = jets.shape[0]
 
     if mask is not None:
-        assert len(mask.shape) == 1 and mask.shape[0] == jet.shape[0], "mask format incorrect"
+        assert len(mask.shape) == 1 or len(mask.shape) == 2, "mask shape incorrect"
+        assert mask.shape == jets.shape[:-1], "mask shape and jets shape do not agree"
         mask = mask.astype(int)
         pt *= mask
 
-    jet_image = np.zeros((im_size, im_size))
+    jet_images = np.zeros((num_jets, im_size, im_size))
 
-    for eta, phi, pt in zip(binned_eta, binned_phi, pt):
-        if eta >= 0 and eta < im_size and phi >= 0 and phi < im_size:
-            jet_image[phi, eta] += pt
+    for i_jet in range(num_jets):
+        hist_2d, _, _ = np.histogram2d(
+            eta[i_jet] if num_jets > 1 else eta,
+            phi[i_jet] if num_jets > 1 else phi,
+            bins=[im_size, im_size],
+            range=[[-maxR, maxR], [-maxR, maxR]],
+            weights=pt[i_jet] if num_jets > 1 else pt,
+        )
+        jet_images[i_jet] = hist_2d
 
-    return jet_image
+    if num_jets == 1:
+        jet_images = jet_images[0]
+
+    return jet_images
 
 
 def gen_jet_corrections(

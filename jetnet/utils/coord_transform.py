@@ -4,7 +4,7 @@ from typing import Union, Iterable
 
 
 def cartesian_to_EtaPhiPtE(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
-    """
+    r"""
     Transform 4-momenta from Cartesian coordinates to polar coordinates for massless particles.
 
     Args:
@@ -29,7 +29,7 @@ def cartesian_to_EtaPhiPtE(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndar
 
 
 def EtaPhiPtE_to_cartesian(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
-    """
+    r"""
     Transform 4-momenta from polar coordinates to Cartesian coordinates for massless particles.
 
     Args:
@@ -52,7 +52,7 @@ def EtaPhiPtE_to_cartesian(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndar
 
 
 def cartesian_to_YPhiPtE(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
-    """
+    r"""
     Transform 4-momenta from Cartesian coordinates to polar coordinates.
 
     Args:
@@ -77,7 +77,7 @@ def cartesian_to_YPhiPtE(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarra
 
 
 def YPhiPtE_to_cartesian(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
-    """
+    r"""
     Transform 4-momenta from polar coordinates to Cartesian coordinates.
 
     Args:
@@ -106,7 +106,7 @@ def YPhiPtE_to_cartesian(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarra
 def cartesian_to_relEtaPhiPt(
     p4: Union[np.ndarray, torch.Tensor]
 ) -> Union[np.ndarray, torch.Tensor]:
-    """
+    r"""
     Get particle features in relative polar coordinates from 4-momenta in Cartesian coordinates.
 
     Args:
@@ -142,7 +142,7 @@ def cartesian_to_relEtaPhiPt(
 def EtaPhiPtE_to_relEtaPhiPt(
     p4: Union[np.ndarray, torch.Tensor]
 ) -> Union[np.ndarray, torch.Tensor]:
-    """
+    r"""
     Get particle features in relative polar coordinates from 4-momenta in polar coordinates.
 
     Args:
@@ -182,7 +182,7 @@ def relEtaPhiPt_to_EtaPhiPt(
     jet_features: Union[np.ndarray, torch.Tensor],
     jet_coord: str = "cartesian",
 ) -> Union[np.ndarray, torch.Tensor]:
-    """
+    r"""
     Get particle features in absolute polar coordinates from relative polar coordinates and jet features.
 
     Args:
@@ -228,7 +228,7 @@ def relEtaPhiPt_to_cartesian(
     jet_features: Union[np.ndarray, torch.Tensor],
     jet_coord: str = "cartesian",
 ) -> Union[np.ndarray, torch.Tensor]:
-    """
+    r"""
     Get particle features in absolute Cartesian coordinates from relative polar coordinates and jet features.
 
     Args:
