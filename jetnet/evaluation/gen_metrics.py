@@ -67,7 +67,9 @@ def _calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6):
     # Product might be almost singular
     covmean, _ = linalg.sqrtm(sigma1.dot(sigma2), disp=False)
     if not np.isfinite(covmean).all():
-        msg = ("fid calculation produces singular product; " "adding %s to diagonal of cov estimates") % eps
+        msg = (
+            "fid calculation produces singular product; " "adding %s to diagonal of cov estimates"
+        ) % eps
         logging.debug(msg)
         offset = np.eye(sigma1.shape[0]) * eps
         covmean = linalg.sqrtm((sigma1 + offset).dot(sigma2 + offset))
@@ -175,7 +177,9 @@ def _init_fpnd_dict(
     pnet.load_state_dict(torch.load(f"{resources_path}/pnet_state_dict.pt", map_location=device))
 
     _eval_module.fpnd_dict[dataset_name][num_particles][jet_type]["pnet"] = pnet
-    _eval_module.fpnd_dict[dataset_name][num_particles][jet_type]["mu"] = np.loadtxt(f"{resources_path}/{jet_type}_mu.txt")
+    _eval_module.fpnd_dict[dataset_name][num_particles][jet_type]["mu"] = np.loadtxt(
+        f"{resources_path}/{jet_type}_mu.txt"
+    )
     _eval_module.fpnd_dict[dataset_name][num_particles][jet_type]["sigma"] = np.loadtxt(
         f"{resources_path}/{jet_type}_sigma.txt"
     )
@@ -222,12 +226,19 @@ def fpnd(
     num_particles = jets.shape[1]
     num_particle_features = jets.shape[2]
 
-    assert num_particles == 30, "Currently FPND only supported for 30 particles - more functionality coming soon."
-    assert num_particle_features == 3, "Not the right number of particle features for the JetNet dataset."
+    assert (
+        num_particles == 30
+    ), "Currently FPND only supported for 30 particles - more functionality coming soon."
+    assert (
+        num_particle_features == 3
+    ), "Not the right number of particle features for the JetNet dataset."
 
     if jets.shape[0] < _eval_module.fpnd_dict["NUM_SAMPLES"]:
         warnings.warn(
-            f"Recommended number of jets for FPND calculation is {_eval_module.fpnd_dict['NUM_SAMPLES']}",
+            (
+                "Recommended number of jets for FPND calculation is "
+                + f"{_eval_module.fpnd_dict['NUM_SAMPLES']}"
+            ),
             RuntimeWarning,
         )
 
@@ -331,8 +342,12 @@ def w1p(
     if num_particle_features <= 0:
         num_particle_features = jets1.shape[2]
 
-    assert num_particle_features <= jets1.shape[2], "more particle features requested than were inputted"
-    assert num_particle_features <= jets2.shape[2], "more particle features requested than were inputted"
+    assert (
+        num_particle_features <= jets1.shape[2]
+    ), "more particle features requested than were inputted"
+    assert (
+        num_particle_features <= jets2.shape[2]
+    ), "more particle features requested than were inputted"
 
     if mask1 is not None:
         # TODO: should be wrapped in try catch
@@ -379,7 +394,10 @@ def w1p(
         if parts1.shape[0] == 0 or parts2.shape[0] == 0:
             w1 = [np.inf, np.inf, np.inf]
         else:
-            w1 = [wasserstein_distance(parts1[:, i], parts2[:, i]) for i in range(num_particle_features)]
+            w1 = [
+                wasserstein_distance(parts1[:, i], parts2[:, i])
+                for i in range(num_particle_features)
+            ]
 
         w1s.append(w1)
 
@@ -505,8 +523,12 @@ def w1efp(
         jets1.shape[2] - int(use_particle_masses) >= 3
     ), "particle feature format is incorrect"
 
-    efps1 = utils.efps(jets1, use_particle_masses=use_particle_masses, efpset_args=efpset_args, efp_jobs=efp_jobs)
-    efps2 = utils.efps(jets2, use_particle_masses=use_particle_masses, efpset_args=efpset_args, efp_jobs=efp_jobs)
+    efps1 = utils.efps(
+        jets1, use_particle_masses=use_particle_masses, efpset_args=efpset_args, efp_jobs=efp_jobs
+    )
+    efps2 = utils.efps(
+        jets2, use_particle_masses=use_particle_masses, efpset_args=efpset_args, efp_jobs=efp_jobs
+    )
     num_efps = efps1.shape[1]
 
     w1s = []
@@ -560,7 +582,9 @@ def cov_mmd(
 
     """
     assert len(real_jets.shape) == 3 and len(gen_jets.shape) == 3, "input jets format is incorrect"
-    assert (real_jets.shape[2] >= 3) and (gen_jets.shape[2] >= 3), "particle feature format is incorrect"
+    assert (real_jets.shape[2] >= 3) and (
+        gen_jets.shape[2] >= 3
+    ), "particle feature format is incorrect"
 
     if isinstance(real_jets, Tensor):
         real_jets = real_jets.cpu().detach().numpy()
@@ -579,7 +603,9 @@ def cov_mmd(
     covs = []
     mmds = []
 
-    for j in _optional_tqdm(range(num_batches), use_tqdm, desc=f"Calculating cov and mmd over {num_batches} batches"):
+    for j in _optional_tqdm(
+        range(num_batches), use_tqdm, desc=f"Calculating cov and mmd over {num_batches} batches"
+    ):
         real_rand = rng.choice(len(real_jets), size=num_eval_samples)
         gen_rand = rng.choice(len(gen_jets), size=num_eval_samples)
 

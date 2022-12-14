@@ -199,9 +199,10 @@ class QuarkGluon(JetDataset):
             Tuple[Optional[np.ndarray], Optional[np.ndarray]]: particle data, jet data
         """
 
-        assert (
-            num_particles <= cls.max_num_particles
-        ), f"num_particles {num_particles} exceeds max number of particles in the dataset {cls.max_num_particles}"
+        assert num_particles <= cls.max_num_particles, (
+            f"num_particles {num_particles} exceeds max number of "
+            + f"particles in the dataset {cls.max_num_particles}"
+        )
 
         jet_type = checkConvertElements(jet_type, cls.jet_types, ntype="jet type")
         type_indices = [cls.jet_types.index(t) for t in jet_type]

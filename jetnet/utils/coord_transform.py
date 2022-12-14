@@ -104,7 +104,9 @@ def YPhiPtE_to_cartesian(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarra
     return __stack([p0, px, py, pz], axis=-1)
 
 
-def cartesian_to_relEtaPhiPt(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
+def cartesian_to_relEtaPhiPt(
+    p4: Union[np.ndarray, torch.Tensor]
+) -> Union[np.ndarray, torch.Tensor]:
     r"""
     Get particle features in relative polar coordinates from 4-momenta in Cartesian coordinates.
 
@@ -114,8 +116,8 @@ def cartesian_to_relEtaPhiPt(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.nd
           :math:`(E/c, p_x, p_y, p_z)`.
 
     Returns:
-        np.ndarray or torch.Tensor: array of features in relative polar coordinates, arranged in order
-          :math:`(\eta^\mathrm{rel}, \phi^\mathrm{rel}, p_\mathrm{T}^\mathrm{rel})`.
+        np.ndarray or torch.Tensor: array of features in relative polar coordinates, arranged
+          in order :math:`(\eta^\mathrm{rel}, \phi^\mathrm{rel}, p_\mathrm{T}^\mathrm{rel})`.
     """
 
     eps = __get_default_eps(p4)  # default epsilon for the dtype
@@ -138,7 +140,9 @@ def cartesian_to_relEtaPhiPt(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.nd
     return __stack([eta_rel, phi_rel, pt_rel], axis=-1)
 
 
-def EtaPhiPtE_to_relEtaPhiPt(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
+def EtaPhiPtE_to_relEtaPhiPt(
+    p4: Union[np.ndarray, torch.Tensor]
+) -> Union[np.ndarray, torch.Tensor]:
     r"""
     Get particle features in relative polar coordinates from 4-momenta in polar coordinates.
 
@@ -148,8 +152,8 @@ def EtaPhiPtE_to_relEtaPhiPt(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.nd
           :math:`(\eta, \phi, p_\mathrm{T}, E/c)`, where :math:`\eta` is the pseudorapidity.
 
     Returns:
-        np.ndarray or torch.Tensor: array of features in relative polar coordinates, arranged in order
-        :math:`(\eta^\mathrm{rel}, \phi^\mathrm{rel}, p_\mathrm{T}^\mathrm{rel})`.
+        np.ndarray or torch.Tensor: array of features in relative polar coordinates, arranged
+          in order :math:`(\eta^\mathrm{rel}, \phi^\mathrm{rel}, p_\mathrm{T}^\mathrm{rel})`.
     """
 
     eps = __get_default_eps(p4)  # default epsilon for the dtype
@@ -180,23 +184,26 @@ def relEtaPhiPt_to_EtaPhiPt(
     jet_coord: str = "cartesian",
 ) -> Union[np.ndarray, torch.Tensor]:
     r"""
-    Get particle features in absolute polar coordinates from relative polar coordinates and jet features.
+    Get particle features in absolute polar coordinates from relative polar coordinates
+      and jet features.
 
     Args:
-        p_polarrel (np.ndarray or torch.Tensor): array of particle features in relative polar coordinates,
-          of shape ``[..., 3]``. The last axis should be in order
-          :math:`(\eta^\mathrm{rel}, \phi^\mathrm{rel}, p_\mathrm{T}^\mathrm{rel})`,
+        p_polarrel (np.ndarray or torch.Tensor): array of particle features in
+          relative polar coordinates of shape ``[..., 3]``. The last axis should be in
+          order :math:`(\eta^\mathrm{rel}, \phi^\mathrm{rel}, p_\mathrm{T}^\mathrm{rel})`,
           where :math:`\eta` is the pseudorapidity.
         jet_features (np.ndarray or torch.Tensor): array of jet features in polar coordinates,
           of shape ``[..., 4]``. The coordinates are specified by ``jet_coord``.
         jet_coord (str): coordinate system of jet features. Can be either "cartesian" or "polar".
             Defaults to "cartesian".
-            If "cartesian", the last axis of ``jet_features`` should be in order :math:`(E/c, p_x, p_y, p_z)`.
-            If "polar", the last axis of ``jet_features`` should be in order :math:`(\eta, \phi, p_\mathrm{T}, E/c)`.
+            If "cartesian", the last axis of ``jet_features`` should be in order
+              :math:`(E/c, p_x, p_y, p_z)`.
+            If "polar", the last axis of ``jet_features`` should be in order
+              :math:`(\eta, \phi, p_\mathrm{T}, E/c)`.
 
     Returns:
-        np.ndarray or torch.Tensor: array of particle features in absolute polar coordinates, arranged in order
-          :math:`(\eta, \phi, p_\mathrm{T}, E/c)`.
+        np.ndarray or torch.Tensor: array of particle features in absolute polar coordinates,
+          arranged in order :math:`(\eta, \phi, p_\mathrm{T}, E/c)`.
     """
 
     # particle features in relative polar coordinates
@@ -227,23 +234,26 @@ def relEtaPhiPt_to_cartesian(
     jet_coord: str = "cartesian",
 ) -> Union[np.ndarray, torch.Tensor]:
     r"""
-    Get particle features in absolute Cartesian coordinates from relative polar coordinates and jet features.
+    Get particle features in absolute Cartesian coordinates from relative polar coordinates
+      and jet features.
 
     Args:
-        p_polarrel (np.ndarray or torch.Tensor): array of particle features in relative polar coordinates,
-          of shape ``[..., 3]``. The last axis should be in order
+        p_polarrel (np.ndarray or torch.Tensor): array of particle features in relative
+          polar coordinates of shape ``[..., 3]``. The last axis should be in order
           :math:`(\eta^\mathrm{rel}, \phi^\mathrm{rel}, p_\mathrm{T}^\mathrm{rel})`,
           where :math:`\eta` is the pseudorapidity.
         jet_features (np.ndarray or torch.Tensor): array of jet features in polar coordinates,
           of shape ``[..., 4]``. The coordinates are specified by ``jet_coord``.
         jet_coord (str): coordinate system of jet features. Can be either "cartesian" or "polar".
             Defaults to "cartesian".
-            If "cartesian", the last axis of ``jet_features`` should be in order :math:`(E/c, p_x, p_y, p_z)`.
-            If "polar", the last axis of ``jet_features`` should be in order :math:`(\eta, \phi, p_\mathrm{T}, E/c)`.
+            If "cartesian", the last axis of ``jet_features`` should be in order
+              :math:`(E/c, p_x, p_y, p_z)`.
+            If "polar", the last axis of ``jet_features`` should be in order
+              :math:`(\eta, \phi, p_\mathrm{T}, E/c)`.
 
     Returns:
-        np.ndarray or torch.Tensor: array of particle features in absolute polar coordinates, arranged in order
-          :math:`(E/c, p_x, p_y, p_z)`.
+        np.ndarray or torch.Tensor: array of particle features in absolute polar coordinates,
+          arranged in order :math:`(E/c, p_x, p_y, p_z)`.
     """
     p4_polar = relEtaPhiPt_to_EtaPhiPt(p_polarrel, jet_features, jet_coord)
     # eta is used even though jet is massive
@@ -260,7 +270,9 @@ def __unbind(x: Union[np.ndarray, torch.Tensor], axis: int) -> Union[np.ndarray,
         raise TypeError(f"x must be either a numpy array or a torch tensor, not {type(x)}")
 
 
-def __stack(x: Iterable[Union[np.ndarray, torch.Tensor]], axis: int) -> Union[np.ndarray, torch.Tensor]:
+def __stack(
+    x: Iterable[Union[np.ndarray, torch.Tensor]], axis: int
+) -> Union[np.ndarray, torch.Tensor]:
     """Stack an iterable of np.ndarray or torch.Tensor along a given axis."""
     if not isinstance(x, Iterable):
         raise TypeError("x must be an iterable.")
@@ -333,7 +345,9 @@ def __log(x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]
         raise TypeError(f"x must be either a numpy array or a torch tensor, not {type(x)}")
 
 
-def __arctan2(y: Union[np.ndarray, torch.Tensor], x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
+def __arctan2(
+    y: Union[np.ndarray, torch.Tensor], x: Union[np.ndarray, torch.Tensor]
+) -> Union[np.ndarray, torch.Tensor]:
     """Arctangent function that works with np.ndarray and torch.Tensor."""
     if isinstance(y, torch.Tensor):
         return torch.atan2(y, x)
@@ -353,7 +367,9 @@ def __sqrt(x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor
         raise TypeError(f"x must be either a numpy array or a torch tensor, not {type(x)}")
 
 
-def __sum(x: Union[np.ndarray, torch.Tensor], axis: int, keepdims: bool = False) -> Union[np.ndarray, torch.Tensor]:
+def __sum(
+    x: Union[np.ndarray, torch.Tensor], axis: int, keepdims: bool = False
+) -> Union[np.ndarray, torch.Tensor]:
     """Sum function that works with np.ndarray and torch.Tensor."""
     if isinstance(x, torch.Tensor):
         return x.sum(axis, keepdim=keepdims)

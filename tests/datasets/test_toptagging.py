@@ -51,7 +51,9 @@ def test_getDataFeatures():
     assert pf.shape == (valid_length, num_particles, 4)
     assert jf is None
 
-    pf, jf = DataClass.getData(data_dir=data_dir, particle_features=["px", "E"], num_particles=30, split=split)
+    pf, jf = DataClass.getData(
+        data_dir=data_dir, particle_features=["px", "E"], num_particles=30, split=split
+    )
     assert pf.shape == (valid_length, 30, 2)
     assert jf.shape == (valid_length, 5)
     assert np.max(pf[:, :, 0]) == approx(700, rel=0.2)
@@ -64,7 +66,9 @@ def test_DataClassNormalisation():
         data_dir=data_dir,
         num_particles=num_particles,
         particle_normalisation=normalisations.FeaturewiseLinearBounded(),
-        jet_normalisation=normalisations.FeaturewiseLinearBounded(normalise_features=[False, True, True, True, True]),
+        jet_normalisation=normalisations.FeaturewiseLinearBounded(
+            normalise_features=[False, True, True, True, True]
+        ),
         split=split,
     )
 

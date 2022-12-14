@@ -113,19 +113,24 @@ def efps(
     return efps
 
 
-def to_image(jets: np.ndarray, im_size: int, mask: np.ndarray = None, maxR: float = 1.0) -> np.ndarray:
+def to_image(
+    jets: np.ndarray, im_size: int, mask: np.ndarray = None, maxR: float = 1.0
+) -> np.ndarray:
     """
-    Convert jet(s) into 2D ``im_size`` x ``im_size`` or  3D ``num_jets`` x ``im_size`` x ``im_size`` image arrays.
+    Convert jet(s) into 2D ``im_size`` x ``im_size`` or  3D ``num_jets`` x ``im_size`` x ``im_size``
+      image arrays.
 
     Args:
         jets (np.ndarray): array of jet(s) of shape ``[num_particles, num_features]`` or
           ``[num_jets, num_particles, num_features]`` with features in order ``[eta, phi, pt]``.
         im_size (int): number of pixels per row and column.
-        mask (np.ndarray): optional binary array of masks of shape ``[num_particles]`` or ``[num_jets, num_particles]``.
+        mask (np.ndarray): optional binary array of masks of shape ``[num_particles]`` or
+          ``[num_jets, num_particles]``.
         maxR (float): max radius of the jet. Defaults to 1.0.
 
     Returns:
-        np.ndarray: 2D or 3D array of shape ``[im_size, im_size]`` or ``[num_jets, im_size, im_size]``.
+        np.ndarray: 2D or 3D array of shape ``[im_size, im_size]`` or
+          ``[num_jets, im_size, im_size]``.
 
     """
     assert len(jets.shape) == 2 or len(jets.shape) == 3, "jets dimensions are incorrect"

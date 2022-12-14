@@ -54,7 +54,9 @@ class _ParticleNet(nn.Module):
 
         for i in range(1, self.num_edge_convs):
             # adding kernel sizes because of skip connections
-            self.edge_nets.append(_ParticleNetEdgeNet(self.output_sizes[i], self.kernel_sizes[i + 1]))
+            self.edge_nets.append(
+                _ParticleNetEdgeNet(self.output_sizes[i], self.kernel_sizes[i + 1])
+            )
             self.edge_convs.append(EdgeConv(self.edge_nets[-1], aggr="mean"))
 
         self.fc1 = nn.Sequential(nn.Linear(self.output_sizes[-1], self.fc_size))
@@ -72,7 +74,9 @@ class _ParticleNet(nn.Module):
 
         for i in range(self.num_edge_convs):
             # using only angular coords for knn in first edgeconv block
-            edge_index = knn_graph(x[:, :2], self.k, batch) if i == 0 else knn_graph(x, self.k, batch)
+            edge_index = (
+                knn_graph(x[:, :2], self.k, batch) if i == 0 else knn_graph(x, self.k, batch)
+            )
             x = torch.cat(
                 (self.edge_convs[i](x, edge_index), x), dim=1
             )  # concatenating with original features i.e. skip connection

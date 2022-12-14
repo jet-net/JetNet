@@ -53,7 +53,9 @@ class JetDataset(torch.utils.data.Dataset):
         self.data_dir = data_dir
 
         self.particle_features, self.jet_features = checkStrToList(particle_features, jet_features)
-        self.use_particle_features, self.use_jet_features = checkListNotEmpty(particle_features, jet_features)
+        self.use_particle_features, self.use_jet_features = checkListNotEmpty(
+            particle_features, jet_features
+        )
 
         self.particle_normalisation = particle_normalisation
         self.jet_normalisation = jet_normalisation

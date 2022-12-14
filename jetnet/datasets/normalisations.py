@@ -95,9 +95,10 @@ class FeaturewiseLinear(NormaliseABC):
         return (self.feature_shifts is None) or (self.feature_scales is None)
 
     def __call__(self, x: ArrayLike, inverse: bool = False, inplace: bool = False) -> ArrayLike:
-        assert (
-            not self.features_need_deriving()
-        ), "Feature means and stds have not been specified, you need to either set or derive them first"
+        assert not self.features_need_deriving(), (
+            "Feature means and stds have not been specified, "
+            + "you need to either set or derive them first"
+        )
 
         num_features = x.shape[-1]
 
@@ -154,7 +155,10 @@ class FeaturewiseLinear(NormaliseABC):
         if self.normal:
             ret = "Normalising features to zero mean and unit standard deviation"
         else:
-            ret = f"Shift features by {self.feature_shifts} " f"and then multiplying by {self.feature_scales}"
+            ret = (
+                f"Shift features by {self.feature_shifts} "
+                f"and then multiplying by {self.feature_scales}"
+            )
 
         if self.normalise_features is not None and self.normalise_features is not True:
             ret += f", normalising features: {self.normalise_features}"
@@ -173,7 +177,8 @@ class FeaturewiseLinearBounded(NormaliseABC):
         feature_norms (Union[float, List[float]], optional): max value to scale each feature to.
             Can either be a single float for all features, or a list of length ``num_features``.
             Defaults to 1.0.
-        feature_shifts (Union[float, List[float]], optional): after scaling, value to shift feature by.
+        feature_shifts (Union[float, List[float]], optional): after scaling,
+            value to shift feature by.
             Can either be a single float for all features, or a list of length ``num_features``.
             Defaults to 0.0.
         feature_maxes (List[float], optional): max pre-scaling absolute value of each feature, used
