@@ -38,5 +38,5 @@ repos:
   hooks:
   - id: flake8
     # black-compatible flake-8 config
-    args: ['--max-line-length=100',  # github viewer width
+    args: ['--max-line-length=100',  # max recommended for sight disabilities
            '--extend-ignore=E203']  # E203 is not PEP8 compliant
