@@ -1,11 +1,9 @@
-import torch
-from torch import nn
-
-from torch_geometric.nn import EdgeConv, global_mean_pool
-from torch_cluster import knn_graph
-
 import numpy as np
+import torch
 import torch.nn.functional as F
+from torch import nn
+from torch_cluster import knn_graph
+from torch_geometric.nn import EdgeConv, global_mean_pool
 
 
 class _ParticleNetEdgeNet(nn.Module):

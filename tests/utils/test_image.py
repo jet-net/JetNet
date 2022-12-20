@@ -1,7 +1,7 @@
-from jetnet.utils import to_image
 import numpy as np
-
 import pytest
+
+from jetnet.utils import to_image
 
 # 1 jet with 3 test particles
 test_data_2d = np.zeros((3, 3))

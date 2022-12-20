@@ -1,27 +1,22 @@
 # energyflow needs to be imported before pytorch
 # because of https://github.com/pkomiske/EnergyFlow/issues/24
-from energyflow.emd import emds
-
 import logging
+import pathlib
+import sys
 import warnings
-from typing import Union, Tuple
+from typing import Tuple, Union
 
 import numpy as np
 import torch
-from torch import Tensor
-from torch.utils.data import DataLoader
-
-from jetnet.datasets import JetNet
-from jetnet import utils
-
+from energyflow.emd import emds
 from scipy import linalg
 from scipy.stats import wasserstein_distance
-
+from torch import Tensor
+from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-import pathlib
-import sys
-
+from jetnet import utils
+from jetnet.datasets import JetNet
 
 rng = np.random.default_rng()
 
@@ -240,7 +235,10 @@ def fpnd(
 
     if jets.shape[0] < _eval_module.fpnd_dict["NUM_SAMPLES"]:
         warnings.warn(
-            f"Recommended number of jets for FPND calculation is {_eval_module.fpnd_dict['NUM_SAMPLES']}",
+            (
+                "Recommended number of jets for FPND calculation is "
+                + f"{_eval_module.fpnd_dict['NUM_SAMPLES']}"
+            ),
             RuntimeWarning,
         )
 

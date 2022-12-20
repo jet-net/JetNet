@@ -1,10 +1,8 @@
-import jetnet
-from jetnet.datasets.normalisations import FeaturewiseLinear, FeaturewiseLinearBounded
 import numpy as np
-
 import pytest
 from pytest import approx
 
+from jetnet.datasets.normalisations import FeaturewiseLinear, FeaturewiseLinearBounded
 
 np.random.seed(42)
 test_data_1d = np.random.rand(3) * 100

@@ -1,8 +1,7 @@
-from jetnet.datasets import utils
 import numpy as np
-
 import pytest
 
+from jetnet.datasets import utils
 
 test_data_2d = np.random.rand(4, 3)
 test_data_3d = np.random.rand(5, 4, 3)

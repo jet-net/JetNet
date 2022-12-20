@@ -1,20 +1,18 @@
-from typing import Callable, List, Set, Union, Optional, Tuple
+from typing import Callable, List, Optional, Set, Tuple, Union
 
 import numpy as np
 
-import logging
-
 from .dataset import JetDataset
+from .normalisations import FeaturewiseLinearBounded, NormaliseABC
 from .utils import (
     checkConvertElements,
     checkDownloadZenodoDataset,
+    checkListNotEmpty,
+    checkStrToList,
     firstNotNoneElement,
     getOrderedFeatures,
-    checkStrToList,
-    checkListNotEmpty,
     getSplitting,
 )
-from .normalisations import FeaturewiseLinearBounded, NormaliseABC
 
 
 class JetNet(JetDataset):
@@ -127,8 +125,8 @@ class JetNet(JetDataset):
 
         Args:
             jet_type (Union[str, Set[str]], optional): individual type or set of types out of
-                'g' (gluon), 't' (top quarks), 'q' (light quarks), 'w' (W bosons), or 'z' (Z bosons).
-                "all" will get all types. Defaults to "all".
+                'g' (gluon), 't' (top quarks), 'q' (light quarks), 'w' (W bosons),
+                or 'z' (Z bosons). "all" will get all types. Defaults to "all".
             data_dir (str, optional): directory in which data is (to be) stored. Defaults to "./".
             particle_features (List[str], optional): list of particle features to retrieve. If empty
                 or None, gets no particle features. Defaults to
@@ -148,9 +146,10 @@ class JetNet(JetDataset):
         Returns:
             Tuple[Optional[np.ndarray], Optional[np.ndarray]]: particle data, jet data
         """
-        assert (
-            num_particles <= cls.max_num_particles
-        ), f"num_particles {num_particles} exceeds max number of particles in the dataset {cls.max_num_particles}"
+        assert num_particles <= cls.max_num_particles, (
+            f"num_particles {num_particles} exceeds max number of "
+            + f"particles in the dataset {cls.max_num_particles}"
+        )
         jet_type = checkConvertElements(jet_type, cls.jet_types, ntype="jet type")
         particle_features, jet_features = checkStrToList(particle_features, jet_features)
         use_particle_features, use_jet_features = checkListNotEmpty(particle_features, jet_features)
@@ -226,7 +225,7 @@ class JetNet(JetDataset):
         ret = f"Including {self.jet_type} jets"
 
         if self.split == "all":
-            ret += f"\nUsing all data (no split)"
+            ret += "\nUsing all data (no split)"
         else:
             ret += (
                 f"\nSplit into {self.split} data out of {self.splits} possible splits, "

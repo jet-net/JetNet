@@ -1,11 +1,9 @@
-from jetnet.datasets import JetNet, normalisations
 import numpy as np
-
 import pytest
 from pytest import approx
-
 from torch.utils.data import DataLoader
 
+from jetnet.datasets import JetNet, normalisations
 
 # TODO: use checksum for downloaded files
 

@@ -1,27 +1,31 @@
-from typing import Union, Tuple
+from typing import Tuple, Union
 
-import torch
-from torch import nn, Tensor
 import numpy as np
+import torch
+from torch import Tensor, nn
 
 
 class EMDLoss(nn.Module):
     """
-    Calculates the energy mover's distance between two batches of jets differentiably as a convex optimization problem
-    either through the linear programming library ``cvxpy`` or by converting it to a quadratic programming problem and
-    using the ``qpth`` library. ``cvxpy`` is marginally more accurate but ``qpth`` is significantly faster so defaults
-    to ``qpth``.
+    Calculates the energy mover's distance between two batches of jets differentiably
+      as a convex optimization problem either through the linear programming library ``cvxpy``
+      or by converting it to a quadratic programming problem and using the ``qpth`` library.
+      ``cvxpy`` is marginally more accurate but ``qpth`` is significantly faster so defaults
+      to ``qpth``.
 
-    **JetNet must be installed with the extra option** ``pip install jetnet[emdloss]`` **to use this.**
+    **JetNet must be installed with the extra option** ``pip install jetnet[emdloss]``
+      **to use this.**
 
-    *Note: PyTorch <= 1.9 has a bug which will cause this to fail for >= 32 particles. This PR should fix this from 1.10 onwards*
-    https://github.com/pytorch/pytorch/pull/61815.
+    *Note: PyTorch <= 1.9 has a bug which will cause this to fail for >= 32 particles.*
+    *This PR should fix this from 1.10 onwards* https://github.com/pytorch/pytorch/pull/61815.
 
     Args:
         method (str): 'cvxpy' or 'qpth'. Defaults to 'qpth'.
-        num_particles (int): number of particles per jet - onlyneeds to be specified if method is 'cvxpy'.
+        num_particles (int): number of particles per jet
+          - only needs to be specified if method is 'cvxpy'.
         qpth_form (str): 'L2' or 'QP'. Defaults to 'L2'.
-        qpth_l2_strength (float): regularization parameter for 'L2' qp form. Defaults to 0.0001.
+        qpth_l2_strength (float): regularization parameter for 'L2' qp form.
+          Defaults to 0.0001.
         device (str): 'cpu' or 'cuda'. Defaults to 'cpu'.
 
     """
@@ -40,9 +44,10 @@ class EMDLoss(nn.Module):
             try:
                 global qpth
                 qpth = __import__("qpth", globals(), locals())
-            except:
+            except ImportError:
                 print(
-                    "QPTH needs to be installed separately to use this method - try pip install jetnet[emdloss]"
+                    "QPTH needs to be installed separately to use this method "
+                    + "- try pip install jetnet[emdloss]"
                 )
                 raise
         else:
@@ -50,9 +55,10 @@ class EMDLoss(nn.Module):
                 global cp, cvxpylayers
                 cp = __import__("cvxpy", globals(), locals())
                 cvxpylayers = __import__("cvxpylayers", globals(), locals())
-            except:
+            except ImportError:
                 print(
-                    "cvxpy needs to be installed separately to use this method - try pip install jetnet[emdloss]"
+                    "cvxpy needs to be installed separately to use this method "
+                    + "- try pip install jetnet[emdloss]"
                 )
                 raise
 
@@ -94,8 +100,10 @@ class EMDLoss(nn.Module):
         self, distance_matrix: Tensor, weight1: Tensor, weight2: Tensor
     ) -> Tuple[Tensor, Tensor]:
         """
-        Using the QP solver QPTH to get EMDs (LP problem), adapted from https://github.com/icoz69/DeepEMD/blob/master/Models/models/emd_utils.py
-        One can transform the LP problem to QP, or omit the QP term by multiplying it with a small value, i.e. l2_strngth.
+        Using the QP solver QPTH to get EMDs (LP problem), adapted from
+          https://github.com/icoz69/DeepEMD/blob/master/Models/models/emd_utils.py.
+        One can transform the LP problem to QP, or omit the QP term by multiplying
+          it with a small value, i.e. l2_strngth.
 
         Args:
             distance_matrix (Tensor): nbatch * element_number * element_number.
@@ -180,15 +188,17 @@ class EMDLoss(nn.Module):
         Calculate EMD between ``jets1`` and ``jets2``.
 
         Args:
-            jets1 (Tensor): tensor of shape ``[num_jets, num_particles, num_features]``, with features in order ``[eta, phi, pt]``.
+            jets1 (Tensor): tensor of shape ``[num_jets, num_particles, num_features]``,
+              with features in order ``[eta, phi, pt]``.
             jets2 (Tensor): tensor of same format as ``jets1``.
-            return_flows (bool): return energy flows between particles in each jet. Defaults to False.
+            return_flows (bool): return energy flows between particles in each jet.
+              Defaults to False.
 
         Returns:
             Union[Tensor, Tuple[Tensor, Tensor]]:
             - **Tensor**: EMD scores tensor of shape [num_jets].
-            - **Tensor** *Optional*, if ``return_flows`` is True: tensor of flows between particles of shape
-              ``[num_jets, num_particles, num_particles]``.
+            - **Tensor** *Optional*, if ``return_flows`` is True: tensor of flows between
+              particles of shape ``[num_jets, num_particles, num_particles]``.
 
         """
         assert (len(jets1.shape) == 3) and (len(jets2.shape) == 3), "Jets shape incorrect"

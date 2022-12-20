@@ -2,17 +2,15 @@
 Utility methods for datasets.
 """
 from __future__ import annotations
-from typing import Set, List, Tuple, Union, Any
-from numpy.typing import ArrayLike
 
-import requests
-import sys
 import os
+import sys
 from os.path import exists
+from typing import Any, List, Set, Tuple, Union
 
 import numpy as np
-
-import logging
+import requests
+from numpy.typing import ArrayLike
 
 
 def download_progress_bar(file_url: str, file_dest: str):
@@ -169,7 +167,7 @@ def getSplitting(
         if split == "all":
             return 0, length
         else:
-            assert splits[-1] == "all", f"'all' must be last entry in ``splits`` array"
+            assert splits[-1] == "all", "'all' must be last entry in ``splits`` array"
             splits = splits[:-1]
 
     assert np.sum(split_fraction) <= 1.0, "sum of split fractions must be ≤ 1"
