@@ -49,9 +49,9 @@ def download_progress_bar(file_url: str, file_dest: str):
     sys.stdout.write("\n")
 
 
-def checkDownloadZenodoDataset(data_dir: str, dataset_name: str, record_id: int, key: str, real_name:str):
+def checkDownloadZenodoDataset(data_dir: str, dataset_name: str, record_id: int, key: str):
     """Checks if dataset exists, if not downloads it from Zenodo, and returns the file path"""
-    file_path = f"{data_dir}/{real_name}"
+    file_path = f"{data_dir}/{key}"
     if not exists(file_path):
         os.system(f"mkdir -p {data_dir}")
         file_url = getZenodoFileURL(record_id, key)
