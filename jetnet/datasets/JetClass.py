@@ -3,7 +3,7 @@ import numpy as np
 import logging
 import uproot
 import os
-from utils import *
+from utils_jetclass import *
 
 class JetClass:
     """
