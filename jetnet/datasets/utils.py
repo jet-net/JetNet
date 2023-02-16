@@ -49,9 +49,9 @@ def download_progress_bar(file_url: str, file_dest: str):
     sys.stdout.write("\n")
 
 
-def checkDownloadZenodoDataset(data_dir: str, dataset_name: str, record_id: int, key: str):
+def checkDownloadZenodoDataset(data_dir: str, dataset_name: str, record_id: int, key: str, file_download_name: str):
     """Checks if dataset exists, if not downloads it from Zenodo, and returns the file path"""
-    file_path = f"{data_dir}/{key}"
+    file_path = f"{data_dir}/{file_download_name}"
     if not exists(file_path):
         os.system(f"mkdir -p {data_dir}")
         file_url = getZenodoFileURL(record_id, key)
@@ -171,3 +171,25 @@ def getSplitting(
     split_index = splits.index(split)
     cuts = (np.cumsum(np.insert(split_fraction, 0, 0)) * length).astype(int)
     return cuts[split_index], cuts[split_index + 1]
+
+
+def findMaxLengthList(lst):
+    maxLength = max(len(x) for x in lst)
+    return maxLength
+
+def zero_padding(lst):
+    returned_list = []
+    for sub_list in lst:
+        sub_list = list(sub_list)
+        returned_list.append(sub_list);
+    
+    padded_list = []
+    max_value = findMaxLengthList(returned_list)
+    for i in returned_list:
+        #print(type(i))
+        pad_list = np.pad(i, (0,max_value - len(i)), 'constant', constant_values = 0)
+        padded_list.append(pad_list)
+    
+    zero_padded_arr = np.array(padded_list)
+    
+    return zero_padded_arr
