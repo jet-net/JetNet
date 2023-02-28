@@ -2,13 +2,13 @@
 Base classes for JetNet datasets.
 """
 
+from typing import Any, Callable, List, Optional, Tuple
+
 import torch
 from torch import Tensor
 
-from typing import List, Optional, Tuple, Any, Callable
-
 from .normalisations import NormaliseABC
-from .utils import checkStrToList, checkListNotEmpty, firstNotNoneElement
+from .utils import checkListNotEmpty, checkStrToList, firstNotNoneElement
 
 
 class JetDataset(torch.utils.data.Dataset):
