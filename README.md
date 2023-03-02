@@ -43,12 +43,14 @@ Currently we provide:
   - [JetNet](https://zenodo.org/record/6975118)
   - [TopTagging](https://zenodo.org/record/2603256)
   - [QuarkGluon](https://zenodo.org/record/3164691)
-- Standard implementations of generative evaluation metrics (Ref. [[1](#references)]):
-  - Fréchet ParticleNet Distance (FPND)
+- Standard implementations of generative evaluation metrics (Ref. [[1, 2](#references)]), including:
+  - Fréchet physics distance (FPD)
+  - Kernel physics distance (KPD)
   - Wasserstein-1 (W1)
+  - Fréchet ParticleNet Distance (FPND)
   - coverage and minimum matching distance (MMD)
 - Loss functions:
-  - Differentiable implementation of the energy mover's distance [[2](#references)]
+  - Differentiable implementation of the energy mover's distance [[3](#references)]
 - And more general jet utilities.
 
 
@@ -131,4 +133,6 @@ Additionally, if you use our EMD loss implementation, please cite the respective
 
 [1] R. Kansal et al. *Particle Cloud Generation with Message Passing Generative Adversarial Networks* [NeurIPS 2021](https://proceedings.neurips.cc/paper/2021/hash/c8512d142a2d849725f31a9a7a361ab9-Abstract.html) [[2106.11535](https://arxiv.org/abs/2106.11535)]
 
-[2] P. T. Komiske, E. M. Metodiev, and J. Thaler, _The Metric Space of Collider Events_, [Phys. Rev. Lett. __123__ (2019) 041801](https://doi.org/10.1103/PhysRevLett.123.041801) [[1902.02346](https://arxiv.org/abs/1902.02346)].
+[2] R. Kansal et al. *On the Evaluation of Generative Models in High Energy Physics* [[2211.10295](https://arxiv.org/abs/2211.10295)]
+
+[3] P. T. Komiske, E. M. Metodiev, and J. Thaler, _The Metric Space of Collider Events_, [Phys. Rev. Lett. __123__ (2019) 041801](https://doi.org/10.1103/PhysRevLett.123.041801) [[1902.02346](https://arxiv.org/abs/1902.02346)].
