@@ -95,7 +95,7 @@ def _calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6):
 
 _eval_module = sys.modules[__name__]
 # for saving fpnd objects after the first loading
-_eval_module.fpnd_dict = {"NUM_SAMPLES": 50000}
+_eval_module.fpnd_dict = {"NUM_SAMPLES": 50_000}
 
 
 def _get_fpnd_real_mu_sigma(
@@ -304,7 +304,7 @@ def w1p(
     mask2: Union[Tensor, np.ndarray] = None,
     exclude_zeros: bool = True,
     num_particle_features: int = 0,
-    num_eval_samples: int = 50000,
+    num_eval_samples: int = 50_000,
     num_batches: int = 5,
     return_std: bool = True,
 ):
@@ -324,7 +324,7 @@ def w1p(
         num_particle_features (int): Will return W1 scores of the first
           ``num_particle_features`` particle features. If 0, will calculate for all.
         num_eval_samples (int): Number of jets out of the total to use for W1 measurement.
-          Defaults to 10000.
+          Defaults to 50,000.
         num_batches (int): Number of different batches to average W1 scores over. Defaults to 5.
         return_std (bool): Return the standard deviation as well of the W1 scores over the
           ``num_batches`` batches. Defaults to True.
@@ -339,8 +339,8 @@ def w1p(
     """
     assert len(jets1.shape) == 3 and len(jets2.shape) == 3, "input jets format is incorrect"
 
-    if len(jets1) < 50000 or len(jets2) < 50000:
-        warnings.warn("Recommended number of jets for W1 estimation is 50000", RuntimeWarning)
+    if len(jets1) < 50_000 or len(jets2) < 50_000:
+        warnings.warn("Recommended number of jets for W1 estimation is 50,000", RuntimeWarning)
 
     if num_particle_features <= 0:
         num_particle_features = jets1.shape[2]
@@ -409,7 +409,7 @@ def w1p(
 def w1m(
     jets1: Union[Tensor, np.ndarray],
     jets2: Union[Tensor, np.ndarray],
-    num_eval_samples: int = 50000,
+    num_eval_samples: int = 50_000,
     num_batches: int = 5,
     return_std: bool = True,
 ):
@@ -422,7 +422,7 @@ def w1m(
           ``[eta, phi, pt, (optional) mass]``
         jets2 (Union[Tensor, np.ndarray]): Tensor or array of jets, of same format as ``jets1``.
         num_eval_samples (int): Number of jets out of the total to use for W1 measurement.
-          Defaults to 10000.
+          Defaults to 50,000.
         num_batches (int): Number of different batches to average W1 scores over. Defaults to 5.
         return_std (bool): Return the standard deviation as well of the W1 scores over the
           ``num_batches`` batches. Defaults to True.
@@ -436,8 +436,8 @@ def w1m(
     """
     assert len(jets1.shape) == 3 and len(jets2.shape) == 3, "input jets format is incorrect"
 
-    if len(jets1) < 50000 or len(jets2) < 50000:
-        warnings.warn("Recommended number of jets for W1 estimation is 50000", RuntimeWarning)
+    if len(jets1) < 50_000 or len(jets2) < 50_000:
+        warnings.warn("Recommended number of jets for W1 estimation is 50,000", RuntimeWarning)
 
     jets1, jets2 = _check_get_ndarray(jets1, jets2)
 
@@ -463,7 +463,7 @@ def w1efp(
     jets2: Union[Tensor, np.ndarray],
     use_particle_masses: bool = False,
     efpset_args: list = [("n==", 4), ("d==", 4), ("p==", 1)],
-    num_eval_samples: int = 10000,
+    num_eval_samples: int = 50_000,
     num_batches: int = 5,
     return_std: bool = True,
     efp_jobs: int = None,
@@ -484,7 +484,7 @@ def w1efp(
           as defined here https://energyflow.network/docs/efp/#efpset.
           Defaults to the n=4, d=5, prime EFPs.
         num_eval_samples (int): Number of jets out of the total to use for W1 measurement.
-          Defaults to 10000.
+          Defaults to 50,000.
         num_batches (int): Number of different batches to average W1 scores over. Defaults to 5.
         average_over_efps (bool): Average over the EFPs to return a single W1-EFP score.
           Defaults to True.
@@ -509,8 +509,8 @@ def w1efp(
           each feature.
 
     """
-    if len(jets1) < 50000 or len(jets2) < 50000:
-        warnings.warn("Recommended number of jets for W1 estimation is 50000", RuntimeWarning)
+    if len(jets1) < 50_000 or len(jets2) < 50_000:
+        warnings.warn("Recommended number of jets for W1 estimation is 50,000", RuntimeWarning)
 
     jets1, jets2 = _check_get_ndarray(jets1, jets2)
 
@@ -667,8 +667,8 @@ def fpd_inf(
           ``[num_samples, num_features]``.
         gen_features (Union[Tensor, np.ndarray]): set of generated features of shape
         ``[num_samples, num_features]``.
-        min_samples (int, optional): min batch size to measure FPD for. Defaults to 20_000.
-        max_samples (int, optional): max batch size to measure FPD for. Defaults to 50_000.
+        min_samples (int, optional): min batch size to measure FPD for. Defaults to 20,000.
+        max_samples (int, optional): max batch size to measure FPD for. Defaults to 50,000.
         num_batches (int, optional): # of batches to average over for each batch size.
           Defaults to 20.
         num_points (int, optional): # of points to sample between the min and max samples.
@@ -680,8 +680,8 @@ def fpd_inf(
     Returns:
         Tuple[float, float]: value and error of FPD.
     """
-    if len(real_features) < 50000 or len(gen_features) < 50000:
-        warnings.warn("Recommended number of samples for FGD estimation is 50000", RuntimeWarning)
+    if len(real_features) < 50_000 or len(gen_features) < 50_000:
+        warnings.warn("Recommended number of samples for FGD estimation is 50,000", RuntimeWarning)
 
     real_features, gen_features = _check_get_ndarray(real_features, gen_features)
 
@@ -748,7 +748,7 @@ def kpd(
     real_features: Union[Tensor, np.ndarray],
     gen_features: Union[Tensor, np.ndarray],
     num_batches: int = 10,
-    batch_size: int = 5000,
+    batch_size: int = 5_000,
     normalise: bool = True,
     seed: int = 42,
 ) -> Tuple[float, float]:
@@ -767,7 +767,7 @@ def kpd(
         gen_features (Union[Tensor, np.ndarray]): set of generated features of shape
         ``[num_samples, num_features]``.
         num_batches (int, optional): number of batches to average over. Defaults to 10.
-        batch_size (int, optional): size of each batch for which MMD is measured. Defaults to 5000.
+        batch_size (int, optional): size of each batch for which MMD is measured. Defaults to 5,000.
         normalise (bool, optional): normalise the individual features over the full sample to have
           the same scaling. Defaults to True.
         seed (int, optional): random seed. Defaults to 42.
@@ -782,7 +782,7 @@ def kpd(
 
     vals_point = []
     for i in range(num_batches):
-        np.random.seed(seed + i * 1000)
+        np.random.seed(seed + i * 1_000)
         rand1 = np.random.choice(len(X), size=batch_size)
         rand2 = np.random.choice(len(Y), size=batch_size)
 
