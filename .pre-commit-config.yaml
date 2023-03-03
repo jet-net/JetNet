@@ -21,7 +21,7 @@ repos:
     args: ['--fix=no']
 
 - repo: https://github.com/PyCQA/isort
-  rev: 5.11.1
+  rev: 5.11.5
   hooks:
   - id: isort
     args: ["--profile", "black"]
@@ -39,4 +39,4 @@ repos:
   - id: flake8
     # black-compatible flake-8 config
     args: ['--max-line-length=100',  # max recommended for sight disabilities
-           '--extend-ignore=E203']  # E203 is not PEP8 compliant
+           '--extend-ignore=E203,F401']  # E203 is not PEP8 compliant

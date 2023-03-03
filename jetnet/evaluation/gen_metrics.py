@@ -1,5 +1,3 @@
-# energyflow needs to be imported before pytorch
-# because of https://github.com/pkomiske/EnergyFlow/issues/24
 import logging
 import pathlib
 import sys
@@ -9,8 +7,11 @@ from typing import Tuple, Union
 import numpy as np
 import torch
 from energyflow.emd import emds
+from numba import njit
+from numpy.typing import ArrayLike
 from scipy import linalg
-from scipy.stats import wasserstein_distance
+from scipy.optimize import curve_fit
+from scipy.stats import iqr, wasserstein_distance
 from torch import Tensor
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -21,9 +22,15 @@ from jetnet.datasets import JetNet
 rng = np.random.default_rng()
 
 
-# TODOs:
-# - Functionality for adding FPND for new datasets
-# - Cartesian coordinates
+def _check_get_ndarray(*arrs):
+    """Checks if each input in ``arrs`` is a PyTorch tensor and, if so, converts to a numpy array"""
+    ret_arrs = []
+    for arr in arrs:
+        if isinstance(arr, Tensor):
+            ret_arrs.append(arr.cpu().detach().numpy())
+        else:
+            ret_arrs.append(arr)
+    return ret_arrs[0] if len(ret_arrs) == 1 else ret_arrs
 
 
 def _optional_tqdm(iter_obj, use_tqdm, total=None, desc=None):
@@ -88,7 +95,7 @@ def _calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6):
 
 _eval_module = sys.modules[__name__]
 # for saving fpnd objects after the first loading
-_eval_module.fpnd_dict = {"NUM_SAMPLES": 50000}
+_eval_module.fpnd_dict = {"NUM_SAMPLES": 50_000}
 
 
 def _get_fpnd_real_mu_sigma(
@@ -297,9 +304,8 @@ def w1p(
     mask2: Union[Tensor, np.ndarray] = None,
     exclude_zeros: bool = True,
     num_particle_features: int = 0,
-    num_eval_samples: int = 10000,
+    num_eval_samples: int = 50_000,
     num_batches: int = 5,
-    average_over_features: bool = True,
     return_std: bool = True,
 ):
     """
@@ -318,26 +324,23 @@ def w1p(
         num_particle_features (int): Will return W1 scores of the first
           ``num_particle_features`` particle features. If 0, will calculate for all.
         num_eval_samples (int): Number of jets out of the total to use for W1 measurement.
-          Defaults to 10000.
+          Defaults to 50,000.
         num_batches (int): Number of different batches to average W1 scores over. Defaults to 5.
-        average_over_features (bool): Average over the particle features to return
-          a single W1-P score. Defaults to True.
         return_std (bool): Return the standard deviation as well of the W1 scores over the
           ``num_batches`` batches. Defaults to True.
 
     Returns:
         Tuple[Union[float, np.ndarray], Union[float, np.ndarray]]:
-        - **Union[float, np.ndarray]**: if ``average_over_features`` is True, float of average W1
-          scores for each particle feature, first averaged over ``num_batches``, else array of
-          length ``num_particle_features`` containing average W1 scores for each feature.
-        - **Union[float, np.ndarray]** `(optional, only if ``return_std`` is True)`: if
-          ``average_over_features`` is True, float of standard deviation of all W1 scores for each
-          particle feature, first calculated over ``num_batches`` then propagated for the final
-          average, else array of length ``num_particle_features`` containing standard deviation W1
-          scores for each feature.
+        - **Union[float, np.ndarray]**:  array of length ``num_particle_features`` containing
+          average W1 scores for each feature.
+        - **Union[float, np.ndarray]** `(optional, only if ``return_std`` is True)`: array of length
+          ``num_particle_features`` containing standard deviation W1 scores for each feature.
 
     """
     assert len(jets1.shape) == 3 and len(jets2.shape) == 3, "input jets format is incorrect"
+
+    if len(jets1) < 50_000 or len(jets2) < 50_000:
+        warnings.warn("Recommended number of jets for W1 estimation is 50,000", RuntimeWarning)
 
     if num_particle_features <= 0:
         num_particle_features = jets1.shape[2]
@@ -356,14 +359,10 @@ def w1p(
 
     if mask2 is not None:
         # TODO: should be wrapped in try catch
-        mask2 = mask2.reshape(jets2.shape[0], jets2.shape[2])
+        mask2 = mask2.reshape(jets2.shape[0], jets2.shape[1])
         mask2 = mask2.astype(bool)
 
-    if isinstance(jets1, Tensor):
-        jets1 = jets1.cpu().detach().numpy()
-
-    if isinstance(jets2, Tensor):
-        jets2 = jets2.cpu().detach().numpy()
+    jets1, jets2 = _check_get_ndarray(jets1, jets2)
 
     if exclude_zeros:
         zeros1 = np.linalg.norm(jets1[:, :, :num_particle_features], axis=2) == 0
@@ -404,16 +403,13 @@ def w1p(
     means = np.mean(w1s, axis=0)
     stds = np.std(w1s, axis=0)
 
-    if average_over_features:
-        return np.mean(means), np.linalg.norm(stds) if return_std else np.mean(means)
-    else:
-        return means, stds if return_std else means
+    return (means, stds) if return_std else means
 
 
 def w1m(
     jets1: Union[Tensor, np.ndarray],
     jets2: Union[Tensor, np.ndarray],
-    num_eval_samples: int = 10000,
+    num_eval_samples: int = 50_000,
     num_batches: int = 5,
     return_std: bool = True,
 ):
@@ -426,7 +422,7 @@ def w1m(
           ``[eta, phi, pt, (optional) mass]``
         jets2 (Union[Tensor, np.ndarray]): Tensor or array of jets, of same format as ``jets1``.
         num_eval_samples (int): Number of jets out of the total to use for W1 measurement.
-          Defaults to 10000.
+          Defaults to 50,000.
         num_batches (int): Number of different batches to average W1 scores over. Defaults to 5.
         return_std (bool): Return the standard deviation as well of the W1 scores over the
           ``num_batches`` batches. Defaults to True.
@@ -440,11 +436,10 @@ def w1m(
     """
     assert len(jets1.shape) == 3 and len(jets2.shape) == 3, "input jets format is incorrect"
 
-    if isinstance(jets1, Tensor):
-        jets1 = jets1.cpu().detach().numpy()
+    if len(jets1) < 50_000 or len(jets2) < 50_000:
+        warnings.warn("Recommended number of jets for W1 estimation is 50,000", RuntimeWarning)
 
-    if isinstance(jets2, Tensor):
-        jets2 = jets2.cpu().detach().numpy()
+    jets1, jets2 = _check_get_ndarray(jets1, jets2)
 
     masses1 = utils.jet_features(jets1)["mass"]
     masses2 = utils.jet_features(jets2)["mass"]
@@ -468,9 +463,8 @@ def w1efp(
     jets2: Union[Tensor, np.ndarray],
     use_particle_masses: bool = False,
     efpset_args: list = [("n==", 4), ("d==", 4), ("p==", 1)],
-    num_eval_samples: int = 10000,
+    num_eval_samples: int = 50_000,
     num_batches: int = 5,
-    average_over_efps: bool = True,
     return_std: bool = True,
     efp_jobs: int = None,
 ):
@@ -490,7 +484,7 @@ def w1efp(
           as defined here https://energyflow.network/docs/efp/#efpset.
           Defaults to the n=4, d=5, prime EFPs.
         num_eval_samples (int): Number of jets out of the total to use for W1 measurement.
-          Defaults to 10000.
+          Defaults to 50,000.
         num_batches (int): Number of different batches to average W1 scores over. Defaults to 5.
         average_over_efps (bool): Average over the EFPs to return a single W1-EFP score.
           Defaults to True.
@@ -509,14 +503,16 @@ def w1efp(
           particle feature, first calculated over ``num_batches`` then propagated for the final
           average, else array of length ``num_particle_features`` containing standard deviation W1
           scores for each feature.
+        Tuple[np.ndarray, np.ndarray]:
+        - **np.ndarray**:  array of average W1 scores for each EFP.
+        - **np.ndarray** `(optional, only if ``return_std`` is True)`: array of std of W1 scores for
+          each feature.
 
     """
+    if len(jets1) < 50_000 or len(jets2) < 50_000:
+        warnings.warn("Recommended number of jets for W1 estimation is 50,000", RuntimeWarning)
 
-    if isinstance(jets1, Tensor):
-        jets1 = jets1.cpu().detach().numpy()
-
-    if isinstance(jets2, Tensor):
-        jets2 = jets2.cpu().detach().numpy()
+    jets1, jets2 = _check_get_ndarray(jets1, jets2)
 
     assert len(jets1.shape) == 3 and len(jets2.shape) == 3, "input jets format is incorrect"
     assert (jets1.shape[2] - int(use_particle_masses) >= 3) and (
@@ -546,10 +542,7 @@ def w1efp(
     means = np.mean(w1s, axis=0)
     stds = np.std(w1s, axis=0)
 
-    if average_over_efps:
-        return np.mean(means), np.linalg.norm(stds) if return_std else np.mean(means)
-    else:
-        return means, stds if return_std else means
+    return (means, stds) if return_std else means
 
 
 def cov_mmd(
@@ -586,11 +579,7 @@ def cov_mmd(
         gen_jets.shape[2] >= 3
     ), "particle feature format is incorrect"
 
-    if isinstance(real_jets, Tensor):
-        real_jets = real_jets.cpu().detach().numpy()
-
-    if isinstance(gen_jets, Tensor):
-        gen_jets = gen_jets.cpu().detach().numpy()
+    real_jets, gen_jets = _check_get_ndarray(real_jets, gen_jets)
 
     assert np.all(real_jets[:, :, 2] >= 0) and np.all(
         gen_jets[:, :, 2] >= 0
@@ -623,3 +612,185 @@ def cov_mmd(
         covs.append(np.unique(np.argmin(dists, axis=1)).size / num_eval_samples)
 
     return np.mean(covs), np.mean(mmds)
+
+
+def get_fpd_kpd_jet_features(jets: Union[Tensor, np.ndarray], efp_jobs: int = None) -> np.ndarray:
+    """Get recommended jet features (36 EFPs) for the FPD and KPD metrics from an input sample of
+    jets.
+
+    Args:
+        jets (Union[Tensor, np.ndarray]): Tensor or array of jets, of shape
+          ``[num_jets, num_particles, num_features]`` with features in order ``[eta, phi, pt]``.
+        efp_jobs (int, optional): number of jobs to use for energyflow's EFP batch computation.
+          None means as many processes as there are CPUs.
+
+    Returns:
+        np.ndarray: array of EFPs of shape ``[num_jets, 36]``.
+    """
+    jets = _check_get_ndarray(jets)
+    return utils.efps(jets, efpset_args=[("d<=", 4)], efp_jobs=efp_jobs)
+
+
+def _normalise_features(X: ArrayLike, Y: ArrayLike = None) -> ArrayLike:
+    maxes = np.max(np.abs(X), axis=0)
+    maxes[maxes == 0] = 1  # don't normalise in case of features which are just 0
+
+    return (X / maxes, Y / maxes) if Y is not None else X / maxes
+
+
+def _linear(x, intercept, slope):
+    return intercept + slope * x
+
+
+# based on https://github.com/mchong6/FID_IS_infinity/blob/master/score_infinity.py
+def fpd_inf(
+    real_features: Union[Tensor, np.ndarray],
+    gen_features: Union[Tensor, np.ndarray],
+    min_samples: int = 20_000,
+    max_samples: int = 50_000,
+    num_batches: int = 20,
+    num_points: int = 10,
+    normalise: bool = True,
+    seed: int = 42,
+) -> Tuple[float, float]:
+    """Calculates the value and error of the Fréchet physics distance (KPD) between a set of real
+    and generated features, as defined in https://arxiv.org/abs/2211.10295.
+
+    It is recommended to use input sample sizes of at least 50,000, and the default values for other
+    input parameters for consistency with other measurements.
+
+    Similarly, for jets, it is recommended to use the set of EFPs as provided by the
+    ``get_fpd_kpd_jet_features`` method.
+
+    Args:
+        real_features (Union[Tensor, np.ndarray]): set of real features of shape
+          ``[num_samples, num_features]``.
+        gen_features (Union[Tensor, np.ndarray]): set of generated features of shape
+        ``[num_samples, num_features]``.
+        min_samples (int, optional): min batch size to measure FPD for. Defaults to 20,000.
+        max_samples (int, optional): max batch size to measure FPD for. Defaults to 50,000.
+        num_batches (int, optional): # of batches to average over for each batch size.
+          Defaults to 20.
+        num_points (int, optional): # of points to sample between the min and max samples.
+          Defaults to 10.
+        normalise (bool, optional): normalise the individual features over the full sample to have
+          the same scaling. Defaults to True.
+        seed (int, optional): random seed. Defaults to 42.
+
+    Returns:
+        Tuple[float, float]: value and error of FPD.
+    """
+    if len(real_features) < 50_000 or len(gen_features) < 50_000:
+        warnings.warn("Recommended number of samples for FGD estimation is 50,000", RuntimeWarning)
+
+    real_features, gen_features = _check_get_ndarray(real_features, gen_features)
+
+    if normalise:
+        X, Y = _normalise_features(real_features, gen_features)
+
+    # regular intervals in 1/N
+    batches = (1 / np.linspace(1.0 / min_samples, 1.0 / max_samples, num_points)).astype("int32")
+    np.random.seed(seed)
+    vals = []
+
+    for i, batch_size in enumerate(batches):
+        val_points = []  # values per batch size
+        for _ in range(num_batches):
+            rand1 = np.random.choice(len(X), size=batch_size)
+            rand2 = np.random.choice(len(Y), size=batch_size)
+
+            rand_sample1 = X[rand1]
+            rand_sample2 = Y[rand2]
+
+            mu1 = np.mean(rand_sample1, axis=0)
+            sigma1 = np.cov(rand_sample1, rowvar=False)
+            mu2 = np.mean(rand_sample2, axis=0)
+            sigma2 = np.cov(rand_sample2, rowvar=False)
+
+            val = _calculate_frechet_distance(mu1, sigma1, mu2, sigma2)
+            val_points.append(val)
+
+        vals.append(np.mean(val_points))
+
+    params, covs = curve_fit(_linear, 1 / batches, vals, bounds=([0, 0], [np.inf, np.inf]))
+    return (params[0], np.sqrt(np.diag(covs)[0]))  # y-intercept, err on y-intercept
+
+
+@njit
+def _poly_kernel_pairwise(X: ArrayLike, Y: ArrayLike, degree: int) -> np.ndarray:
+    """Pairwise polynomial kernel of degree ``degree`` between X and Y"""
+    gamma = 1.0 / X.shape[-1]
+    return (X @ Y.T * gamma + 1.0) ** degree
+
+
+@njit
+def _mmd_quadratic_unbiased(XX: ArrayLike, YY: ArrayLike, XY: ArrayLike):
+    """Calculate quadratic estimate for MMD given pairwise distances between X and Y"""
+    m, n = XX.shape[0], YY.shape[0]
+    # subtract diagonal 1s
+    return (
+        (XX.sum() - np.trace(XX)) / (m * (m - 1))
+        + (YY.sum() - np.trace(YY)) / (n * (n - 1))
+        - 2 * np.mean(XY)
+    )
+
+
+@njit
+def _mmd_poly_quadratic_unbiased(X: ArrayLike, Y: ArrayLike, degree: int = 4) -> float:
+    """Calculate quadratic estimate for MMD with a polynomial kernel of degree ``degree``"""
+    XX = _poly_kernel_pairwise(X, X, degree=degree)
+    YY = _poly_kernel_pairwise(Y, Y, degree=degree)
+    XY = _poly_kernel_pairwise(X, Y, degree=degree)
+    return _mmd_quadratic_unbiased(XX, YY, XY)
+
+
+def kpd(
+    real_features: Union[Tensor, np.ndarray],
+    gen_features: Union[Tensor, np.ndarray],
+    num_batches: int = 10,
+    batch_size: int = 5_000,
+    normalise: bool = True,
+    seed: int = 42,
+) -> Tuple[float, float]:
+    """Calculates the median and error of the kernel physics distance (KPD) between a set of real
+    and generated features, as defined in https://arxiv.org/abs/2211.10295.
+
+    It is recommended to use input sample sizes of at least 50,000, and the default values for other
+    input parameters for consistency with other measurements.
+
+    Similarly, for jets, it is recommended to use the set of EFPs as provided by the
+    ``get_fpd_kpd_jet_features`` method.
+
+    Args:
+        real_features (Union[Tensor, np.ndarray]): set of real features of shape
+          ``[num_samples, num_features]``.
+        gen_features (Union[Tensor, np.ndarray]): set of generated features of shape
+        ``[num_samples, num_features]``.
+        num_batches (int, optional): number of batches to average over. Defaults to 10.
+        batch_size (int, optional): size of each batch for which MMD is measured. Defaults to 5,000.
+        normalise (bool, optional): normalise the individual features over the full sample to have
+          the same scaling. Defaults to True.
+        seed (int, optional): random seed. Defaults to 42.
+
+    Returns:
+        Tuple[float, float]: median and error of KPD.
+    """
+    real_features, gen_features = _check_get_ndarray(real_features, gen_features)
+
+    if normalise:
+        X, Y = _normalise_features(real_features, gen_features)
+
+    vals_point = []
+    for i in range(num_batches):
+        np.random.seed(seed + i * 1_000)
+        rand1 = np.random.choice(len(X), size=batch_size)
+        rand2 = np.random.choice(len(Y), size=batch_size)
+
+        rand_sample1 = X[rand1]
+        rand_sample2 = Y[rand2]
+
+        val = _mmd_poly_quadratic_unbiased(rand_sample1, rand_sample2)
+        vals_point.append(val)
+
+    # median, error = half of 16 - 84 IQR
+    return (np.median(vals_point), iqr(vals_point, rng=(16.275, 83.725)) / 2)
