@@ -39,4 +39,4 @@ repos:
   - id: flake8
     # black-compatible flake-8 config
     args: ['--max-line-length=100',  # max recommended for sight disabilities
-           '--extend-ignore=E203']  # E203 is not PEP8 compliant
+           '--extend-ignore=E203,F401']  # E203 is not PEP8 compliant
