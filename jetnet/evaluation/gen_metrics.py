@@ -653,7 +653,7 @@ def fpd_inf(
     normalise: bool = True,
     seed: int = 42,
 ) -> Tuple[float, float]:
-    """Calculates the value and error of the Fréchet physics distance (KPD) between a set of real
+    """Calculates the value and error of the Fréchet physics distance (FPD) between a set of real
     and generated features, as defined in https://arxiv.org/abs/2211.10295.
 
     It is recommended to use input sample sizes of at least 50,000, and the default values for other
