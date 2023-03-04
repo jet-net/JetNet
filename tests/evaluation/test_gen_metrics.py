@@ -4,8 +4,8 @@ from pytest import approx
 
 from jetnet import evaluation
 
-test_zeros = np.zeros((50000, 2))
-test_ones = np.ones((50000, 2))
+test_zeros = np.zeros((50_000, 2))
+test_ones = np.ones((50_000, 2))
 
 
 def test_fpd():
