@@ -25,6 +25,7 @@ autodoc_mock_imports = [
     "torch",
     "cvxpy",
     "qpth",
+    "numba",
 ]
 
 # -- Project information -----------------------------------------------------
