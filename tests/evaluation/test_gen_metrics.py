@@ -9,11 +9,11 @@ test_ones = np.ones((50_000, 2))
 
 
 def test_fpd():
-    val, err = evaluation.fpd_inf(test_zeros, test_zeros)
+    val, err = evaluation.fpd(test_zeros, test_zeros)
     assert val == approx(0, abs=0.01)
     assert err < 1e-3
 
-    val, err = evaluation.fpd_inf(test_zeros, test_ones)
+    val, err = evaluation.fpd(test_zeros, test_ones)
     assert val == approx(2, rel=0.01)
     assert err < 1e-3
 
