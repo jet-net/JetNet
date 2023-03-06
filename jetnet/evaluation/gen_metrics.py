@@ -22,6 +22,9 @@ from jetnet.datasets import JetNet
 rng = np.random.default_rng()
 
 
+# TODO: generic w1 method
+
+
 def _check_get_ndarray(*arrs):
     """Checks if each input in ``arrs`` is a PyTorch tensor and, if so, converts to a numpy array"""
     ret_arrs = []
@@ -643,7 +646,7 @@ def _linear(x, intercept, slope):
 
 
 # based on https://github.com/mchong6/FID_IS_infinity/blob/master/score_infinity.py
-def fpd_inf(
+def fpd(
     real_features: Union[Tensor, np.ndarray],
     gen_features: Union[Tensor, np.ndarray],
     min_samples: int = 20_000,

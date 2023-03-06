@@ -8,13 +8,13 @@ from torch import Tensor, nn
 class EMDLoss(nn.Module):
     """
     Calculates the energy mover's distance between two batches of jets differentiably
-      as a convex optimization problem either through the linear programming library ``cvxpy``
-      or by converting it to a quadratic programming problem and using the ``qpth`` library.
-      ``cvxpy`` is marginally more accurate but ``qpth`` is significantly faster so defaults
-      to ``qpth``.
+    as a convex optimization problem either through the linear programming library ``cvxpy``
+    or by converting it to a quadratic programming problem and using the ``qpth`` library.
+    ``cvxpy`` is marginally more accurate but ``qpth`` is significantly faster so defaults
+    to ``qpth``.
 
     **JetNet must be installed with the extra option** ``pip install jetnet[emdloss]``
-      **to use this.**
+    **to use this.**
 
     *Note: PyTorch <= 1.9 has a bug which will cause this to fail for >= 32 particles.*
     *This PR should fix this from 1.10 onwards* https://github.com/pytorch/pytorch/pull/61815.
