@@ -205,3 +205,26 @@ def gen_jet_corrections(
         jets[:, :, pt_index][jets[:, :, pt_index] < 0] = 0
 
     return (jets[:, :, :-1], mask) if ret_mask_separate else jets
+
+def findMaxLengthList(lst):
+    maxLength = max(len(x) for x in lst)
+    return maxLength
+
+
+def zero_padding(lst):
+    returned_list = []
+    for sub_list in lst:
+        sub_list = list(sub_list)
+        returned_list.append(sub_list)
+
+    padded_list = []
+    max_value = findMaxLengthList(returned_list)
+    for i in returned_list:
+        # print(type(i))
+        pad_list = np.pad(i, (0, max_value - len(i)), "constant", constant_values=0)
+        padded_list.append(pad_list)
+
+    zero_padded_arr = np.array(padded_list)
+
+    return zero_padded_arr
+
