@@ -1,8 +1,9 @@
-from typing import Callable, List, Set, Union, Optional, Tuple
-import numpy as np
 import logging
-import uproot
 import os
+from typing import Callable, List, Optional, Set, Tuple, Union
+
+import numpy as np
+import uproot
 from utils import *
 
 
