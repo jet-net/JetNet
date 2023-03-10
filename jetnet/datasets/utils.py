@@ -2,17 +2,16 @@
 Utility methods for datasets.
 """
 from __future__ import annotations
-from typing import Set, List, Tuple, Union, Any
-from numpy.typing import ArrayLike
-
-import requests
-import sys
-import os
-from os.path import exists
-
-import numpy as np
 
 import logging
+import os
+import sys
+from os.path import exists
+from typing import Any, List, Set, Tuple, Union
+
+import numpy as np
+import requests
+from numpy.typing import ArrayLike
 
 
 def download_progress_bar(file_url: str, file_dest: str):
@@ -176,18 +175,18 @@ def getSplitting(
 
 
 def findMaxLengthList(lst):
-    ''' 
+    """
     Finds max length sublist in list, returns the integer value of the max sublist.
     Args:
-        lst (List): A nested list containing sublists as its elements. 
-    
-    '''
+        lst (List): A nested list containing sublists as its elements.
+
+    """
     maxLength = max(len(x) for x in lst)
     return maxLength
 
 
 def zero_padding(lst):
-    '''
+    """
     Takes in a list containing awkward level array elements. Converts elements into lists
     and appends to a new list that will now contain list with nested lists in each eleement
     of the outer list. Next, we find the max length of the sublists and use that number to convert
@@ -197,7 +196,7 @@ def zero_padding(lst):
     Args:
         lst (List): An asymmetrical list that needs to be converted to a NumPy 2D array and needs zero padding.
 
-    '''
+    """
     returned_list = []
     for sub_list in lst:
         sub_list = list(sub_list)
