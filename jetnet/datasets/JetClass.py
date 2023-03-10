@@ -99,16 +99,16 @@ class JetClass(JetDataset):
 
     @classmethod
     def getData(self, jet_type, data_dir, particle_features, jet_features):
-        '''
+        """
         Downloads JetClass dataset from zenodo if dataset is not already downloaded in
-        user specified data directory. Loads and returns the JetClass data in the form a 
+        user specified data directory. Loads and returns the JetClass data in the form a
         multidimensional NumPy array.
 
         Args:
             jet_type (Union[str, Set[str]]): individual type or set of types out of 'HToBB' ,
                 "HtoCC", "HtoGG", "HtoWW", "HtoWW2Q1L", "HtoWW4Q", "TTBar", "TTBarLep", "WtoQQ",
                 "ZJetstoNuNu", "ZtoQQ" ).
-                data_dir (str, optional): 
+                data_dir (str, optional):
                 data_dir (str, optional): directory in which data is (to be) stored. Defaults to "./".
             particle_features (List[str], optional): list of particle features to retrieve. If empty
                 or None, gets no particle features. Defaults to
@@ -121,7 +121,7 @@ class JetClass(JetDataset):
         Returns:
             Tuple[Optional[np.ndarray], Optional[np.ndarray]]: jet data, particle data
 
-        '''
+        """
 
         dataset_name = "JetClass Validation Set"
         file_download_name = "Val_5M"
@@ -160,7 +160,7 @@ class JetClass(JetDataset):
                             # checking if user specified particle feature type(s) are part of the keys
                             if particle in i:
                                 arr_awk = branch[i].array()
-                                # Converting awkward level array to a list 
+                                # Converting awkward level array to a list
                                 awk_list = list(arr_awk)
                                 # takes in the 'awk_list' and zero pads the sublists in order to match dimensions
                                 zero_pad_arr = zero_padding(awk_list)
