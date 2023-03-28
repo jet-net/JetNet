@@ -86,9 +86,20 @@ def _calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6):
 
     # Numerical error might give slight imaginary component
     if np.iscomplexobj(covmean):
-        if not np.allclose(np.diagonal(covmean).imag, 0, atol=1e-3):
-            m = np.max(np.abs(covmean.imag))
-            raise ValueError("Imaginary component {}".format(m))
+        if not (
+            np.allclose(np.diagonal(covmean).imag, 0, atol=1e-3)
+            or np.isclose(np.trace(covmean.imag) / np.trace(covmean.real), 0, atol=1e-3)
+        ):
+            im_trace = np.trace(covmean.imag)
+            re_trace = np.trace(covmean.real)
+            warnings.warn(
+                (
+                    "Large imaginary components in covariance matrix while calculating "
+                    f"Fréchet distance Im: {im_trace:.2f} Re: {re_trace:.2f}"
+                ),
+                RuntimeWarning,
+            )
+
         covmean = covmean.real
 
     tr_covmean = np.trace(covmean)
