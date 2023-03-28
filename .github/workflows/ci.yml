@@ -57,4 +57,4 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Test with pytest
         run: |
-          pytest -n 0 --duration 0 -v -m "not slow" -k ${{ matrix.pytest-file }}
+          pytest -n 0 --durations 0 -v -m "not slow" -k ${{ matrix.pytest-file }}
