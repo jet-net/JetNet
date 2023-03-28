@@ -18,6 +18,7 @@ def test_fpd():
     assert err < 1e-3
 
 
-def test_kpd():
-    assert evaluation.kpd(test_zeros, test_zeros) == approx([0, 0])
-    assert evaluation.kpd(test_zeros, test_ones) == approx([15, 0])
+@pytest.mark.parametrize("num_threads", [None, 0, 2])  # test numba parallelization
+def test_kpd(num_threads):
+    assert evaluation.kpd(test_zeros, test_zeros, num_threads=num_threads) == approx([0, 0])
+    assert evaluation.kpd(test_zeros, test_ones, num_threads=num_threads) == approx([15, 0])

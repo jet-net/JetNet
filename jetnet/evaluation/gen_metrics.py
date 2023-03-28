@@ -7,7 +7,7 @@ from typing import Tuple, Union
 import numpy as np
 import torch
 from energyflow.emd import emds
-from numba import njit
+from numba import njit, prange, set_num_threads
 from numpy.typing import ArrayLike
 from scipy import linalg
 from scipy.optimize import curve_fit
@@ -747,6 +747,39 @@ def _mmd_poly_quadratic_unbiased(X: ArrayLike, Y: ArrayLike, degree: int = 4) ->
     return _mmd_quadratic_unbiased(XX, YY, XY)
 
 
+@njit(parallel=True)
+def _kpd_batches_parallel(X, Y, num_batches, batch_size, seed):
+    vals_point = np.zeros(num_batches, dtype=np.float64)
+    for i in prange(num_batches):
+        np.random.seed(seed + i * 1000)  # in case of multi-threading
+        rand1 = np.random.choice(len(X), size=batch_size)
+        rand2 = np.random.choice(len(Y), size=batch_size)
+
+        rand_sample1 = X[rand1]
+        rand_sample2 = Y[rand2]
+
+        val = _mmd_poly_quadratic_unbiased(rand_sample1, rand_sample2, degree=4)
+        vals_point[i] = val
+
+    return vals_point
+
+
+def _kpd_batches(X, Y, num_batches, batch_size, seed):
+    vals_point = []
+    for i in range(num_batches):
+        np.random.seed(seed + i * 1_000)
+        rand1 = np.random.choice(len(X), size=batch_size)
+        rand2 = np.random.choice(len(Y), size=batch_size)
+
+        rand_sample1 = X[rand1]
+        rand_sample2 = Y[rand2]
+
+        val = _mmd_poly_quadratic_unbiased(rand_sample1, rand_sample2)
+        vals_point.append(val)
+
+    return vals_point
+
+
 def kpd(
     real_features: Union[Tensor, np.ndarray],
     gen_features: Union[Tensor, np.ndarray],
@@ -754,6 +787,7 @@ def kpd(
     batch_size: int = 5_000,
     normalise: bool = True,
     seed: int = 42,
+    num_threads: int = None,
 ) -> Tuple[float, float]:
     """Calculates the median and error of the kernel physics distance (KPD) between a set of real
     and generated features, as defined in https://arxiv.org/abs/2211.10295.
@@ -768,12 +802,15 @@ def kpd(
         real_features (Union[Tensor, np.ndarray]): set of real features of shape
           ``[num_samples, num_features]``.
         gen_features (Union[Tensor, np.ndarray]): set of generated features of shape
-        ``[num_samples, num_features]``.
+          ``[num_samples, num_features]``.
         num_batches (int, optional): number of batches to average over. Defaults to 10.
         batch_size (int, optional): size of each batch for which MMD is measured. Defaults to 5,000.
         normalise (bool, optional): normalise the individual features over the full sample to have
           the same scaling. Defaults to True.
         seed (int, optional): random seed. Defaults to 42.
+        num_threads (int, optional): parallelize KPD through numba using this many threads. 0 means
+          numba's default number of threads, based on # of cores available. Defaults to None, i.e.
+          no parallelization.
 
     Returns:
         Tuple[float, float]: median and error of KPD.
@@ -783,17 +820,13 @@ def kpd(
     if normalise:
         X, Y = _normalise_features(real_features, gen_features)
 
-    vals_point = []
-    for i in range(num_batches):
-        np.random.seed(seed + i * 1_000)
-        rand1 = np.random.choice(len(X), size=batch_size)
-        rand2 = np.random.choice(len(Y), size=batch_size)
+    if num_threads is None:
+        vals_point = _kpd_batches(X, Y, num_batches, batch_size, seed)
+    else:
+        if num_threads > 0:
+            set_num_threads(num_threads)
 
-        rand_sample1 = X[rand1]
-        rand_sample2 = Y[rand2]
-
-        val = _mmd_poly_quadratic_unbiased(rand_sample1, rand_sample2)
-        vals_point.append(val)
+        vals_point = _kpd_batches_parallel(X, Y, num_batches, batch_size, seed)
 
     # median, error = half of 16 - 84 IQR
     return (np.median(vals_point), iqr(vals_point, rng=(16.275, 83.725)) / 2)
