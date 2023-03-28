@@ -684,7 +684,7 @@ def fpd(
         Tuple[float, float]: value and error of FPD.
     """
     if len(real_features) < 50_000 or len(gen_features) < 50_000:
-        warnings.warn("Recommended number of samples for FGD estimation is 50,000", RuntimeWarning)
+        warnings.warn("Recommended number of samples for FPD estimation is 50,000", RuntimeWarning)
 
     real_features, gen_features = _check_get_ndarray(real_features, gen_features)
 

@@ -4,9 +4,7 @@ We're using Sphinx with the Napolean extension, and the Google Python docstrings
 
 ## Build
 
-Requirements are:
- - `sphinx`
- - `autodocsumm`
+Install requirements with `pip install -r requirements.txt`.
 
 And then you can run the following command to build locally
 
