@@ -11,3 +11,5 @@ docs/_build
 
 !tests
 !tests/**/*.py
+
+/test.ipynb

@@ -444,7 +444,7 @@ def w1m(
     Returns:
         Tuple[float, float]:
         - **float**: W1 mass score, averaged over ``num_batches``.
-        - **float** `(optional, only if ``return_std`` is True)`: standard deviation of W1 mass
+        - **float** `(optional, only if ```return_std``` is True)`: standard deviation of W1 mass
           scores over ``num_batches``.
 
     """
@@ -508,18 +508,9 @@ def w1efp(
           None means as many processes as there are CPUs.
 
     Returns:
-        Tuple[Union[float, np.ndarray], Union[float, np.ndarray]]:
-        - **Union[float, np.ndarray]**: if ``average_over_features`` is True, float of average W1
-          scores for each particle feature, first averaged over ``num_batches``, else array of
-          length ``num_particle_features`` containing average W1 scores for each feature.
-        - **Union[float, np.ndarray]** `(optional, only if ``return_std`` is True)`: if
-          ``average_over_features`` is True, float of standard deviation of all W1 scores for each
-          particle feature, first calculated over ``num_batches`` then propagated for the final
-          average, else array of length ``num_particle_features`` containing standard deviation W1
-          scores for each feature.
         Tuple[np.ndarray, np.ndarray]:
         - **np.ndarray**:  array of average W1 scores for each EFP.
-        - **np.ndarray** `(optional, only if ``return_std`` is True)`: array of std of W1 scores for
+        - **np.ndarray** `(optional, only if return_std is True)`: array of std of W1 scores for
           each feature.
 
     """
