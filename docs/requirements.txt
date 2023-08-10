@@ -1,13 +1,13 @@
 # File: docs/requirements.txt
 
-autodocsumm==0.2.7
+autodocsumm
 ipykernel
 m2r2
 nbsphinx
 numpy
-readthedocs-sphinx-search==0.1.0rc3
+readthedocs-sphinx-search
 scipy
-sphinx==4.2.0
-sphinx_rtd_theme==1.0.0
+sphinx
+sphinx_rtd_theme
 torch
 tqdm

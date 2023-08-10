@@ -118,7 +118,7 @@ def to_image(
 ) -> np.ndarray:
     """
     Convert jet(s) into 2D ``im_size`` x ``im_size`` or  3D ``num_jets`` x ``im_size`` x ``im_size``
-      image arrays.
+    image arrays.
 
     Args:
         jets (np.ndarray): array of jet(s) of shape ``[num_particles, num_features]`` or
@@ -130,7 +130,7 @@ def to_image(
 
     Returns:
         np.ndarray: 2D or 3D array of shape ``[im_size, im_size]`` or
-          ``[num_jets, im_size, im_size]``.
+        ``[num_jets, im_size, im_size]``.
 
     """
     assert len(jets.shape) == 2 or len(jets.shape) == 3, "jets dimensions are incorrect"

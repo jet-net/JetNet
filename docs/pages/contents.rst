@@ -8,7 +8,7 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   index
+   ../index
 
 .. toctree::
    :maxdepth: 2

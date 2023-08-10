@@ -1,4 +1,4 @@
-exclude: '^docs/conf.py|^docs/_static/images/jetnetlogo.key'
+exclude: '^docs/conf.py|.*key'
 
 default_language_version:
     python: python3
