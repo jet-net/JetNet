@@ -28,7 +28,7 @@ bibliography: paper.bib
 
 # Summary
 
-`JetNet` is a Python package that aims to increase accessibility and reproducibility for machine learning (ML) research in high energy physics (HEP), especially related to particle jets. Based on the popular PyTorch ML framework, it provides easy-to-access and standardized interfaces for multiple heterogeneous HEP datasets as well as implementations of evaluation metrics, loss functions, and more general utilities relevant to HEP. 
+`JetNet` is a Python package that aims to increase accessibility and reproducibility for machine learning (ML) research in high energy physics (HEP), especially related to particle jets. Based on the popular PyTorch ML framework, it provides easy-to-access and standardized interfaces for multiple heterogeneous HEP datasets as well as implementations of evaluation metrics, loss functions, and more general utilities relevant to HEP.
 
 
 
