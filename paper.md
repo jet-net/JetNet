@@ -38,7 +38,7 @@ It is essential in scientific research to maintain standardized benchmark datase
 
 ## Impact
 
-The impact of `JetNet` is demonstrated by the surge in ML and HEP research in recent months facilitated by the package, including in the areas of generative adversarial networks `[@Kansal:2021cqp]`, transformers `[@Kach:2022uzq; @Kansal:2022spb; @Kach:2023rqw]`, diffusion models `[@Leigh:2023toe, @Mikuni:2023dvk]`, and equivariant networks `[@Hao:2022zns; @Buhmann:2023pmh]`, all accessing datasets, metrics, and more through `JetNet`.
+The impact of `JetNet` is demonstrated by the surge in ML and HEP research in recent months facilitated by the package, including in the areas of generative adversarial networks `[@Kansal:2021cqp]`, transformers `[@Kach:2022uzq; @Kansal:2022spb; @Kach:2023rqw]`, diffusion models `[@Leigh:2023toe; @Mikuni:2023dvk]`, and equivariant networks `[@Hao:2022zns; @Buhmann:2023pmh]`, all accessing datasets, metrics, and more through `JetNet`.
 
 ## Future Work
 
