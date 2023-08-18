@@ -23,7 +23,7 @@ affiliations:
  - name: Fermilab, USA
    index: 2
 date: 2023
-bibliography: docs/JOSS/paper.bib
+bibliography: paper.bib
 ---
 
 # Summary
