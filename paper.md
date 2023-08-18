@@ -42,7 +42,7 @@ The impact of `JetNet` is demonstrated by the surge in ML and HEP research in re
 
 ## Future Work
 
-Future work will expand the package to additional dataset loaders, including detector-level data, and different machine learning backends such as JAX `@jax2018github`. Improvements to the performance, such as optional lazy loading of large datasets, are also planned.
+Future work will expand the package to additional dataset loaders, including detector-level data, and different machine learning backends such as JAX `[@jax2018github]`. Improvements to the performance, such as optional lazy loading of large datasets, are also planned.
 
 
 # Acknowledgements
