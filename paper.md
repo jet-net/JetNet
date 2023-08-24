@@ -31,14 +31,34 @@ bibliography: paper.bib
 `JetNet` is a Python package that aims to increase accessibility and reproducibility for machine learning (ML) research in high energy physics (HEP), primarily related to particle jets. Based on the popular PyTorch ML framework, it provides easy-to-access and standardized interfaces for multiple heterogeneous HEP datasets and implementations of evaluation metrics, loss functions, and more general utilities relevant to HEP.
 
 
-
 # Statement of need
 
 It is essential in scientific research to maintain standardized benchmark datasets following the findable, accessible, interoperable, and reproducible (FAIR) data principles (see @Chen:2021euv), practices for using the data, and methods for evaluating and comparing different algorithms. This can often be difficult in high energy physics (HEP) because of the broad set of formats in which data is released and the expert knowledge required to parse the relevant information. The `JetNet` Python package aims to facilitate this by providing a standard interface and format for HEP datasets, integrated with PyTorch [@NEURIPS2019_9015], to improve accessibility for both HEP experts and new or interdisciplinary researchers looking to do ML. Furthermore, by providing standard formats and implementations for evaluation metrics, results are more easily reproducible, and models are more easily assessed and benchmarked.
 
+
+## Content
+
+`JetNet` currently provides:
+
+- Easy-to-access and standardised interfaces for the following datasets:
+  - JetNet [@kansal_raghav_2022_6975118]
+  - TopTagging [kasieczka_gregor_2019_2603256]
+  - QuarkGluon [@komiske_patrick_2019_3164691]
+- Standard implementations of generative evaluation metrics [@Kansal:2021cqp; @Kansal:2022spb], including:
+  - Fréchet physics distance (FPD)
+  - Kernel physics distance (KPD)
+  - Wasserstein-1 (W1)
+  - Fréchet ParticleNet Distance (FPND)
+  - coverage and minimum matching distance (MMD)
+- Loss functions:
+  - Differentiable implementation of the energy mover's distance [@PhysRevLett.123.041801]
+- And more general jet utilities.
+
+
 ## Impact
 
 The impact of `JetNet` is demonstrated by the surge in ML and HEP research in recent months facilitated by the package, including in the areas of generative adversarial networks [@Kansal:2021cqp], transformers [@Kach:2022uzq; @Kansal:2022spb; @Kach:2023rqw], diffusion models [@Leigh:2023toe; @Mikuni:2023dvk], and equivariant networks [@Hao:2022zns; @Buhmann:2023pmh], all accessing datasets, metrics, and more through `JetNet`.
+
 
 ## Future Work
 
