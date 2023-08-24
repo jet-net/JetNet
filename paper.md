@@ -38,21 +38,7 @@ It is essential in scientific research to maintain standardized benchmark datase
 
 ## Content
 
-`JetNet` currently provides:
-
-- Easy-to-access and standardised interfaces for the following datasets:
-  - JetNet [@kansal_raghav_2022_6975118]
-  - TopTagging [@kasieczka_gregor_2019_2603256]
-  - QuarkGluon [@komiske_patrick_2019_3164691]
-- Standard implementations of generative evaluation metrics [@Kansal:2021cqp; @Kansal:2022spb], including:
-  - Fréchet physics distance (FPD)
-  - Kernel physics distance (KPD)
-  - Wasserstein-1 (W1)
-  - Fréchet ParticleNet Distance (FPND)
-  - coverage and minimum matching distance (MMD)
-- Loss functions:
-  - Differentiable implementation of the energy mover's distance [@PhysRevLett.123.041801]
-- And more general jet utilities.
+`JetNet` currently provides easy-to-access and standardized interfaces for the JetNet [@kansal_raghav_2022_6975118], top quark tagging [@kasieczka_gregor_2019_2603256; @Kasieczka:2019dbj], and quark-gluon tagging [@komiske_patrick_2019_3164691] reference datasets. It also provides standard implementations of generative evaluation metrics [@Kansal:2021cqp; @Kansal:2022spb], including Fréchet physics distance (FPD), kernel physics distance (KPD), 1-Wasserstein distance (W1), Fréchet ParticleNet distance (FPND), coverage, and minimum matching distance (MMD). Finally, `JetNet` implements custom loss functions like a differentiable version of the energy mover's distance [@PhysRevLett.123.041801] and more general jet utilities.
 
 
 ## Impact
@@ -67,7 +53,7 @@ Future work will expand the package to additional dataset loaders, including det
 
 # Acknowledgements
 
-We thank the `JetNet` community for their support and feedback. J.D. and R.K. received support for work related to `JetNet` provided by the U.S. Department of Energy (DOE), Office of Science, Office of High Energy Physics Early Career Research Program under Award No. DE-SC0021187, the DOE, Office of Advanced Scientific Computing Research under Award No. DE-SC0021396 (FAIR4HEP). R.K. was partially supported by the LHC Physics Center at Fermi National Accelerator Laboratory, managed and operated by Fermi Research Alliance, LLC under Contract No. DE-AC02-07CH11359 with the DOE. C.P. was supported by the EXperiential Projects for Accelerated Networking and Development (EXPAND) mentorship program at UC San Diego.
+We thank the `JetNet` community for their support and feedback. J.D. and R.K. received support for work related to `JetNet` provided by the U.S. Department of Energy (DOE), Office of Science, Office of High Energy Physics Early Career Research Program under Award No. DE-SC0021187, the DOE, Office of Advanced Scientific Computing Research under Award No. DE-SC0021396 (FAIR4HEP). R.K. was partially supported by the LHC Physics Center at Fermi National Accelerator Laboratory, managed and operated by Fermi Research Alliance, LLC under Contract No. DE-AC02-07CH11359 with the DOE. C.P. was supported by the Experiential Projects for Accelerated Networking and Development (EXPAND) mentorship program at UC San Diego.
 
 
 # References
