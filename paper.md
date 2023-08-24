@@ -42,7 +42,7 @@ It is essential in scientific research to maintain standardized benchmark datase
 
 - Easy-to-access and standardised interfaces for the following datasets:
   - JetNet [@kansal_raghav_2022_6975118]
-  - TopTagging [kasieczka_gregor_2019_2603256]
+  - TopTagging [@kasieczka_gregor_2019_2603256]
   - QuarkGluon [@komiske_patrick_2019_3164691]
 - Standard implementations of generative evaluation metrics [@Kansal:2021cqp; @Kansal:2022spb], including:
   - Fréchet physics distance (FPD)
