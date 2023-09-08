@@ -21,7 +21,7 @@ ______________________________________________________________________
 
 
 
-![CI](https://github.com/jet-net/jetnet/actions/workflows/ci.yml/badge.svg)
+[![CI](https://github.com/jet-net/jetnet/actions/workflows/ci.yml/badge.svg)](https://github.com/jet-net/jetnet/actions)
 [![Documentation Status](https://readthedocs.org/projects/jetnet/badge/?version=latest)](https://jetnet.readthedocs.io/en/latest/)
 [![Codestyle](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/jet-net/JetNet/main.svg)](https://results.pre-commit.ci/latest/github/jet-net/JetNet/main)
@@ -83,7 +83,7 @@ from jetnet.datasets import JetNet, TopTagging
 # as numpy arrays:
 particle_data, jet_data = JetNet.getData(jet_type=["g", "q"], data_dir="./datasets/jetnet/")
 # or as a PyTorch dataset:
-dataset = TopTagging(jet_type="all", , data_dir="./datasets/toptagging/", split="train")
+dataset = TopTagging(jet_type="all", data_dir="./datasets/toptagging/", split="train")
 ```
 
 Evaluation metrics can be used as such:
