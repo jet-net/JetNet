@@ -83,7 +83,7 @@ from jetnet.datasets import JetNet, TopTagging
 # as numpy arrays:
 particle_data, jet_data = JetNet.getData(jet_type=["g", "q"], data_dir="./datasets/jetnet/")
 # or as a PyTorch dataset:
-dataset = TopTagging(jet_type="all", , data_dir="./datasets/toptagging/", split="train")
+dataset = TopTagging(jet_type="all", data_dir="./datasets/toptagging/", split="train")
 ```
 
 Evaluation metrics can be used as such:
