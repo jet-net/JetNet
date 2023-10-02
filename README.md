@@ -13,6 +13,7 @@ ______________________________________________________________________
   <a href="#installation">Installation</a> •
   <a href="#quickstart">Quickstart</a> •
   <a href="#documentation">Documentation</a> •
+  <a href="#contributing">Contributing</a> •
   <a href="#citation">Citation</a> •
   <a href="#references">References</a>
 </p>
@@ -73,7 +74,6 @@ pip install "jetnet[emdloss]"
 
 Finally, [PyTorch Geometric](https://github.com/pyg-team/pytorch_geometric) must be installed independently for the Fréchet ParticleNet Distance metric `jetnet.evaluation.fpnd` ([Installation instructions](https://github.com/pyg-team/pytorch_geometric#installation)).
 
-
 ## Quickstart
 
 Datasets can be downloaded and accessed quickly, for example:
@@ -106,6 +106,26 @@ loss.backward()
 The full API reference and tutorials are available at [jetnet.readthedocs.io](https://jetnet.readthedocs.io/en/latest/). Tutorial notebooks are in the [tutorials](tutorials) folder, with more to come.
 
 More detailed information about each dataset can (or will) be found at [jet-net.github.io](https://jet-net.github.io/).
+
+## Contributing
+
+We welcome feedback and contributions! Please feel free to [create an issue](https://github.com/jet-net/JetNet/issues/new) for bugs or functionality requests, or open [pull requests](https://github.com/jet-net/JetNet/pulls) from your [forked repo](https://docs.github.com/en/get-started/quickstart/fork-a-repo) to solve them.
+
+### Building and testing locally
+
+Perform an editable installation of the package from inside your forked repo and install the `pytest` package for unit testing:
+
+```bash
+pip install -e .
+pip install pytest
+```
+
+Run the test suite to ensure everything is working as expected:
+
+```bash
+pytest tests                    # tests all datasets
+pytest tests -m "not slow"      # tests only on the JetNet dataset for convenience
+```
 
 ## Citation
 
