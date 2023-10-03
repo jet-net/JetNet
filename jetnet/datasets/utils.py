@@ -104,6 +104,8 @@ def checkDownloadZenodoDataset(
                     f"File corrupted - MD5 hash of {file_path} does not match: "
                     f"(expected md5:{md5}, got md5:{fmd5}), "
                     "removing existing file and re-downloading."
+                    "\nPlease open an issue at https://github.com/jet-net/JetNet/issues/new "
+                    "if you believe this is an error."
                 )
                 os.remove(file_path)
 
@@ -125,6 +127,8 @@ def checkDownloadZenodoDataset(
             f"File corrupted - MD5 hash of {file_path} does not match: "
             f"(expected md5:{md5}, got md5:{fmd5}), "
             "you can use download=True to re-download it."
+            "\nPlease open an issue at https://github.com/jet-net/JetNet/issues/new "
+            "if you believe this is an error."
         )
 
     return file_path
