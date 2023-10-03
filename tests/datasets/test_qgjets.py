@@ -1,3 +1,6 @@
+import os
+from os.path import isfile
+
 import numpy as np
 import pytest
 from pytest import approx
@@ -36,11 +39,24 @@ num_particles = 153
 def test_getData(jet_types, split, expected_length, class_id, file_list):
     # test md5 checksum is working for one of the datasets
     if jet_types == "q" and file_list == test_file_list_withoutbc:
+        file_path = data_dir + "/" + file_list[-1]
+
+        if isfile(file_path):
+            os.remove(file_path)
+
+        # should raise a RunetimeError since file doesn't exist
+        with pytest.raises(RuntimeError):
+            DataClass.getData(jet_types, data_dir, file_list=file_list, split=split)
+
         # write random data to file
-        with open(data_dir + "/" + file_list[-1], "wb") as f:
+        with open(file_path, "wb") as f:
             f.write(np.random.bytes(100))
 
-    pf, jf = DataClass.getData(jet_types, data_dir, file_list=file_list, split=split)
+        # should raise a RunetimeError since file exists but is incorret
+        with pytest.raises(RuntimeError):
+            DataClass.getData(jet_types, data_dir, file_list=file_list, split=split)
+
+    pf, jf = DataClass.getData(jet_types, data_dir, file_list=file_list, split=split, download=True)
     assert pf.shape == (expected_length, num_particles, 4)
     assert jf.shape == (expected_length, 1)
     if class_id is not None:

@@ -6,7 +6,7 @@ from __future__ import annotations
 import hashlib
 import os
 import sys
-from os.path import exists
+from os.path import isfile
 from typing import Any, List, Set, Tuple, Union
 
 import numpy as np
@@ -85,29 +85,47 @@ def _getZenodoFileURL(record_id: int, file_name: str) -> str:
     return file_url, md5
 
 
-def checkDownloadZenodoDataset(data_dir: str, dataset_name: str, record_id: int, key: str) -> str:
+def checkDownloadZenodoDataset(
+    data_dir: str, dataset_name: str, record_id: int, key: str, download: bool
+) -> str:
     """
     Checks if dataset exists and md5 hash matches;
-    if not, downloads it from Zenodo, and returns the file path.
+    if not and download = True, downloads it from Zenodo, and returns the file path.
+    or if not and download = False, raises an error.
     """
     file_path = f"{data_dir}/{key}"
     file_url, md5 = _getZenodoFileURL(record_id, key)
 
-    if exists(file_path):
-        match_md5, fmd5 = _check_md5(file_path, md5)
-        if not match_md5:
-            print(
-                f"MD5 hash of {file_path} does not match: "
-                f"expected md5:{md5}, got md5:{fmd5}, "
-                "removing existing file and re-downloading."
-            )
-            os.remove(file_path)
+    if download:
+        if isfile(file_path):
+            match_md5, fmd5 = _check_md5(file_path, md5)
+            if not match_md5:
+                print(
+                    f"File corrupted - MD5 hash of {file_path} does not match: "
+                    f"(expected md5:{md5}, got md5:{fmd5}), "
+                    "removing existing file and re-downloading."
+                )
+                os.remove(file_path)
 
-    if not exists(file_path):
-        os.makedirs(data_dir, exist_ok=True)
+        if not isfile(file_path):
+            os.makedirs(data_dir, exist_ok=True)
 
-        print(f"Downloading {dataset_name} dataset to {file_path}")
-        download_progress_bar(file_url, file_path)
+            print(f"Downloading {dataset_name} dataset to {file_path}")
+            download_progress_bar(file_url, file_path)
+
+    if not isfile(file_path):
+        raise RuntimeError(
+            f"Dataset {dataset_name} not found at {file_path}, "
+            "you can use download=True to download it."
+        )
+
+    match_md5, fmd5 = _check_md5(file_path, md5)
+    if not match_md5:
+        raise RuntimeError(
+            f"File corrupted - MD5 hash of {file_path} does not match: "
+            f"(expected md5:{md5}, got md5:{fmd5}), "
+            "you can use download=True to re-download it."
+        )
 
     return file_path
 

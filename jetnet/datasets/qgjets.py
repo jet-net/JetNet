@@ -127,6 +127,7 @@ class QuarkGluon(JetDataset):
         split_fraction: List[float] = [0.7, 0.15, 0.15],
         seed: int = 42,
         file_list: List[str] = None,
+        download: bool = False,
     ):
         self.particle_data, self.jet_data = self.getData(
             jet_type,
@@ -139,6 +140,7 @@ class QuarkGluon(JetDataset):
             split_fraction,
             seed,
             file_list,
+            download,
         )
 
         super().__init__(
@@ -169,6 +171,7 @@ class QuarkGluon(JetDataset):
         split_fraction: List[float] = [0.7, 0.15, 0.15],
         seed: int = 42,
         file_list: List[str] = None,
+        download: bool = False,
     ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
         """
         Downloads, if needed, and loads and returns Quark Gluon data.
@@ -221,6 +224,7 @@ class QuarkGluon(JetDataset):
                 dataset_name=file_name,
                 record_id=cls._zenodo_record_id,
                 key=file_name,
+                download=download,
             )
 
             print(f"Loading {file_name}")

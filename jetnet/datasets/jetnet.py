@@ -49,6 +49,9 @@ class JetNet(JetDataset):
             testing data respectively. Defaults to [0.7, 0.15, 0.15].
         seed (int, optional): PyTorch manual seed - important to use the same seed for all
             dataset splittings. Defaults to 42.
+        download (bool, optional): If True, downloads the dataset from the internet and
+            puts it in the ``data_dir`` directory. If dataset is already downloaded, it is not
+            downloaded again.
     """
 
     _zenodo_record_ids = {"30": 6975118, "150": 6975117}
@@ -81,6 +84,7 @@ class JetNet(JetDataset):
         split: str = "train",
         split_fraction: List[float] = [0.7, 0.15, 0.15],
         seed: int = 42,
+        download: bool = False,
     ):
         self.particle_data, self.jet_data = self.getData(
             jet_type,
@@ -91,6 +95,7 @@ class JetNet(JetDataset):
             split,
             split_fraction,
             seed,
+            download,
         )
 
         super().__init__(
@@ -119,6 +124,7 @@ class JetNet(JetDataset):
         split: str = "all",
         split_fraction: List[float] = [0.7, 0.15, 0.15],
         seed: int = 42,
+        download: bool = False,
     ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
         """
         Downloads, if needed, and loads and returns JetNet data.
@@ -142,6 +148,9 @@ class JetNet(JetDataset):
                 testing data respectively. Defaults to [0.7, 0.15, 0.15].
             seed (int, optional): PyTorch manual seed - important to use the same seed for all
                 dataset splittings. Defaults to 42.
+            download (bool, optional): If True, downloads the dataset from the internet and
+                puts it in the ``data_dir`` directory. If dataset is already downloaded, it is not
+                downloaded again.
 
         Returns:
             Tuple[Optional[np.ndarray], Optional[np.ndarray]]: particle data, jet data
@@ -170,6 +179,7 @@ class JetNet(JetDataset):
                 dataset_name=dname,
                 record_id=cls._zenodo_record_ids["150" if use_150 else "30"],
                 key=f"{dname}.hdf5",
+                download=download,
             )
 
             with h5py.File(hdf5_file, "r") as f:

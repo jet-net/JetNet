@@ -63,9 +63,10 @@ class TopTagging(JetDataset):
         jet_transform: Optional[Callable] = None,
         num_particles: int = max_num_particles,
         split: str = "train",
+        download: bool = False,
     ):
         self.particle_data, self.jet_data = self.getData(
-            jet_type, data_dir, particle_features, jet_features, num_particles, split
+            jet_type, data_dir, particle_features, jet_features, num_particles, split, download
         )
 
         super().__init__(
@@ -91,6 +92,7 @@ class TopTagging(JetDataset):
         jet_features: List[str] = all_jet_features,
         num_particles: int = max_num_particles,
         split: str = "all",
+        download: bool = False,
     ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
         """
         Downloads, if needed, and loads and returns Top Quark Tagging data.
@@ -134,6 +136,7 @@ class TopTagging(JetDataset):
                 dataset_name=cls._split_key_mapping[s],
                 record_id=cls._zenodo_record_id,
                 key=f"{cls._split_key_mapping[s]}.h5",
+                download=download,
             )
 
             data = np.array(pd.read_hdf(hdf5_file, key="table"))
