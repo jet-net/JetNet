@@ -34,6 +34,12 @@ num_particles = 153
 )
 @pytest.mark.parametrize("file_list", [test_file_list_withbc, test_file_list_withoutbc])
 def test_getData(jet_types, split, expected_length, class_id, file_list):
+    # test md5 checksum is working for one of the datasets
+    if jet_types == "q" and file_list == test_file_list_withoutbc:
+        # write random data to file
+        with open(data_dir + "/" + file_list[-1], "wb") as f:
+            f.write(np.random.bytes(100))
+
     pf, jf = DataClass.getData(jet_types, data_dir, file_list=file_list, split=split)
     assert pf.shape == (expected_length, num_particles, 4)
     assert jf.shape == (expected_length, 1)

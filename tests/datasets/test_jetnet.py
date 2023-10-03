@@ -10,7 +10,7 @@ from jetnet.datasets import JetNet, normalisations
 
 data_dir = "./datasets/jetnet"
 DataClass = JetNet
-jet_types = ["g", "q"]  # faster testing than using full dataset
+jet_types = ["g", "q"]  # subset of jet types
 gq_length = 177252 + 170679
 
 
@@ -24,6 +24,12 @@ gq_length = 177252 + 170679
 )
 @pytest.mark.parametrize("num_particles", [30, 75])
 def test_getData(jet_types, num_particles, expected_length, class_id):
+    # test md5 checksum is working for one of the datasets
+    if jet_types == "q":
+        # write random data to file
+        with open(f"{data_dir}/q{'150' if num_particles > 30 else ''}.hdf5", "wb") as f:
+            f.write(np.random.bytes(100))
+
     pf, jf = DataClass.getData(jet_types, data_dir, num_particles=num_particles)
     assert pf.shape == (expected_length, num_particles, 4)
     assert jf.shape == (expected_length, 5)
