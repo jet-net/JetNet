@@ -3,6 +3,7 @@ Utility methods for datasets.
 """
 from __future__ import annotations
 
+import logging
 import os
 import sys
 from os.path import exists
@@ -17,7 +18,6 @@ def download_progress_bar(file_url: str, file_dest: str):
     """
     Download while outputting a progress bar.
     Modified from https://sumit-ghosh.com/articles/python-download-progress-bar/
-
     Args:
         file_url (str): url to download from
         file_dest (str): path at which to save downloaded file
@@ -48,9 +48,11 @@ def download_progress_bar(file_url: str, file_dest: str):
     sys.stdout.write("\n")
 
 
-def checkDownloadZenodoDataset(data_dir: str, dataset_name: str, record_id: int, key: str):
+def checkDownloadZenodoDataset(
+    data_dir: str, dataset_name: str, record_id: int, key: str, file_download_name: str
+):
     """Checks if dataset exists, if not downloads it from Zenodo, and returns the file path"""
-    file_path = f"{data_dir}/{key}"
+    file_path = f"{data_dir}/{file_download_name}"
     if not exists(file_path):
         os.system(f"mkdir -p {data_dir}")
         file_url = getZenodoFileURL(record_id, key)
@@ -76,12 +78,10 @@ def getOrderedFeatures(
     data: ArrayLike, features: List[str], features_order: List[str]
 ) -> np.ndarray:
     """Returns data with features in the order specified by ``features``.
-
     Args:
         data (ArrayLike): input data
         features (List[str]): desired features in order
         features_order (List[str]): name and ordering of features in input data
-
     Returns:
         (np.ndarray): data with features in specified order
     """
@@ -151,13 +151,10 @@ def getSplitting(
     """
     Returns starting and ending index for splitting a dataset of length ``length`` according to
     the input ``split`` out of the total possible ``splits`` and a given ``split_fraction``.
-
     "all" is considered a special keyword to mean the entire dataset - it cannot be used to define a
     normal splitting, and if it is a possible splitting it must be the last entry in ``splits``.
-
     e.g. for ``length = 100``, ``split = "valid"``, ``splits = ["train", "valid", "test"]``,
     ``split_fraction = [0.7, 0.15, 0.15]``
-
     This will return ``(70, 85)``.
     """
 
@@ -167,7 +164,7 @@ def getSplitting(
         if split == "all":
             return 0, length
         else:
-            assert splits[-1] == "all", "'all' must be last entry in ``splits`` array"
+            assert splits[-1] == "all", f"'all' must be last entry in ``splits`` array"
             splits = splits[:-1]
 
     assert np.sum(split_fraction) <= 1.0, "sum of split fractions must be ≤ 1"
@@ -175,3 +172,43 @@ def getSplitting(
     split_index = splits.index(split)
     cuts = (np.cumsum(np.insert(split_fraction, 0, 0)) * length).astype(int)
     return cuts[split_index], cuts[split_index + 1]
+
+
+def findMaxLengthList(lst):
+    """
+    Finds max length sublist in list, returns the integer value of the max sublist.
+    Args:
+        lst (List): A nested list containing sublists as its elements.
+
+    """
+    maxLength = max(len(x) for x in lst)
+    return maxLength
+
+
+def zero_padding(lst):
+    """
+    Takes in a list containing awkward level array elements. Converts elements into lists
+    and appends to a new list that will now contain list with nested lists in each eleement
+    of the outer list. Next, we find the max length of the sublists and use that number to convert
+    other sublists to lists of that max length sublist by adding zeros at the end of the list in order
+    to reach the length threshold. Returns a 2D NumPy array of our data after all zero padding is completed.
+
+    Args:
+        lst (List): An asymmetrical list that needs to be converted to a NumPy 2D array and needs zero padding.
+
+    """
+    returned_list = []
+    for sub_list in lst:
+        sub_list = list(sub_list)
+        returned_list.append(sub_list)
+
+    padded_list = []
+    max_value = findMaxLengthList(returned_list)
+    for i in returned_list:
+        # print(type(i))
+        pad_list = np.pad(i, (0, max_value - len(i)), "constant", constant_values=0)
+        padded_list.append(pad_list)
+
+    zero_padded_arr = np.array(padded_list)
+
+    return zero_padded_arr
