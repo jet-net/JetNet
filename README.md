@@ -13,6 +13,7 @@ ______________________________________________________________________
   <a href="#installation">Installation</a> •
   <a href="#quickstart">Quickstart</a> •
   <a href="#documentation">Documentation</a> •
+  <a href="#contributing">Contributing</a> •
   <a href="#citation">Citation</a> •
   <a href="#references">References</a>
 </p>
@@ -21,7 +22,7 @@ ______________________________________________________________________
 
 
 
-![CI](https://github.com/jet-net/jetnet/actions/workflows/ci.yml/badge.svg)
+[![CI](https://github.com/jet-net/jetnet/actions/workflows/ci.yml/badge.svg)](https://github.com/jet-net/jetnet/actions)
 [![Documentation Status](https://readthedocs.org/projects/jetnet/badge/?version=latest)](https://jetnet.readthedocs.io/en/latest/)
 [![Codestyle](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/jet-net/JetNet/main.svg)](https://results.pre-commit.ci/latest/github/jet-net/JetNet/main)
@@ -73,7 +74,6 @@ pip install "jetnet[emdloss]"
 
 Finally, [PyTorch Geometric](https://github.com/pyg-team/pytorch_geometric) must be installed independently for the Fréchet ParticleNet Distance metric `jetnet.evaluation.fpnd` ([Installation instructions](https://github.com/pyg-team/pytorch_geometric#installation)).
 
-
 ## Quickstart
 
 Datasets can be downloaded and accessed quickly, for example:
@@ -83,7 +83,7 @@ from jetnet.datasets import JetNet, TopTagging
 # as numpy arrays:
 particle_data, jet_data = JetNet.getData(jet_type=["g", "q"], data_dir="./datasets/jetnet/")
 # or as a PyTorch dataset:
-dataset = TopTagging(jet_type="all", , data_dir="./datasets/toptagging/", split="train")
+dataset = TopTagging(jet_type="all", data_dir="./datasets/toptagging/", split="train")
 ```
 
 Evaluation metrics can be used as such:
@@ -106,6 +106,26 @@ loss.backward()
 The full API reference and tutorials are available at [jetnet.readthedocs.io](https://jetnet.readthedocs.io/en/latest/). Tutorial notebooks are in the [tutorials](tutorials) folder, with more to come.
 
 More detailed information about each dataset can (or will) be found at [jet-net.github.io](https://jet-net.github.io/).
+
+## Contributing
+
+We welcome feedback and contributions! Please feel free to [create an issue](https://github.com/jet-net/JetNet/issues/new) for bugs or functionality requests, or open [pull requests](https://github.com/jet-net/JetNet/pulls) from your [forked repo](https://docs.github.com/en/get-started/quickstart/fork-a-repo) to solve them.
+
+### Building and testing locally
+
+Perform an editable installation of the package from inside your forked repo and install the `pytest` package for unit testing:
+
+```bash
+pip install -e .
+pip install pytest
+```
+
+Run the test suite to ensure everything is working as expected:
+
+```bash
+pytest tests                    # tests all datasets
+pytest tests -m "not slow"      # tests only on the JetNet dataset for convenience
+```
 
 ## Citation
 
@@ -131,8 +151,8 @@ Additionally, if you use our EMD loss implementation, please cite the respective
 
 ## References
 
-[1] R. Kansal et al. *Particle Cloud Generation with Message Passing Generative Adversarial Networks* [NeurIPS 2021](https://proceedings.neurips.cc/paper/2021/hash/c8512d142a2d849725f31a9a7a361ab9-Abstract.html) [[2106.11535](https://arxiv.org/abs/2106.11535)]
+[1] R. Kansal et al., *Particle Cloud Generation with Message Passing Generative Adversarial Networks*, [NeurIPS 2021](https://proceedings.neurips.cc/paper/2021/hash/c8512d142a2d849725f31a9a7a361ab9-Abstract.html) [[2106.11535](https://arxiv.org/abs/2106.11535)].
 
-[2] R. Kansal et al. *On the Evaluation of Generative Models in High Energy Physics* [[2211.10295](https://arxiv.org/abs/2211.10295)]
+[2] R. Kansal et al., *Evaluating Generative Models in High Energy Physics*, [Phys. Rev. D **107** (2023) 076017](https://doi.org/10.1103/PhysRevD.107.076017) [[2211.10295](https://arxiv.org/abs/2211.10295)].
 
 [3] P. T. Komiske, E. M. Metodiev, and J. Thaler, _The Metric Space of Collider Events_, [Phys. Rev. Lett. __123__ (2019) 041801](https://doi.org/10.1103/PhysRevLett.123.041801) [[1902.02346](https://arxiv.org/abs/1902.02346)].

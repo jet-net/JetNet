@@ -15,7 +15,7 @@ def cartesian_to_EtaPhiPtE(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndar
 
     Returns:
         np.ndarray or torch.Tensor: array of 4-momenta in polar coordinates, arranged in order
-          :math:`(\eta, \phi, p_\mathrm{T}, E/c)`, where :math:`\eta` is the pseudorapidity.
+        :math:`(\eta, \phi, p_\mathrm{T}, E/c)`, where :math:`\eta` is the pseudorapidity.
     """
 
     eps = __get_default_eps(p4)  # default epsilon for the dtype
@@ -40,7 +40,7 @@ def EtaPhiPtE_to_cartesian(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndar
 
     Returns:
         np.ndarray or torch.Tensor: array of 4-momenta in polar coordinates, arranged in order
-          :math:`(E/c, p_x, p_y, p_z)`.
+        :math:`(E/c, p_x, p_y, p_z)`.
     """
 
     # (eta, phi, pT, E/c) -> (E/c, px, py, pz)
@@ -63,7 +63,7 @@ def cartesian_to_YPhiPtE(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarra
 
     Returns:
         np.ndarray or torch.Tensor: array of 4-momenta in polar coordinates, arranged in order
-          :math:`(y, \phi, E/c, p_\mathrm{T})`, where :math:`y` is the rapidity.
+        :math:`(y, \phi, E/c, p_\mathrm{T})`, where :math:`y` is the rapidity.
     """
 
     eps = __get_default_eps(p4)  # default epsilon for the dtype
@@ -88,8 +88,7 @@ def YPhiPtE_to_cartesian(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarra
 
     Returns:
         np.ndarray or torch.Tensor: array of 4-momenta in polar coordinates, arranged in order
-          :math:`(y, \phi, E/c, p_\mathrm{T})`, where :math:`y` is the rapidity.
-          :math:`(E/c, p_x, p_y, p_z)`.
+        :math:`(E/c, p_x, p_y, p_z)`.
     """
 
     eps = __get_default_eps(p4)  # default epsilon for the dtype
@@ -117,7 +116,7 @@ def cartesian_to_relEtaPhiPt(
 
     Returns:
         np.ndarray or torch.Tensor: array of features in relative polar coordinates, arranged
-          in order :math:`(\eta^\mathrm{rel}, \phi^\mathrm{rel}, p_\mathrm{T}^\mathrm{rel})`.
+        in order :math:`(\eta^\mathrm{rel}, \phi^\mathrm{rel}, p_\mathrm{T}^\mathrm{rel})`.
     """
 
     eps = __get_default_eps(p4)  # default epsilon for the dtype
@@ -153,7 +152,7 @@ def EtaPhiPtE_to_relEtaPhiPt(
 
     Returns:
         np.ndarray or torch.Tensor: array of features in relative polar coordinates, arranged
-          in order :math:`(\eta^\mathrm{rel}, \phi^\mathrm{rel}, p_\mathrm{T}^\mathrm{rel})`.
+        in order :math:`(\eta^\mathrm{rel}, \phi^\mathrm{rel}, p_\mathrm{T}^\mathrm{rel})`.
     """
 
     eps = __get_default_eps(p4)  # default epsilon for the dtype
@@ -185,7 +184,7 @@ def relEtaPhiPt_to_EtaPhiPt(
 ) -> Union[np.ndarray, torch.Tensor]:
     r"""
     Get particle features in absolute polar coordinates from relative polar coordinates
-      and jet features.
+    and jet features.
 
     Args:
         p_polarrel (np.ndarray or torch.Tensor): array of particle features in
@@ -195,15 +194,15 @@ def relEtaPhiPt_to_EtaPhiPt(
         jet_features (np.ndarray or torch.Tensor): array of jet features in polar coordinates,
           of shape ``[..., 4]``. The coordinates are specified by ``jet_coord``.
         jet_coord (str): coordinate system of jet features. Can be either "cartesian" or "polar".
-            Defaults to "cartesian".
-            If "cartesian", the last axis of ``jet_features`` should be in order
-              :math:`(E/c, p_x, p_y, p_z)`.
-            If "polar", the last axis of ``jet_features`` should be in order
-              :math:`(\eta, \phi, p_\mathrm{T}, E/c)`.
+          Defaults to "cartesian".
+          If "cartesian", the last axis of ``jet_features`` should be in order
+          :math:`(E/c, p_x, p_y, p_z)`.
+          If "polar", the last axis of ``jet_features`` should be in order
+          :math:`(\eta, \phi, p_\mathrm{T}, E/c)`.
 
     Returns:
         np.ndarray or torch.Tensor: array of particle features in absolute polar coordinates,
-          arranged in order :math:`(\eta, \phi, p_\mathrm{T}, E/c)`.
+        arranged in order :math:`(\eta, \phi, p_\mathrm{T}, E/c)`.
     """
 
     # particle features in relative polar coordinates
@@ -245,15 +244,15 @@ def relEtaPhiPt_to_cartesian(
         jet_features (np.ndarray or torch.Tensor): array of jet features in polar coordinates,
           of shape ``[..., 4]``. The coordinates are specified by ``jet_coord``.
         jet_coord (str): coordinate system of jet features. Can be either "cartesian" or "polar".
-            Defaults to "cartesian".
-            If "cartesian", the last axis of ``jet_features`` should be in order
-              :math:`(E/c, p_x, p_y, p_z)`.
-            If "polar", the last axis of ``jet_features`` should be in order
-              :math:`(\eta, \phi, p_\mathrm{T}, E/c)`.
+          Defaults to "cartesian".
+          If "cartesian", the last axis of ``jet_features`` should be in order
+          :math:`(E/c, p_x, p_y, p_z)`.
+          If "polar", the last axis of ``jet_features`` should be in order
+          :math:`(\eta, \phi, p_\mathrm{T}, E/c)`.
 
     Returns:
         np.ndarray or torch.Tensor: array of particle features in absolute polar coordinates,
-          arranged in order :math:`(E/c, p_x, p_y, p_z)`.
+        arranged in order :math:`(E/c, p_x, p_y, p_z)`.
     """
     p4_polar = relEtaPhiPt_to_EtaPhiPt(p_polarrel, jet_features, jet_coord)
     # eta is used even though jet is massive

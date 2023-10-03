@@ -21,6 +21,8 @@ from jetnet.datasets import JetNet
 
 rng = np.random.default_rng()
 
+logger = logging.getLogger("jetnet")
+logger.setLevel(logging.INFO)
 
 # TODO: generic w1 method
 
@@ -80,7 +82,7 @@ def _calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6):
         msg = (
             "fid calculation produces singular product; " "adding %s to diagonal of cov estimates"
         ) % eps
-        logging.debug(msg)
+        logger.debug(msg)
         offset = np.eye(sigma1.shape[0]) * eps
         covmean = linalg.sqrtm((sigma1 + offset).dot(sigma2 + offset))
 
@@ -152,7 +154,7 @@ def _get_fpnd_real_mu_sigma(
     # run inference and store activations
     jets_loaded = DataLoader(jets, batch_size)
 
-    logging.info(f"Calculating ParticleNet activations on real jets with batch size {batch_size}")
+    logger.info(f"Calculating ParticleNet activations on real jets with batch size {batch_size}")
     activations = []
     for i, jets_batch in _optional_tqdm(
         enumerate(jets_loaded), use_tqdm, total=len(jets_loaded), desc="Running ParticleNet"
@@ -294,7 +296,7 @@ def fpnd(
     # run inference and store activations
     jets_loaded = DataLoader(jets[: _eval_module.fpnd_dict["NUM_SAMPLES"]], batch_size)
 
-    logging.info(f"Calculating ParticleNet activations with batch size: {batch_size}")
+    logger.info(f"Calculating ParticleNet activations with batch size: {batch_size}")
     activations = []
     for i, jets_batch in _optional_tqdm(
         enumerate(jets_loaded), use_tqdm, total=len(jets_loaded), desc="Running ParticleNet"
@@ -444,7 +446,7 @@ def w1m(
     Returns:
         Tuple[float, float]:
         - **float**: W1 mass score, averaged over ``num_batches``.
-        - **float** `(optional, only if ``return_std`` is True)`: standard deviation of W1 mass
+        - **float** `(optional, only if ```return_std``` is True)`: standard deviation of W1 mass
           scores over ``num_batches``.
 
     """
@@ -508,18 +510,9 @@ def w1efp(
           None means as many processes as there are CPUs.
 
     Returns:
-        Tuple[Union[float, np.ndarray], Union[float, np.ndarray]]:
-        - **Union[float, np.ndarray]**: if ``average_over_features`` is True, float of average W1
-          scores for each particle feature, first averaged over ``num_batches``, else array of
-          length ``num_particle_features`` containing average W1 scores for each feature.
-        - **Union[float, np.ndarray]** `(optional, only if ``return_std`` is True)`: if
-          ``average_over_features`` is True, float of standard deviation of all W1 scores for each
-          particle feature, first calculated over ``num_batches`` then propagated for the final
-          average, else array of length ``num_particle_features`` containing standard deviation W1
-          scores for each feature.
         Tuple[np.ndarray, np.ndarray]:
         - **np.ndarray**:  array of average W1 scores for each EFP.
-        - **np.ndarray** `(optional, only if ``return_std`` is True)`: array of std of W1 scores for
+        - **np.ndarray** `(optional, only if return_std is True)`: array of std of W1 scores for
           each feature.
 
     """
