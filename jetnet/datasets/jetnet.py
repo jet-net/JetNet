@@ -51,7 +51,7 @@ class JetNet(JetDataset):
             dataset splittings. Defaults to 42.
         download (bool, optional): If True, downloads the dataset from the internet and
             puts it in the ``data_dir`` directory. If dataset is already downloaded, it is not
-            downloaded again.
+            downloaded again. Defaults to False.
     """
 
     _zenodo_record_ids = {"30": 6975118, "150": 6975117}
@@ -150,7 +150,7 @@ class JetNet(JetDataset):
                 dataset splittings. Defaults to 42.
             download (bool, optional): If True, downloads the dataset from the internet and
                 puts it in the ``data_dir`` directory. If dataset is already downloaded, it is not
-                downloaded again.
+                downloaded again. Defaults to False.
 
         Returns:
             Tuple[Optional[np.ndarray], Optional[np.ndarray]]: particle data, jet data

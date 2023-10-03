@@ -40,6 +40,9 @@ class TopTagging(JetDataset):
             to 200.
         split (str, optional): dataset split, out of {"train", "valid", "test", "all"}. Defaults
             to "train".
+        download (bool, optional): If True, downloads the dataset from the internet and
+            puts it in the ``data_dir`` directory. If dataset is already downloaded, it is not
+            downloaded again. Defaults to False.
     """
 
     _zenodo_record_id = 2603256
@@ -109,6 +112,9 @@ class TopTagging(JetDataset):
                 Defaults to 200.
             split (str, optional): dataset split, out of {"train", "valid", "test", "all"}. Defaults
                 to "all".
+            download (bool, optional): If True, downloads the dataset from the internet and
+                puts it in the ``data_dir`` directory. If dataset is already downloaded, it is not
+                downloaded again. Defaults to False.
 
         Returns:
             (Tuple[Optional[np.ndarray], Optional[np.ndarray]]): particle data, jet data

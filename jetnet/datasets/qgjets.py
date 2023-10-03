@@ -51,6 +51,9 @@ class QuarkGluon(JetDataset):
             dataset splittings. Defaults to 42.
         file_list (List[str], optional): list of files to load, if full dataset is not required.
             Defaults to None (will load all files).
+        download (bool, optional): If True, downloads the dataset from the internet and
+            puts it in the ``data_dir`` directory. If dataset is already downloaded, it is not
+            downloaded again. Defaults to False.
     """
 
     _zenodo_record_id = 3164691
@@ -197,6 +200,9 @@ class QuarkGluon(JetDataset):
                 dataset splittings. Defaults to 42.
             file_list (List[str], optional): list of files to load, if full dataset is not required.
                 Defaults to None (will load all files).
+            download (bool, optional): If True, downloads the dataset from the internet and
+                puts it in the ``data_dir`` directory. If dataset is already downloaded, it is not
+                downloaded again. Defaults to False.
 
         Returns:
             Tuple[Optional[np.ndarray], Optional[np.ndarray]]: particle data, jet data
