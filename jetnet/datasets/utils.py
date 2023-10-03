@@ -97,9 +97,11 @@ def checkDownloadZenodoDataset(data_dir: str, dataset_name: str, record_id: int,
         match_md5, fmd5 = _check_md5(file_path, md5)
         if not match_md5:
             print(
-                f"MD5 hash of {file_path} does not match: "
-                f"expected md5:{md5}, got md5:{fmd5}, "
-                "removing existing file and re-downloading."
+                f"MD5 hash of {file_path} does not match "
+                f"(expected md5:{md5}, got md5:{fmd5}), "
+                "removing existing file and re-downloading. "
+                "Please open an issue at https://github.com/jet-net/JetNet/issues/new "
+                "if you believe the matching is failing incorrectly."
             )
             os.remove(file_path)
 
