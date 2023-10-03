@@ -68,7 +68,8 @@ def _calculate_md5(fpath: str, chunk_size: int = 1024 * 1024) -> str:
 
 
 def _check_md5(fpath: str, md5: str, **kwargs: Any) -> bool:
-    return md5 == _calculate_md5(fpath, **kwargs)
+    fmd5 = _calculate_md5(fpath, **kwargs)
+    return (md5 == fmd5), fmd5
 
 
 def _getZenodoFileURL(record_id: int, file_name: str) -> str:
@@ -93,15 +94,17 @@ def checkDownloadZenodoDataset(data_dir: str, dataset_name: str, record_id: int,
     file_url, md5 = _getZenodoFileURL(record_id, key)
 
     if exists(file_path):
-        if not _check_md5(file_path, md5):
+        match_md5, fmd5 = _check_md5(file_path, md5)
+        if not match_md5:
             print(
-                f"MD5 hash of {file_path} does not match, "
+                f"MD5 hash of {file_path} does not match: "
+                f"expected md5:{md5}, got md5:{fmd5}, "
                 "removing existing file and re-downloading."
             )
-            os.system(f"rm {file_path}")
+            os.remove(file_path)
 
     if not exists(file_path):
-        os.system(f"mkdir -p {data_dir}")
+        os.makedirs(data_dir, exist_ok=True)
 
         print(f"Downloading {dataset_name} dataset to {file_path}")
         download_progress_bar(file_url, file_path)
