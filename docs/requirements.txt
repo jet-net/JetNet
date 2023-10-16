@@ -7,7 +7,7 @@ nbsphinx
 numpy
 readthedocs-sphinx-search
 scipy
-sphinx
+sphinx<7
 sphinx_rtd_theme
 torch
 tqdm
