@@ -6,6 +6,7 @@ docs/_build
 /dist
 *egg-info
 *test*.py
+*test*.ipynb
 /datasets
 .vscode
 

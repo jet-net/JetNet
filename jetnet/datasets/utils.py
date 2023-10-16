@@ -3,6 +3,7 @@ Utility methods for datasets.
 """
 from __future__ import annotations
 
+import hashlib
 import os
 import sys
 from os.path import exists
@@ -48,28 +49,69 @@ def download_progress_bar(file_url: str, file_dest: str):
     sys.stdout.write("\n")
 
 
-def checkDownloadZenodoDataset(data_dir: str, dataset_name: str, record_id: int, key: str):
-    """Checks if dataset exists, if not downloads it from Zenodo, and returns the file path"""
-    file_path = f"{data_dir}/{key}"
-    if not exists(file_path):
-        os.system(f"mkdir -p {data_dir}")
-        file_url = getZenodoFileURL(record_id, key)
+# from TorchVision
+# https://github.com/pytorch/vision/blob/48f8473e21b0f3e425aabc60db201b68fedf59b3/torchvision/datasets/utils.py#L51-L66  # noqa: E501
+def _calculate_md5(fpath: str, chunk_size: int = 1024 * 1024) -> str:
+    # Setting the `usedforsecurity` flag does not change anything about the functionality, but
+    # indicates that we are not using the MD5 checksum for cryptography. This enables its usage
+    # in restricted environments like FIPS.
+    if sys.version_info >= (3, 9):
+        md5 = hashlib.md5(usedforsecurity=False)
+    else:
+        md5 = hashlib.md5()
+    with open(fpath, "rb") as f:
+        # switch to simpler assignment operator once we support only Python >=3.8
+        # while chunk := f.read(chunk_size):
+        for chunk in iter(lambda: f.read(chunk_size), b""):
+            md5.update(chunk)
+    return md5.hexdigest()
 
-        print(f"Downloading {dataset_name} dataset to {file_path}")
-        download_progress_bar(file_url, file_path)
 
-    return file_path
+def _check_md5(fpath: str, md5: str, **kwargs: Any) -> bool:
+    fmd5 = _calculate_md5(fpath, **kwargs)
+    return (md5 == fmd5), fmd5
 
 
-def getZenodoFileURL(record_id: int, file_name: str) -> str:
-    """Finds URL for downloading the file ``file_name`` from a Zenodo record."""
+def _getZenodoFileURL(record_id: int, file_name: str) -> str:
+    """Finds URL and md5 hash for downloading the file ``file_name`` from a Zenodo record."""
 
     import requests
 
     records_url = f"https://zenodo.org/api/records/{record_id}"
     r = requests.get(records_url).json()
-    file_url = next(item for item in r["files"] if item["key"] == file_name)["links"]["self"]
-    return file_url
+    file = next(item for item in r["files"] if item["key"] == file_name)
+    file_url = file["links"]["self"]
+    md5 = file["checksum"].split("md5:")[1]
+    return file_url, md5
+
+
+def checkDownloadZenodoDataset(data_dir: str, dataset_name: str, record_id: int, key: str) -> str:
+    """
+    Checks if dataset exists and md5 hash matches;
+    if not, downloads it from Zenodo, and returns the file path.
+    """
+    file_path = f"{data_dir}/{key}"
+    file_url, md5 = _getZenodoFileURL(record_id, key)
+
+    if exists(file_path):
+        match_md5, fmd5 = _check_md5(file_path, md5)
+        if not match_md5:
+            print(
+                f"MD5 hash of {file_path} does not match "
+                f"(expected md5:{md5}, got md5:{fmd5}), "
+                "removing existing file and re-downloading. "
+                "Please open an issue at https://github.com/jet-net/JetNet/issues/new "
+                "if you believe the matching is failing incorrectly."
+            )
+            os.remove(file_path)
+
+    if not exists(file_path):
+        os.makedirs(data_dir, exist_ok=True)
+
+        print(f"Downloading {dataset_name} dataset to {file_path}")
+        download_progress_bar(file_url, file_path)
+
+    return file_path
 
 
 def getOrderedFeatures(
