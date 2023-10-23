@@ -50,7 +50,7 @@ extensions = [
     "autodocsumm",
     "m2r2",
     "nbsphinx",
-    "sphinx_rtd_theme"
+    "sphinx_rtd_theme",
 ]
 autosummary_generate = True  # Turn on sphinx.ext.autosummary
 
