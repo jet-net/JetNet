@@ -2,12 +2,12 @@
 
 autodocsumm
 ipykernel
-m2r2
 nbsphinx
 numpy
 readthedocs-sphinx-search
 scipy
-sphinx
-sphinx_rtd_theme
+sphinx<7
+sphinx_rtd_theme==0.5.2
+m2r2
 torch
 tqdm
