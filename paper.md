@@ -38,7 +38,7 @@ It is essential in scientific research to maintain standardized benchmark datase
 
 ## Content
 
-`JetNet` currently provides easy-to-access and standardized interfaces for the JetNet [@kansal_raghav_2022_6975118], top quark tagging [@kasieczka_gregor_2019_2603256; @Kasieczka:2019dbj], and quark-gluon tagging [@komiske_patrick_2019_3164691] reference datasets, all hosted on Zenodo. It also provides standard implementations of generative evaluation metrics [@Kansal:2021cqp; @Kansal:2022spb], including Fréchet physics distance (FPD), kernel physics distance (KPD), 1-Wasserstein distance (W1), Fréchet ParticleNet distance (FPND), coverage, and minimum matching distance (MMD). Finally, `JetNet` implements custom loss functions like a differentiable version of the energy mover's distance [@PhysRevLett.123.041801] and more general jet utilities.
+`JetNet` currently provides easy-to-access and standardized interfaces for the JetNet [@kansal_raghav_2022_6975118], top quark tagging [@kasieczka_gregor_2019_2603256; @Kasieczka:2019dbj], and quark-gluon tagging [@komiske_patrick_2019_3164691] reference datasets, all hosted on Zenodo [@Zenodo]. It also provides standard implementations of generative evaluation metrics [@Kansal:2021cqp; @Kansal:2022spb], including Fréchet physics distance (FPD), kernel physics distance (KPD), 1-Wasserstein distance (W1), Fréchet ParticleNet distance (FPND), coverage, and minimum matching distance (MMD). Finally, `JetNet` implements custom loss functions like a differentiable version of the energy mover's distance [@PhysRevLett.123.041801] and more general jet utilities.
 
 
 ## Impact
