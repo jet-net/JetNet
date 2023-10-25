@@ -21,6 +21,8 @@ from jetnet.datasets import JetNet
 
 rng = np.random.default_rng()
 
+logger = logging.getLogger("jetnet")
+logger.setLevel(logging.INFO)
 
 # TODO: generic w1 method
 
@@ -80,7 +82,7 @@ def _calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6):
         msg = (
             "fid calculation produces singular product; " "adding %s to diagonal of cov estimates"
         ) % eps
-        logging.debug(msg)
+        logger.debug(msg)
         offset = np.eye(sigma1.shape[0]) * eps
         covmean = linalg.sqrtm((sigma1 + offset).dot(sigma2 + offset))
 
@@ -152,7 +154,7 @@ def _get_fpnd_real_mu_sigma(
     # run inference and store activations
     jets_loaded = DataLoader(jets, batch_size)
 
-    logging.info(f"Calculating ParticleNet activations on real jets with batch size {batch_size}")
+    logger.info(f"Calculating ParticleNet activations on real jets with batch size {batch_size}")
     activations = []
     for i, jets_batch in _optional_tqdm(
         enumerate(jets_loaded), use_tqdm, total=len(jets_loaded), desc="Running ParticleNet"
@@ -294,7 +296,7 @@ def fpnd(
     # run inference and store activations
     jets_loaded = DataLoader(jets[: _eval_module.fpnd_dict["NUM_SAMPLES"]], batch_size)
 
-    logging.info(f"Calculating ParticleNet activations with batch size: {batch_size}")
+    logger.info(f"Calculating ParticleNet activations with batch size: {batch_size}")
     activations = []
     for i, jets_batch in _optional_tqdm(
         enumerate(jets_loaded), use_tqdm, total=len(jets_loaded), desc="Running ParticleNet"

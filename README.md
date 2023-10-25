@@ -13,6 +13,7 @@ ______________________________________________________________________
   <a href="#installation">Installation</a> •
   <a href="#quickstart">Quickstart</a> •
   <a href="#documentation">Documentation</a> •
+  <a href="#contributing">Contributing</a> •
   <a href="#citation">Citation</a> •
   <a href="#references">References</a>
 </p>
@@ -21,7 +22,7 @@ ______________________________________________________________________
 
 
 
-![CI](https://github.com/jet-net/jetnet/actions/workflows/ci.yml/badge.svg)
+[![CI](https://github.com/jet-net/jetnet/actions/workflows/ci.yml/badge.svg)](https://github.com/jet-net/jetnet/actions)
 [![Documentation Status](https://readthedocs.org/projects/jetnet/badge/?version=latest)](https://jetnet.readthedocs.io/en/latest/)
 [![Codestyle](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/jet-net/JetNet/main.svg)](https://results.pre-commit.ci/latest/github/jet-net/JetNet/main)
@@ -73,7 +74,6 @@ pip install "jetnet[emdloss]"
 
 Finally, [PyTorch Geometric](https://github.com/pyg-team/pytorch_geometric) must be installed independently for the Fréchet ParticleNet Distance metric `jetnet.evaluation.fpnd` ([Installation instructions](https://github.com/pyg-team/pytorch_geometric#installation)).
 
-
 ## Quickstart
 
 Datasets can be downloaded and accessed quickly, for example:
@@ -83,7 +83,7 @@ from jetnet.datasets import JetNet, TopTagging
 # as numpy arrays:
 particle_data, jet_data = JetNet.getData(jet_type=["g", "q"], data_dir="./datasets/jetnet/")
 # or as a PyTorch dataset:
-dataset = TopTagging(jet_type="all", , data_dir="./datasets/toptagging/", split="train")
+dataset = TopTagging(jet_type="all", data_dir="./datasets/toptagging/", split="train")
 ```
 
 Evaluation metrics can be used as such:
@@ -103,9 +103,29 @@ loss.backward()
 
 ## Documentation
 
-The full API reference and tutorials are available at [jetnet.readthedocs.io](https://jetnet.readthedocs.io/en/latest/). Tutorial notebooks are in the [tutorials](tutorials) folder, with more to come.
+The full API reference and tutorials are available at [jetnet.readthedocs.io](https://jetnet.readthedocs.io/en/latest/). Tutorial notebooks are in the [tutorials](https://github.com/jet-net/JetNet/tree/main/tutorials) folder, with more to come.
 
-More detailed information about each dataset can (or will) be found at [jet-net.github.io](https://jet-net.github.io/).
+<!-- More detailed information about each dataset can (or will) be found at [jet-net.github.io](https://jet-net.github.io/). -->
+
+## Contributing
+
+We welcome feedback and contributions! Please feel free to [create an issue](https://github.com/jet-net/JetNet/issues/new) for bugs or functionality requests, or open [pull requests](https://github.com/jet-net/JetNet/pulls) from your [forked repo](https://docs.github.com/en/get-started/quickstart/fork-a-repo) to solve them.
+
+### Building and testing locally
+
+Perform an editable installation of the package from inside your forked repo and install the `pytest` package for unit testing:
+
+```bash
+pip install -e .
+pip install pytest
+```
+
+Run the test suite to ensure everything is working as expected:
+
+```bash
+pytest tests                    # tests all datasets
+pytest tests -m "not slow"      # tests only on the JetNet dataset for convenience
+```
 
 ## Citation
 

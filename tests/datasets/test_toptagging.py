@@ -32,6 +32,12 @@ split = "valid"  # for faster testing
     ],
 )
 def test_getData(jet_types, split, expected_length, class_id):
+    # test md5 checksum is working for one of the datasets
+    if jet_types == "top" and split == "valid":
+        # write random data to file
+        with open(f"{data_dir}/val.h5", "wb") as f:
+            f.write(np.random.bytes(100))
+
     pf, jf = DataClass.getData(jet_types, data_dir, split=split)
     assert pf.shape == (expected_length, num_particles, 4)
     assert jf.shape == (expected_length, 5)
