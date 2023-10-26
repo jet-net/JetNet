@@ -79,9 +79,17 @@ def _getZenodoFileURL(record_id: int, file_name: str) -> str:
 
     records_url = f"https://zenodo.org/api/records/{record_id}"
     r = requests.get(records_url).json()
-    file = next(item for item in r["files"] if item["filename"] == file_name)
-    file_url = file["links"]["download"]
-    md5 = file["checksum"]
+
+    # Zenodo API seems to be switching back and forth between these at the moment... so trying both
+    try:
+        file = next(item for item in r["files"] if item["filename"] == file_name)
+        file_url = file["links"]["download"]
+        md5 = file["checksum"]
+    except KeyError:
+        file = next(item for item in r["files"] if item["key"] == file_name)
+        file_url = file["links"]["self"]
+        md5 = file["checksum"].split("md5:")[1]
+
     return file_url, md5
 
 
