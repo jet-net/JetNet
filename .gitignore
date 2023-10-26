@@ -8,6 +8,7 @@ docs/_build
 *test*.py
 *test*.ipynb
 /datasets
+tutorials/datasets
 .vscode
 
 !tests
