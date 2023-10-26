@@ -26,7 +26,7 @@ affiliations:
  - name: Fermilab, USA
    index: 2
  - name: California Institute of Technology, USA
-   index: 2
+   index: 3
 date: 2023
 bibliography: paper.bib
 ---
