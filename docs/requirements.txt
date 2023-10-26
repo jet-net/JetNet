@@ -8,6 +8,6 @@ numpy
 readthedocs-sphinx-search
 scipy
 sphinx<7
-sphinx_rtd_theme
+sphinx_rtd_theme==0.5.2
 torch
 tqdm

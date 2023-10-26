@@ -14,7 +14,6 @@ from scipy.optimize import curve_fit
 from scipy.stats import iqr, wasserstein_distance
 from torch import Tensor
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 
 from jetnet import utils
 from jetnet.datasets import JetNet
@@ -40,6 +39,8 @@ def _check_get_ndarray(*arrs):
 
 def _optional_tqdm(iter_obj, use_tqdm, total=None, desc=None):
     if use_tqdm:
+        from tqdm import tqdm
+
         return tqdm(iter_obj, total=total, desc=desc)
     else:
         return iter_obj

@@ -1,3 +1,6 @@
+import os
+from os.path import isfile
+
 import numpy as np
 import pytest
 from pytest import approx
@@ -24,13 +27,26 @@ gq_length = 177252 + 170679
 )
 @pytest.mark.parametrize("num_particles", [30, 75])
 def test_getData(jet_types, num_particles, expected_length, class_id):
-    # test md5 checksum is working for one of the datasets
+    # test getData errors and md5 checksum for one of the datasets
     if jet_types == "q":
+        file_path = f"{data_dir}/q{'150' if num_particles > 30 else ''}.hdf5"
+
+        if isfile(file_path):
+            os.remove(file_path)
+
+        # should raise a RunetimeError since file doesn't exist
+        with pytest.raises(RuntimeError):
+            DataClass.getData(jet_types, data_dir, num_particles=num_particles)
+
         # write random data to file
-        with open(f"{data_dir}/q{'150' if num_particles > 30 else ''}.hdf5", "wb") as f:
+        with open(file_path, "wb") as f:
             f.write(np.random.bytes(100))
 
-    pf, jf = DataClass.getData(jet_types, data_dir, num_particles=num_particles)
+        # should raise a RunetimeError since file exists but is incorret
+        with pytest.raises(RuntimeError):
+            DataClass.getData(jet_types, data_dir, num_particles=num_particles)
+
+    pf, jf = DataClass.getData(jet_types, data_dir, num_particles=num_particles, download=True)
     assert pf.shape == (expected_length, num_particles, 4)
     assert jf.shape == (expected_length, 5)
     if class_id is not None:
