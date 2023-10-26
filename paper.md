@@ -14,6 +14,9 @@ authors:
   - name: Carlos Pareja
     orcid: 0000-0002-9022-2349
     affiliation: 1
+  - name: Zichun Hao
+    orcid: 0000-0002-5624-4907
+    affiliation: 3
   - name: Javier Duarte
     orcid: 0000-0002-5076-7096
     affiliation: 1
@@ -21,6 +24,8 @@ affiliations:
  - name: UC San Diego, USA
    index: 1
  - name: Fermilab, USA
+   index: 2
+ - name: California Institute of Technology, USA
    index: 2
 date: 2023
 bibliography: paper.bib
