@@ -29,7 +29,7 @@ ______________________________________________________________________
 
 [![PyPI Version](https://badge.fury.io/py/jetnet.svg)](https://pypi.org/project/jetnet/)
 [![PyPI Downloads](https://pepy.tech/badge/jetnet)](https://pepy.tech/project/jetnet)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5598104.svg)](https://doi.org/10.5281/zenodo.5598104)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10044601.svg)](https://doi.org/10.5281/zenodo.10044601)
 
 
 
