@@ -1,0 +1,49 @@
+cff-version: "1.2.0"
+authors:
+- family-names: Kansal
+  given-names: Raghav
+  orcid: "https://orcid.org/0000-0003-2445-1060"
+- family-names: Pareja
+  given-names: Carlos
+  orcid: "https://orcid.org/0000-0002-9022-2349"
+- family-names: Hao
+  given-names: Zichun
+  orcid: "https://orcid.org/0000-0002-5624-4907"
+- family-names: Duarte
+  given-names: Javier
+  orcid: "https://orcid.org/0000-0002-5076-7096"
+contact:
+- family-names: Kansal
+  given-names: Raghav
+  orcid: "https://orcid.org/0000-0003-2445-1060"
+doi: 10.5281/zenodo.10044601
+message: If you use this software, please cite the following works.
+preferred-citation:
+  authors:
+  - family-names: Kansal
+    given-names: Raghav
+    orcid: "https://orcid.org/0000-0003-2445-1060"
+  - family-names: Pareja
+    given-names: Carlos
+    orcid: "https://orcid.org/0000-0002-9022-2349"
+  - family-names: Hao
+    given-names: Zichun
+    orcid: "https://orcid.org/0000-0002-5624-4907"
+  - family-names: Duarte
+    given-names: Javier
+    orcid: "https://orcid.org/0000-0002-5076-7096"
+  date-published: 2023-10-30
+  doi: 10.21105/joss.05789
+  issn: 2475-9066
+  issue: 90
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 5789
+  title: "JetNet: A Python package for accessing open datasets and
+    benchmarking machine learning methods in high energy physics"
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.05789"
+  volume: 8
+title: "JetNet: A Python package for accessing open datasets and
+  benchmarking machine learning methods in high energy physics"
