@@ -133,12 +133,11 @@ pytest tests -m "not slow"      # tests only on the JetNet dataset for convenien
 
 If you use this library for your research, please cite our article in the Journal of Open Source Software:
 
-```latex
+```
 @article{Kansal_JetNet_2023,
   author = {Kansal, Raghav and Pareja, Carlos and Hao, Zichun and Duarte, Javier},
   doi = {10.21105/joss.05789},
   journal = {Journal of Open Source Software},
-  month = oct,
   number = {90},
   pages = {5789},
   title = {{JetNet: A Python package for accessing open datasets and benchmarking machine learning methods in high energy physics}},
@@ -152,7 +151,7 @@ Please further cite the following if you use these components of the library.
 
 ### JetNet dataset or FPND
 
-```latex
+```
 @inproceedings{Kansal_MPGAN_2021,
   author = {Kansal, Raghav and Duarte, Javier and Su, Hao and Orzari, Breno and Tomei, Thiago and Pierini, Maurizio and Touranakou, Mary and Vlimant, Jean-Roch and Gunopulos, Dimitrios},
   booktitle = "{Advances in Neural Information Processing Systems}",
@@ -170,7 +169,7 @@ Please further cite the following if you use these components of the library.
 
 ### FPD or KPD
 
-```latex
+```
 @article{Kansal_Evaluating_2023,
   author = {Kansal, Raghav and Li, Anni and Duarte, Javier and Chernyavskaya, Nadezda and Pierini, Maurizio and Orzari, Breno and Tomei, Thiago},
   title = {Evaluating generative models in high energy physics},
