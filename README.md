@@ -155,16 +155,16 @@ Please further cite the following if you use these components of the library.
 ```latex
 @inproceedings{Kansal_MPGAN_2021,
   author = {Kansal, Raghav and Duarte, Javier and Su, Hao and Orzari, Breno and Tomei, Thiago and Pierini, Maurizio and Touranakou, Mary and Vlimant, Jean-Roch and Gunopulos, Dimitrios},
-  booktitle = {Advances in Neural Information Processing Systems},
+  booktitle = "{Advances in Neural Information Processing Systems}",
   editor = {M. Ranzato and A. Beygelzimer and Y. Dauphin and P.S. Liang and J. Wortman Vaughan},
   pages = {23858--23871},
   publisher = {Curran Associates, Inc.},
   title = {Particle Cloud Generation with Message Passing Generative Adversarial Networks},
   url = {https://proceedings.neurips.cc/paper_files/paper/2021/file/c8512d142a2d849725f31a9a7a361ab9-Paper.pdf},
   volume = {34},
-  year = {2021}
-  eprint = "2106.11535",
-  archivePrefix = "arXiv",
+  year = {2021},
+  eprint = {2106.11535},
+  archivePrefix = {arXiv},
 }
 ```
 
@@ -172,10 +172,8 @@ Please further cite the following if you use these components of the library.
 
 ```latex
 @article{Kansal_Evaluating_2023,
-  author = "Kansal, Raghav and Li, Anni and Duarte, Javier and Chernyavskaya, Nadezda and Pierini, Maurizio and Orzari, Breno and Tomei, Thiago",
-  title = "{Evaluating generative models in high energy physics}",
-  eprint = "2211.10295",
-  archivePrefix = "arXiv",
+  author = {Kansal, Raghav and Li, Anni and Duarte, Javier and Chernyavskaya, Nadezda and Pierini, Maurizio and Orzari, Breno and Tomei, Thiago},
+  title = {Evaluating generative models in high energy physics},
   reportNumber = "FERMILAB-PUB-22-872-CMS-PPD",
   doi = "10.1103/PhysRevD.107.076017",
   journal = "{Phys. Rev. D}",
@@ -183,6 +181,8 @@ Please further cite the following if you use these components of the library.
   number = "7",
   pages = "076017",
   year = "2023",
+  eprint = "2211.10295",
+  archivePrefix = "arXiv",
 }
 ```
 
