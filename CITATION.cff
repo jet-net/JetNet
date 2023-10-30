@@ -17,7 +17,7 @@ contact:
   given-names: Raghav
   orcid: "https://orcid.org/0000-0003-2445-1060"
 doi: 10.5281/zenodo.10044601
-message: If you use this software, please cite the following works.
+message: If you use this library for your research, please cite our article in the Journal of Open Source Software.
 preferred-citation:
   authors:
   - family-names: Kansal
