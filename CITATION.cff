@@ -47,3 +47,4 @@ preferred-citation:
   volume: 8
 title: "JetNet: A Python package for accessing open datasets and
   benchmarking machine learning methods in high energy physics"
+version: "v0.2.4"
