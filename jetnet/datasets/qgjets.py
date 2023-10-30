@@ -51,6 +51,9 @@ class QuarkGluon(JetDataset):
             dataset splittings. Defaults to 42.
         file_list (List[str], optional): list of files to load, if full dataset is not required.
             Defaults to None (will load all files).
+        download (bool, optional): If True, downloads the dataset from the internet and
+            puts it in the ``data_dir`` directory. If dataset is already downloaded, it is not
+            downloaded again. Defaults to False.
     """
 
     _zenodo_record_id = 3164691
@@ -127,6 +130,7 @@ class QuarkGluon(JetDataset):
         split_fraction: List[float] = [0.7, 0.15, 0.15],
         seed: int = 42,
         file_list: List[str] = None,
+        download: bool = False,
     ):
         self.particle_data, self.jet_data = self.getData(
             jet_type,
@@ -139,6 +143,7 @@ class QuarkGluon(JetDataset):
             split_fraction,
             seed,
             file_list,
+            download,
         )
 
         super().__init__(
@@ -169,6 +174,7 @@ class QuarkGluon(JetDataset):
         split_fraction: List[float] = [0.7, 0.15, 0.15],
         seed: int = 42,
         file_list: List[str] = None,
+        download: bool = False,
     ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
         """
         Downloads, if needed, and loads and returns Quark Gluon data.
@@ -194,6 +200,9 @@ class QuarkGluon(JetDataset):
                 dataset splittings. Defaults to 42.
             file_list (List[str], optional): list of files to load, if full dataset is not required.
                 Defaults to None (will load all files).
+            download (bool, optional): If True, downloads the dataset from the internet and
+                puts it in the ``data_dir`` directory. If dataset is already downloaded, it is not
+                downloaded again. Defaults to False.
 
         Returns:
             Tuple[Optional[np.ndarray], Optional[np.ndarray]]: particle data, jet data
@@ -221,6 +230,7 @@ class QuarkGluon(JetDataset):
                 dataset_name=file_name,
                 record_id=cls._zenodo_record_id,
                 key=file_name,
+                download=download,
             )
 
             print(f"Loading {file_name}")

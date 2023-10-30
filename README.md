@@ -29,7 +29,7 @@ ______________________________________________________________________
 
 [![PyPI Version](https://badge.fury.io/py/jetnet.svg)](https://pypi.org/project/jetnet/)
 [![PyPI Downloads](https://pepy.tech/badge/jetnet)](https://pepy.tech/project/jetnet)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5598104.svg)](https://doi.org/10.5281/zenodo.5598104)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10044601.svg)](https://doi.org/10.5281/zenodo.10044601)
 
 
 
@@ -81,9 +81,9 @@ Datasets can be downloaded and accessed quickly, for example:
 ```python
 from jetnet.datasets import JetNet, TopTagging
 # as numpy arrays:
-particle_data, jet_data = JetNet.getData(jet_type=["g", "q"], data_dir="./datasets/jetnet/")
+particle_data, jet_data = JetNet.getData(jet_type=["g", "q"], data_dir="./datasets/jetnet/", download=True)
 # or as a PyTorch dataset:
-dataset = TopTagging(jet_type="all", data_dir="./datasets/toptagging/", split="train")
+dataset = TopTagging(jet_type="all", data_dir="./datasets/toptagging/", split="train", download=True)
 ```
 
 Evaluation metrics can be used as such:
