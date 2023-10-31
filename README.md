@@ -30,6 +30,7 @@ ______________________________________________________________________
 [![PyPI Version](https://badge.fury.io/py/jetnet.svg)](https://pypi.org/project/jetnet/)
 [![PyPI Downloads](https://pepy.tech/badge/jetnet)](https://pepy.tech/project/jetnet)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10044601.svg)](https://doi.org/10.5281/zenodo.10044601)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.05789/status.svg)](https://doi.org/10.21105/joss.05789)
 
 
 
@@ -103,7 +104,8 @@ loss.backward()
 
 ## Documentation
 
-The full API reference and tutorials are available at [jetnet.readthedocs.io](https://jetnet.readthedocs.io/en/latest/). Tutorial notebooks are in the [tutorials](https://github.com/jet-net/JetNet/tree/main/tutorials) folder, with more to come.
+The full API reference and tutorials are available at [jetnet.readthedocs.io](https://jetnet.readthedocs.io/en/latest/).
+Tutorial notebooks are in the [tutorials](https://github.com/jet-net/JetNet/tree/main/tutorials) folder, with more to come.
 
 <!-- More detailed information about each dataset can (or will) be found at [jet-net.github.io](https://jet-net.github.io/). -->
 
@@ -129,24 +131,63 @@ pytest tests -m "not slow"      # tests only on the JetNet dataset for convenien
 
 ## Citation
 
-If you find this library useful for your research, please consider citing our original paper which introduces it [[1](#references)].
+If you use this library for your research, please cite our article in the Journal of Open Source Software:
 
-<!--
-```latex
-@inproceedings{kansal21,
- author = {Raghav Kansal and Javier Duarte and Hao Su and Breno Orzari and Thiago Tomei and Maurizio Pierini and Mary Touranakou and Jean-Roch Vlimant and Dimitrios Gunopulos},
- booktitle = {Advances in Neural Information Processing Systems},
- editor = {H. Larochelle and M. Ranzato and R. Hadsell and M. F. Balcan and H. Lin},
- pages = {1--12},
- publisher = {Curran Associates, Inc.},
- title = {Particle Cloud Generation with Message Passing Generative Adversarial Networks},
- url = {https://proceedings.neurips.cc/paper/2020/file/0004d0b59e19461ff126e3a08a814c33-Paper.pdf},
- volume = {33},
- year = {2020}
+```
+@article{Kansal_JetNet_2023,
+  author = {Kansal, Raghav and Pareja, Carlos and Hao, Zichun and Duarte, Javier},
+  doi = {10.21105/joss.05789},
+  journal = {Journal of Open Source Software},
+  number = {90},
+  pages = {5789},
+  title = {{JetNet: A Python package for accessing open datasets and benchmarking machine learning methods in high energy physics}},
+  url = {https://joss.theoj.org/papers/10.21105/joss.05789},
+  volume = {8},
+  year = {2023}
 }
-``` -->
+```
 
-Additionally, if you use our EMD loss implementation, please cite the respective [qpth](https://locuslab.github.io/qpth/) or [cvxpy](https://github.com/cvxpy/cvxpy) libraries, depending on the method used (`qpth` by default).
+Please further cite the following if you use these components of the library.
+
+### JetNet dataset or FPND
+
+```
+@inproceedings{Kansal_MPGAN_2021,
+  author = {Kansal, Raghav and Duarte, Javier and Su, Hao and Orzari, Breno and Tomei, Thiago and Pierini, Maurizio and Touranakou, Mary and Vlimant, Jean-Roch and Gunopulos, Dimitrios},
+  booktitle = "{Advances in Neural Information Processing Systems}",
+  editor = {M. Ranzato and A. Beygelzimer and Y. Dauphin and P.S. Liang and J. Wortman Vaughan},
+  pages = {23858--23871},
+  publisher = {Curran Associates, Inc.},
+  title = {Particle Cloud Generation with Message Passing Generative Adversarial Networks},
+  url = {https://proceedings.neurips.cc/paper_files/paper/2021/file/c8512d142a2d849725f31a9a7a361ab9-Paper.pdf},
+  volume = {34},
+  year = {2021},
+  eprint = {2106.11535},
+  archivePrefix = {arXiv},
+}
+```
+
+### FPD or KPD
+
+```
+@article{Kansal_Evaluating_2023,
+  author = {Kansal, Raghav and Li, Anni and Duarte, Javier and Chernyavskaya, Nadezda and Pierini, Maurizio and Orzari, Breno and Tomei, Thiago},
+  title = {Evaluating generative models in high energy physics},
+  reportNumber = "FERMILAB-PUB-22-872-CMS-PPD",
+  doi = "10.1103/PhysRevD.107.076017",
+  journal = "{Phys. Rev. D}",
+  volume = "107",
+  number = "7",
+  pages = "076017",
+  year = "2023",
+  eprint = "2211.10295",
+  archivePrefix = "arXiv",
+}
+```
+
+### EMD Loss
+
+Please cite the respective [qpth](https://locuslab.github.io/qpth/) or [cvxpy](https://github.com/cvxpy/cvxpy) libraries, depending on the method used (`qpth` by default), as well as the original EMD paper [[3]](#references).
 
 
 ## References
