@@ -165,7 +165,7 @@ class JetNet(JetDataset):
                 downloaded again. Defaults to False.
 
         Returns:
-            Tuple[Optional[np.ndarray], Optional[np.ndarray]]: particle data, jet data
+            tuple[np.ndarray | None, np.ndarray | None]: particle data, jet data
         """
         if particle_features == "all":
             particle_features = copy(cls.ALL_PARTICLE_FEATURES)
