@@ -12,12 +12,12 @@
 #
 from __future__ import annotations
 
+import os
 import sys
-from pathlib import Path
 
 import sphinx_rtd_theme
 
-sys.path.insert(0, Path("../").resolve())
+sys.path.insert(0, os.path.abspath("../"))  # noqa: PTH100
 # sys.path.insert(0, os.path.abspath("../tutorials/"))
 autodoc_mock_imports = [
     "energyflow",
@@ -68,7 +68,7 @@ templates_path = ["_templates"]
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "README.md"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "README.md", "JOSS"]
 
 master_doc = "pages/contents"
 

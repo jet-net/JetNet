@@ -1,7 +1,6 @@
 # JetNet Docs
 
-We're using Sphinx with the Napoleon extension, and the Google Python docstrings
-style.
+We're using Sphinx with the Napoleon extension, and the Google Python docstrings style.
 
 ## Build
 

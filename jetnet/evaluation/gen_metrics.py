@@ -233,7 +233,7 @@ def fpnd(
     other datasets + ability for users to use their own version is in development.
 
     Args:
-        jets (Union[Tensor, np.ndarray]): Tensor or array of jets, of shape
+        jets (Tensor | np.ndarray): Tensor or array of jets, of shape
           ``[num_jets, num_particles, num_features]`` with features in order
           ``[eta, phi, pt, (optional) mask]``
         jet_type (str): jet type, out of ``['g', 't', 'q']``.
@@ -332,13 +332,13 @@ def w1p(
     Get 1-Wasserstein distances between particle features of ``jets1`` and ``jets2``.
 
     Args:
-        jets1 (Union[Tensor, np.ndarray]): Tensor or array of jets, of shape
+        jets1 (Tensor | np.ndarray): Tensor or array of jets, of shape
           ``[num_jets, num_particles_per_jet, num_features_per_particle]``.
-        jets2 (Union[Tensor, np.ndarray]): Tensor or array of jets, of same format as ``jets1``.
-        mask1 (Union[Tensor, np.ndarray]): Optional tensor or array of binary particle masks, of
+        jets2 (Tensor | np.ndarray): Tensor or array of jets, of same format as ``jets1``.
+        mask1 (Tensor | np.ndarray): Optional tensor or array of binary particle masks, of
           shape ``[num_jets, num_particles_per_jet]`` or ``[num_jets, num_particles_per_jet, 1]``.
           If given, 0-masked particles will be excluded from w1 calculation.
-        mask2 (Union[Tensor, np.ndarray]): Optional tensor or array of same format as ``masks2``.
+        mask2 (Tensor | np.ndarray): Optional tensor or array of same format as ``masks2``.
         exclude_zeros (bool): Ignore zero-padded particles i.e.
           those whose whose feature norms are exactly 0. Defaults to True.
         num_particle_features (int): Will return W1 scores of the first
@@ -439,10 +439,10 @@ def w1m(
     Get 1-Wasserstein distance between masses of ``jets1`` and ``jets2``.
 
     Args:
-        jets1 (Union[Tensor, np.ndarray]): Tensor or array of jets, of shape
+        jets1 (Tensor | np.ndarray): Tensor or array of jets, of shape
           ``[num_jets, num_particles, num_features]`` with features in order
           ``[eta, phi, pt, (optional) mass]``
-        jets2 (Union[Tensor, np.ndarray]): Tensor or array of jets, of same format as ``jets1``.
+        jets2 (Tensor | np.ndarray): Tensor or array of jets, of same format as ``jets1``.
         num_eval_samples (int): Number of jets out of the total to use for W1 measurement.
           Defaults to 50,000.
         num_batches (int): Number of different batches to average W1 scores over. Defaults to 5.
@@ -497,11 +497,11 @@ def w1efp(
     (Komiske et al. 2017 https://arxiv.org/abs/1712.07124) of ``jets1`` and ``jets2``.
 
     Args:
-        jets1 (Union[Tensor, np.ndarray]): Tensor or array of jets of shape
+        jets1 (Tensor | np.ndarray): Tensor or array of jets of shape
           ``[num_jets, num_particles, num_features]``, with features in order
           ``[eta, phi, pt, (optional) mass]``. If no particle masses given
           (``particle_masses`` should be False), they are assumed to be 0.
-        jets2 (Union[Tensor, np.ndarray]): Tensor or array of jets, of same format as ``jets1``.
+        jets2 (Tensor | np.ndarray): Tensor or array of jets, of same format as ``jets1``.
         use_particle_masses (bool): Whether ``jets1`` and ``jets2`` have particle masses as their
           4th particle features. Defaults to False.
         efpset_args (List): Args for the energyflow.efpset function to specify which EFPs to use,
@@ -577,9 +577,9 @@ def cov_mmd(
     using the Energy Mover's Distance as the distance metric.
 
     Args:
-        real_jets (Union[Tensor, np.ndarray]): Tensor or array of jets, of shape
+        real_jets (Tensor | np.ndarray): Tensor or array of jets, of shape
           ``[num_jets, num_particles, num_features]`` with features in order ``[eta, phi, pt]``
-        gen_jets (Union[Tensor, np.ndarray]): tensor or array of generated jets,
+        gen_jets (Tensor | np.ndarray): tensor or array of generated jets,
           same format as real_jets.
         num_eval_samples (int): number of jets out of the real and gen jets each between which to
           evaluate COV and MMD. Defaults to 100.
@@ -639,7 +639,7 @@ def get_fpd_kpd_jet_features(jets: Tensor | np.ndarray, efp_jobs: int | None = N
     jets.
 
     Args:
-        jets (Union[Tensor, np.ndarray]): Tensor or array of jets, of shape
+        jets (Tensor | np.ndarray): Tensor or array of jets, of shape
           ``[num_jets, num_particles, num_features]`` with features in order ``[eta, phi, pt]``.
         efp_jobs (int, optional): number of jobs to use for energyflow's EFP batch computation.
           None means as many processes as there are CPUs.
@@ -683,10 +683,10 @@ def fpd(
     ``get_fpd_kpd_jet_features`` method.
 
     Args:
-        real_features (Union[Tensor, np.ndarray]): set of real features of shape
+        real_features (Tensor | np.ndarray): set of real features of shape
           ``[num_samples, num_features]``.
-        gen_features (Union[Tensor, np.ndarray]): set of generated features of shape
-        ``[num_samples, num_features]``.
+        gen_features (Tensor | np.ndarray): set of generated features of shape
+          ``[num_samples, num_features]``.
         min_samples (int, optional): min batch size to measure FPD for. Defaults to 20,000.
         max_samples (int, optional): max batch size to measure FPD for. Defaults to 50,000.
         num_batches (int, optional): # of batches to average over for each batch size.
@@ -820,9 +820,9 @@ def kpd(
     ``get_fpd_kpd_jet_features`` method.
 
     Args:
-        real_features (Union[Tensor, np.ndarray]): set of real features of shape
+        real_features (Tensor | np.ndarray): set of real features of shape
           ``[num_samples, num_features]``.
-        gen_features (Union[Tensor, np.ndarray]): set of generated features of shape
+        gen_features (Tensor | np.ndarray): set of generated features of shape
           ``[num_samples, num_features]``.
         num_batches (int, optional): number of batches to average over. Defaults to 10.
         batch_size (int, optional): size of each batch for which MMD is measured. Defaults to 5,000.
