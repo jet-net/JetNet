@@ -5,8 +5,8 @@ import pytest
 from jetnet.datasets import utils
 
 rng = np.random.default_rng(42)
-test_data_2d = rng.random(4, 3)
-test_data_3d = rng.random(5, 4, 3)
+test_data_2d = rng.random((4, 3))
+test_data_3d = rng.random((5, 4, 3))
 
 
 @pytest.fixture()

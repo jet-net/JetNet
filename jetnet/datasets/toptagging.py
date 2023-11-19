@@ -61,8 +61,8 @@ class TopTagging(JetDataset):
         self,
         jet_type: str | set[str] = "all",
         data_dir: str = "./",
-        particle_features: list[str] | None = None,
-        jet_features: list[str] | None = None,
+        particle_features: list[str] | None = "all",
+        jet_features: list[str] | None = "all",
         particle_normalisation: NormaliseABC | None = None,
         jet_normalisation: NormaliseABC | None = None,
         particle_transform: Callable | None = None,
@@ -71,10 +71,10 @@ class TopTagging(JetDataset):
         split: str = "train",
         download: bool = False,
     ):
-        if particle_features is None:
+        if particle_features == "all":
             particle_features = copy(self.ALL_PARTICLE_FEATURES)
 
-        if jet_features is None:
+        if jet_features == "all":
             jet_features = copy(self.ALL_JET_FEATURES)
 
         self.particle_data, self.jet_data = self.getData(
@@ -100,8 +100,8 @@ class TopTagging(JetDataset):
         cls,
         jet_type: str | set[str] = "all",
         data_dir: str = "./",
-        particle_features: list[str] | None = None,
-        jet_features: list[str] | None = None,
+        particle_features: list[str] | None = "all",
+        jet_features: list[str] | None = "all",
         num_particles: int = MAX_NUM_PARTICLES,
         split: str = "all",
         download: bool = False,
@@ -128,10 +128,10 @@ class TopTagging(JetDataset):
         Returns:
             (Tuple[Optional[np.ndarray], Optional[np.ndarray]]): particle data, jet data
         """
-        if particle_features is None:
+        if particle_features == "all":
             particle_features = copy(cls.ALL_PARTICLE_FEATURES)
 
-        if jet_features is None:
+        if jet_features == "all":
             jet_features = copy(cls.ALL_JET_FEATURES)
 
         assert num_particles <= cls.MAX_NUM_PARTICLES, (

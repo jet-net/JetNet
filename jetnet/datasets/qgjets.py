@@ -122,8 +122,8 @@ class QuarkGluon(JetDataset):
         jet_type: str | set[str] = "all",
         data_dir: str = "./",
         with_bc: bool = True,
-        particle_features: list[str] | None = None,
-        jet_features: list[str] | None = None,
+        particle_features: list[str] | None = "all",
+        jet_features: list[str] | None = "all",
         particle_normalisation: NormaliseABC | None = None,
         jet_normalisation: NormaliseABC | None = None,
         particle_transform: Callable | None = None,
@@ -135,10 +135,10 @@ class QuarkGluon(JetDataset):
         file_list: list[str] | None = None,
         download: bool = False,
     ):
-        if particle_features is None:
+        if particle_features == "all":
             particle_features = copy(self.ALL_PARTICLE_FEATURES)
 
-        if jet_features is None:
+        if jet_features == "all":
             jet_features = copy(self.ALL_JET_FEATURES)
 
         if split_fraction is None:
@@ -179,8 +179,8 @@ class QuarkGluon(JetDataset):
         jet_type: str | set[str] = "all",
         data_dir: str = "./",
         with_bc: bool = True,
-        particle_features: list[str] | None = None,
-        jet_features: list[str] | None = None,
+        particle_features: list[str] | None = "all",
+        jet_features: list[str] | None = "all",
         num_particles: int = MAX_NUM_PARTICLES,
         split: str = "all",
         split_fraction: list[float] | None = None,
@@ -219,10 +219,10 @@ class QuarkGluon(JetDataset):
         Returns:
             Tuple[Optional[np.ndarray], Optional[np.ndarray]]: particle data, jet data
         """
-        if particle_features is None:
+        if particle_features == "all":
             particle_features = copy(cls.ALL_PARTICLE_FEATURES)
 
-        if jet_features is None:
+        if jet_features == "all":
             jet_features = copy(cls.ALL_JET_FEATURES)
 
         if split_fraction is None:

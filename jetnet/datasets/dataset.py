@@ -43,8 +43,8 @@ class JetDataset(torch.utils.data.Dataset):
     def __init__(
         self,
         data_dir: str = "./",
-        particle_features: list[str] | None = None,
-        jet_features: list[str] | None = None,
+        particle_features: list[str] | None = "all",
+        jet_features: list[str] | None = "all",
         particle_normalisation: NormaliseABC | None = None,
         jet_normalisation: NormaliseABC | None = None,
         particle_transform: Callable | None = None,

@@ -5,14 +5,14 @@ import pytest
 from jetnet.datasets.normalisations import FeaturewiseLinear, FeaturewiseLinearBounded
 from pytest import approx
 
-rng = np.random.generator(42)
+rng = np.random.default_rng(42)
 test_data_1d = rng.random(3) * 100
-test_data_2d = rng.random(4, 3) * 100
-test_data_3d = rng.random(5, 4, 3) * 100
+test_data_2d = rng.random((4, 3)) * 100
+test_data_3d = rng.random((5, 4, 3)) * 100
 
 test_data_1d_posneg = rng.random(3) * 100 - 50
-test_data_2d_posneg = rng.random(4, 3) * 100 - 50
-test_data_3d_posneg = rng.random(5, 4, 3) * 100 - 50
+test_data_2d_posneg = rng.random((4, 3)) * 100 - 50
+test_data_3d_posneg = rng.random((5, 4, 3)) * 100 - 50
 
 
 @pytest.mark.parametrize(

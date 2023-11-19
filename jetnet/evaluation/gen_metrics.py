@@ -772,9 +772,9 @@ def _mmd_poly_quadratic_unbiased(X: ArrayLike, Y: ArrayLike, degree: int = 4) ->
 def _kpd_batches_parallel(X, Y, num_batches, batch_size, seed):
     vals_point = np.zeros(num_batches, dtype=np.float64)
     for i in prange(num_batches):
-        rng = np.random.default_rng(seed + i * 1000)  # in case of multi-threading
-        rand1 = rng.choice(len(X), size=batch_size)
-        rand2 = rng.choice(len(Y), size=batch_size)
+        np.random.seed(seed + i * 1000)  # in case of multi-threading  # noqa: NPY002
+        rand1 = np.random.choice(len(X), size=batch_size)  # noqa: NPY002
+        rand2 = np.random.choice(len(Y), size=batch_size)  # noqa: NPY002
 
         rand_sample1 = X[rand1]
         rand_sample2 = Y[rand2]
