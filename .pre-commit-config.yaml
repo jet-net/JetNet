@@ -1,10 +1,11 @@
 ci:
   autoupdate_commit_msg: "chore: update pre-commit hooks"
   autofix_commit_msg: "style: pre-commit fixes"
+  autoupdate_schedule: "monthly"
 
 repos:
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 23.10.1
+    rev: 23.11.0
     hooks:
       - id: black-jupyter
         language_version: python3
