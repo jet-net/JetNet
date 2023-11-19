@@ -4,7 +4,6 @@ Suite of common ways to normalise data.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import List, Optional, Tuple, Union
 
 import numpy as np
 import torch
@@ -20,9 +19,9 @@ class NormaliseABC(ABC):
         """Checks if any dataset values or features need to be derived"""
         return False
 
-    def derive_dataset_features(self, x: ArrayLike):
+    def derive_dataset_features(self, x: ArrayLike):  # noqa: ARG002
         """Derive features from dataset needed for normalisation if needed"""
-        pass
+        return
 
     @abstractmethod
     def __call__(self, x: ArrayLike, inverse: bool = False, inplace: bool = False) -> ArrayLike:
@@ -30,7 +29,6 @@ class NormaliseABC(ABC):
         Normalises (``inverse`` = False) or inverses normalisation of (``inverse`` = True) ``x``
         Performed inplace if ``inplace`` is True.
         """
-        pass
 
 
 class FeaturewiseLinear(NormaliseABC):
@@ -59,9 +57,9 @@ class FeaturewiseLinear(NormaliseABC):
 
     def __init__(
         self,
-        feature_shifts: Union[float, List[float]] = 0.0,
-        feature_scales: Union[float, List[float]] = 1.0,
-        normalise_features: Optional[List[bool]] = None,
+        feature_shifts: float | list[float] = 0.0,
+        feature_scales: float | list[float] = 1.0,
+        normalise_features: list[bool] | None = None,
         normal: bool = False,
     ):
         super().__init__()
@@ -71,7 +69,7 @@ class FeaturewiseLinear(NormaliseABC):
         self.normalise_features = normalise_features
         self.normal = normal
 
-    def derive_dataset_features(self, x: ArrayLike) -> Optional[Tuple[np.ndarray, np.ndarray]]:
+    def derive_dataset_features(self, x: ArrayLike) -> tuple[np.ndarray, np.ndarray] | None:
         """
         If using the ``normal`` option, this will derive the means and standard deviations per
         feature, and save and return them. If not, will do nothing.
@@ -89,6 +87,8 @@ class FeaturewiseLinear(NormaliseABC):
             self.feature_shifts = -np.mean(x.reshape(-1, num_features), axis=0)
             self.feature_scales = 1.0 / np.std(x.reshape(-1, num_features), axis=0)
             return self.feature_shifts, self.feature_scales
+
+        return None
 
     def features_need_deriving(self) -> bool:
         """Checks if any dataset values or features need to be derived"""
@@ -132,10 +132,7 @@ class FeaturewiseLinear(NormaliseABC):
         ), "Number of features in input does not equal length of ``normalise_features``"
 
         if not inplace:
-            if isinstance(x, torch.Tensor):
-                x = torch.clone(x)
-            else:
-                x = np.copy(x)
+            x = torch.clone(x) if isinstance(x, torch.Tensor) else np.copy(x)
 
         if not inverse:
             for i in range(num_features):
@@ -191,10 +188,10 @@ class FeaturewiseLinearBounded(NormaliseABC):
 
     def __init__(
         self,
-        feature_norms: Union[float, List[float]] = 1.0,
-        feature_shifts: Union[float, List[float]] = 0.0,
-        feature_maxes: List[float] = None,
-        normalise_features: Optional[List[bool]] = None,
+        feature_norms: float | list[float] = 1.0,
+        feature_shifts: float | list[float] = 0.0,
+        feature_maxes: list[float] | None = None,
+        normalise_features: list[bool] | None = None,
     ):
         super().__init__()
 
@@ -263,10 +260,7 @@ class FeaturewiseLinearBounded(NormaliseABC):
         ), "Number of features in input does not equal length of ``normalise_features``"
 
         if not inplace:
-            if isinstance(x, torch.Tensor):
-                x = torch.clone(x)
-            else:
-                x = np.copy(x)
+            x = torch.clone(x) if isinstance(x, torch.Tensor) else np.copy(x)
 
         if not inverse:
             for i in range(num_features):

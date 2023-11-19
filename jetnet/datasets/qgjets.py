@@ -1,4 +1,7 @@
-from typing import Callable, List, Optional, Set, Tuple, Union
+from __future__ import annotations
+
+from copy import copy
+from typing import Callable
 
 import numpy as np
 
@@ -56,10 +59,10 @@ class QuarkGluon(JetDataset):
             downloaded again. Defaults to False.
     """
 
-    _zenodo_record_id = 3164691
+    _ZENODO_RECORD_ID = 3164691
 
     # False - without bc, True - with bc
-    _file_list = {
+    _FILE_LIST = {
         False: [
             "QG_jets.npz",
             "QG_jets_1.npz",
@@ -107,31 +110,40 @@ class QuarkGluon(JetDataset):
         ],
     }
 
-    max_num_particles = 153
+    MAX_NUM_PARTICLES = 153
 
-    jet_types = ["g", "q"]
-    all_particle_features = ["pt", "eta", "phi", "pdgid"]
-    all_jet_features = ["type"]
-    splits = ["train", "valid", "test", "all"]
+    JET_TYPES = ["g", "q"]
+    ALL_PARTICLE_FEATURES = ["pt", "eta", "phi", "pdgid"]
+    ALL_JET_FEATURES = ["type"]
+    SPLITS = ["train", "valid", "test", "all"]
 
     def __init__(
         self,
-        jet_type: Union[str, Set[str]] = "all",
+        jet_type: str | set[str] = "all",
         data_dir: str = "./",
         with_bc: bool = True,
-        particle_features: List[str] = all_particle_features,
-        jet_features: List[str] = all_jet_features,
-        particle_normalisation: Optional[NormaliseABC] = None,
-        jet_normalisation: Optional[NormaliseABC] = None,
-        particle_transform: Optional[Callable] = None,
-        jet_transform: Optional[Callable] = None,
-        num_particles: int = max_num_particles,
+        particle_features: list[str] | None = None,
+        jet_features: list[str] | None = None,
+        particle_normalisation: NormaliseABC | None = None,
+        jet_normalisation: NormaliseABC | None = None,
+        particle_transform: Callable | None = None,
+        jet_transform: Callable | None = None,
+        num_particles: int = MAX_NUM_PARTICLES,
         split: str = "train",
-        split_fraction: List[float] = [0.7, 0.15, 0.15],
+        split_fraction: list[float] | None = None,
         seed: int = 42,
-        file_list: List[str] = None,
+        file_list: list[str] | None = None,
         download: bool = False,
     ):
+        if particle_features is None:
+            particle_features = copy(self.ALL_PARTICLE_FEATURES)
+
+        if jet_features is None:
+            jet_features = copy(self.ALL_JET_FEATURES)
+
+        if split_fraction is None:
+            split_fraction = [0.7, 0.15, 0.15]
+
         self.particle_data, self.jet_data = self.getData(
             jet_type,
             data_dir,
@@ -164,18 +176,18 @@ class QuarkGluon(JetDataset):
     @classmethod
     def getData(
         cls: JetDataset,
-        jet_type: Union[str, Set[str]] = "all",
+        jet_type: str | set[str] = "all",
         data_dir: str = "./",
         with_bc: bool = True,
-        particle_features: List[str] = all_particle_features,
-        jet_features: List[str] = all_jet_features,
-        num_particles: int = max_num_particles,
+        particle_features: list[str] | None = None,
+        jet_features: list[str] | None = None,
+        num_particles: int = MAX_NUM_PARTICLES,
         split: str = "all",
-        split_fraction: List[float] = [0.7, 0.15, 0.15],
+        split_fraction: list[float] | None = None,
         seed: int = 42,
-        file_list: List[str] = None,
+        file_list: list[str] | None = None,
         download: bool = False,
-    ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
+    ) -> tuple[np.ndarray | None, np.ndarray | None]:
         """
         Downloads, if needed, and loads and returns Quark Gluon data.
 
@@ -207,14 +219,22 @@ class QuarkGluon(JetDataset):
         Returns:
             Tuple[Optional[np.ndarray], Optional[np.ndarray]]: particle data, jet data
         """
+        if particle_features is None:
+            particle_features = copy(cls.ALL_PARTICLE_FEATURES)
 
-        assert num_particles <= cls.max_num_particles, (
+        if jet_features is None:
+            jet_features = copy(cls.ALL_JET_FEATURES)
+
+        if split_fraction is None:
+            split_fraction = [0.7, 0.15, 0.15]
+
+        assert num_particles <= cls.MAX_NUM_PARTICLES, (
             f"num_particles {num_particles} exceeds max number of "
-            + f"particles in the dataset {cls.max_num_particles}"
+            + f"particles in the dataset {cls.MAX_NUM_PARTICLES}"
         )
 
-        jet_type = checkConvertElements(jet_type, cls.jet_types, ntype="jet type")
-        type_indices = [cls.jet_types.index(t) for t in jet_type]
+        jet_type = checkConvertElements(jet_type, cls.JET_TYPES, ntype="jet type")
+        type_indices = [cls.JET_TYPES.index(t) for t in jet_type]
 
         particle_features, jet_features = checkStrToList(particle_features, jet_features)
         use_particle_features, use_jet_features = checkListNotEmpty(particle_features, jet_features)
@@ -222,13 +242,13 @@ class QuarkGluon(JetDataset):
         particle_data = []
         jet_data = []
 
-        file_list = cls._file_list[with_bc] if file_list is None else file_list
+        file_list = cls._FILE_LIST[with_bc] if file_list is None else file_list
 
         for file_name in file_list:
             npz_file = checkDownloadZenodoDataset(
                 data_dir,
                 dataset_name=file_name,
-                record_id=cls._zenodo_record_id,
+                record_id=cls._ZENODO_RECORD_ID,
                 key=file_name,
                 download=download,
             )
@@ -248,19 +268,19 @@ class QuarkGluon(JetDataset):
                     pf = np.pad(pf, ((0, 0), (0, num_particles - pf_np), (0, 0)), constant_values=0)
 
                 # reorder if needed
-                pf = getOrderedFeatures(pf, particle_features, cls.all_particle_features)
+                pf = getOrderedFeatures(pf, particle_features, cls.ALL_PARTICLE_FEATURES)
 
             if use_jet_features:
                 jf = data["y"][jet_selector].reshape(-1, 1)
-                jf = getOrderedFeatures(jf, jet_features, cls.all_jet_features)
+                jf = getOrderedFeatures(jf, jet_features, cls.ALL_JET_FEATURES)
 
             length = np.sum(jet_selector)
 
             # shuffling and splitting into training and test
-            lcut, rcut = getSplitting(length, split, cls.splits, split_fraction)
+            lcut, rcut = getSplitting(length, split, cls.SPLITS, split_fraction)
 
-            np.random.seed(seed)
-            randperm = np.random.permutation(length)
+            rng = np.random.default_rng(seed)
+            randperm = rng.permutation(length)
 
             if use_particle_features:
                 pf = pf[randperm][lcut:rcut]
@@ -282,7 +302,7 @@ class QuarkGluon(JetDataset):
             ret += "\nUsing all data (no split)"
         else:
             ret += (
-                f"\nSplit into {self.split} data out of {self.splits} possible splits, "
+                f"\nSplit into {self.split} data out of {self.SPLITS} possible splits, "
                 f"with splitting fractions {self.split_fraction}"
             )
 

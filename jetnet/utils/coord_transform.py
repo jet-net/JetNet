@@ -1,10 +1,12 @@
-from typing import Iterable, Union
+from __future__ import annotations
+
+from typing import Iterable
 
 import numpy as np
 import torch
 
 
-def cartesian_to_EtaPhiPtE(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
+def cartesian_to_EtaPhiPtE(p4: np.ndarray | torch.Tensor) -> np.ndarray | torch.Tensor:
     r"""
     Transform 4-momenta from Cartesian coordinates to polar coordinates for massless particles.
 
@@ -29,7 +31,7 @@ def cartesian_to_EtaPhiPtE(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndar
     return __stack([eta, phi, pt, p0], axis=-1)
 
 
-def EtaPhiPtE_to_cartesian(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
+def EtaPhiPtE_to_cartesian(p4: np.ndarray | torch.Tensor) -> np.ndarray | torch.Tensor:
     r"""
     Transform 4-momenta from polar coordinates to Cartesian coordinates for massless particles.
 
@@ -52,7 +54,7 @@ def EtaPhiPtE_to_cartesian(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndar
     return __stack([p0, px, py, pz], axis=-1)
 
 
-def cartesian_to_YPhiPtE(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
+def cartesian_to_YPhiPtE(p4: np.ndarray | torch.Tensor) -> np.ndarray | torch.Tensor:
     r"""
     Transform 4-momenta from Cartesian coordinates to polar coordinates.
 
@@ -77,7 +79,7 @@ def cartesian_to_YPhiPtE(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarra
     return __stack([y, phi, pt, p0], axis=-1)
 
 
-def YPhiPtE_to_cartesian(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
+def YPhiPtE_to_cartesian(p4: np.ndarray | torch.Tensor) -> np.ndarray | torch.Tensor:
     r"""
     Transform 4-momenta from polar coordinates to Cartesian coordinates.
 
@@ -103,9 +105,7 @@ def YPhiPtE_to_cartesian(p4: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarra
     return __stack([p0, px, py, pz], axis=-1)
 
 
-def cartesian_to_relEtaPhiPt(
-    p4: Union[np.ndarray, torch.Tensor]
-) -> Union[np.ndarray, torch.Tensor]:
+def cartesian_to_relEtaPhiPt(p4: np.ndarray | torch.Tensor) -> np.ndarray | torch.Tensor:
     r"""
     Get particle features in relative polar coordinates from 4-momenta in Cartesian coordinates.
 
@@ -139,9 +139,7 @@ def cartesian_to_relEtaPhiPt(
     return __stack([eta_rel, phi_rel, pt_rel], axis=-1)
 
 
-def EtaPhiPtE_to_relEtaPhiPt(
-    p4: Union[np.ndarray, torch.Tensor]
-) -> Union[np.ndarray, torch.Tensor]:
+def EtaPhiPtE_to_relEtaPhiPt(p4: np.ndarray | torch.Tensor) -> np.ndarray | torch.Tensor:
     r"""
     Get particle features in relative polar coordinates from 4-momenta in polar coordinates.
 
@@ -178,10 +176,10 @@ def EtaPhiPtE_to_relEtaPhiPt(
 
 
 def relEtaPhiPt_to_EtaPhiPt(
-    p_polarrel: Union[np.ndarray, torch.Tensor],
-    jet_features: Union[np.ndarray, torch.Tensor],
+    p_polarrel: np.ndarray | torch.Tensor,
+    jet_features: np.ndarray | torch.Tensor,
     jet_coord: str = "cartesian",
-) -> Union[np.ndarray, torch.Tensor]:
+) -> np.ndarray | torch.Tensor:
     r"""
     Get particle features in absolute polar coordinates from relative polar coordinates
     and jet features.
@@ -228,10 +226,10 @@ def relEtaPhiPt_to_EtaPhiPt(
 
 
 def relEtaPhiPt_to_cartesian(
-    p_polarrel: Union[np.ndarray, torch.Tensor],
-    jet_features: Union[np.ndarray, torch.Tensor],
+    p_polarrel: np.ndarray | torch.Tensor,
+    jet_features: np.ndarray | torch.Tensor,
     jet_coord: str = "cartesian",
-) -> Union[np.ndarray, torch.Tensor]:
+) -> np.ndarray | torch.Tensor:
     r"""
     Get particle features in absolute Cartesian coordinates from relative polar coordinates
       and jet features.
@@ -259,7 +257,7 @@ def relEtaPhiPt_to_cartesian(
     return EtaPhiPtE_to_cartesian(p4_polar)
 
 
-def __unbind(x: Union[np.ndarray, torch.Tensor], axis: int) -> Union[np.ndarray, torch.Tensor]:
+def __unbind(x: np.ndarray | torch.Tensor, axis: int) -> np.ndarray | torch.Tensor:
     """Unbind an np.ndarray or torch.Tensor along a given axis."""
     if isinstance(x, torch.Tensor):
         return torch.unbind(x, dim=axis)
@@ -269,9 +267,7 @@ def __unbind(x: Union[np.ndarray, torch.Tensor], axis: int) -> Union[np.ndarray,
         raise TypeError(f"x must be either a numpy array or a torch tensor, not {type(x)}")
 
 
-def __stack(
-    x: Iterable[Union[np.ndarray, torch.Tensor]], axis: int
-) -> Union[np.ndarray, torch.Tensor]:
+def __stack(x: Iterable[np.ndarray | torch.Tensor], axis: int) -> np.ndarray | torch.Tensor:
     """Stack an iterable of np.ndarray or torch.Tensor along a given axis."""
     if not isinstance(x, Iterable):
         raise TypeError("x must be an iterable.")
@@ -284,7 +280,7 @@ def __stack(
         raise TypeError(f"x must be either a numpy array or a torch tensor, not {type(x)}")
 
 
-def __cos(x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
+def __cos(x: np.ndarray | torch.Tensor) -> np.ndarray | torch.Tensor:
     """Cosine function that works with np.ndarray and torch.Tensor."""
     if isinstance(x, torch.Tensor):
         return torch.cos(x)
@@ -294,7 +290,7 @@ def __cos(x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]
         raise TypeError(f"x must be either a numpy array or a torch tensor, not {type(x)}")
 
 
-def __sin(x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
+def __sin(x: np.ndarray | torch.Tensor) -> np.ndarray | torch.Tensor:
     """Sine function that works with np.ndarray and torch.Tensor."""
     if isinstance(x, torch.Tensor):
         return torch.sin(x)
@@ -304,7 +300,7 @@ def __sin(x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]
         raise TypeError(f"x must be either a numpy array or a torch tensor, not {type(x)}")
 
 
-def __sinh(x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
+def __sinh(x: np.ndarray | torch.Tensor) -> np.ndarray | torch.Tensor:
     """Hyperbolic sine function that works with np.ndarray and torch.Tensor."""
     if isinstance(x, torch.Tensor):
         return torch.sinh(x)
@@ -314,7 +310,7 @@ def __sinh(x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor
         raise TypeError(f"x must be either a numpy array or a torch tensor, not {type(x)}")
 
 
-def __arcsinh(x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
+def __arcsinh(x: np.ndarray | torch.Tensor) -> np.ndarray | torch.Tensor:
     """Inverse hyperbolic sine function that works with np.ndarray and torch.Tensor."""
     if isinstance(x, torch.Tensor):
         return torch.asinh(x)
@@ -324,7 +320,7 @@ def __arcsinh(x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Ten
         raise TypeError(f"x must be either a numpy array or a torch tensor, not {type(x)}")
 
 
-def __cosh(x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
+def __cosh(x: np.ndarray | torch.Tensor) -> np.ndarray | torch.Tensor:
     """Hyperbolic cosine function that works with np.ndarray and torch.Tensor."""
     if isinstance(x, torch.Tensor):
         return torch.cosh(x)
@@ -334,7 +330,7 @@ def __cosh(x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor
         raise TypeError(f"x must be either a numpy array or a torch tensor, not {type(x)}")
 
 
-def __log(x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
+def __log(x: np.ndarray | torch.Tensor) -> np.ndarray | torch.Tensor:
     """Logarithm function that works with np.ndarray and torch.Tensor."""
     if isinstance(x, torch.Tensor):
         return torch.log(x)
@@ -345,8 +341,8 @@ def __log(x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]
 
 
 def __arctan2(
-    y: Union[np.ndarray, torch.Tensor], x: Union[np.ndarray, torch.Tensor]
-) -> Union[np.ndarray, torch.Tensor]:
+    y: np.ndarray | torch.Tensor, x: np.ndarray | torch.Tensor
+) -> np.ndarray | torch.Tensor:
     """Arctangent function that works with np.ndarray and torch.Tensor."""
     if isinstance(y, torch.Tensor):
         return torch.atan2(y, x)
@@ -356,7 +352,7 @@ def __arctan2(
         raise TypeError(f"y must be either a numpy array or a torch tensor, not {type(y)}")
 
 
-def __sqrt(x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor]:
+def __sqrt(x: np.ndarray | torch.Tensor) -> np.ndarray | torch.Tensor:
     """Square root function that works with np.ndarray and torch.Tensor."""
     if isinstance(x, torch.Tensor):
         return torch.sqrt(x)
@@ -367,8 +363,8 @@ def __sqrt(x: Union[np.ndarray, torch.Tensor]) -> Union[np.ndarray, torch.Tensor
 
 
 def __sum(
-    x: Union[np.ndarray, torch.Tensor], axis: int, keepdims: bool = False
-) -> Union[np.ndarray, torch.Tensor]:
+    x: np.ndarray | torch.Tensor, axis: int, keepdims: bool = False
+) -> np.ndarray | torch.Tensor:
     """Sum function that works with np.ndarray and torch.Tensor."""
     if isinstance(x, torch.Tensor):
         return x.sum(axis, keepdim=keepdims)
@@ -378,7 +374,7 @@ def __sum(
         raise TypeError(f"x must be either a numpy array or a torch tensor, not {type(x)}")
 
 
-def __get_default_eps(x: Union[np.ndarray, torch.Tensor]) -> float:
+def __get_default_eps(x: np.ndarray | torch.Tensor) -> float:
     if isinstance(x, torch.Tensor):
         return torch.finfo(x.dtype).eps
     elif isinstance(x, np.ndarray):

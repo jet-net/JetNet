@@ -1,7 +1,5 @@
 from __future__ import annotations  # for ArrayLike type in docs
 
-from typing import Dict, Tuple, Union
-
 # for calculating jet features quickly,
 # TODO: replace with vector library when summing over axis feature is implemented
 import awkward as ak
@@ -13,7 +11,7 @@ from numpy.typing import ArrayLike
 ak.behavior.update(vector.behavior)
 
 
-def jet_features(jets: np.ndarray) -> Dict[str, Union[float, np.ndarray]]:
+def jet_features(jets: np.ndarray) -> dict[str, float | np.ndarray]:
     """
     Calculates jet features by summing over particle Lorentz 4-vectors.
 
@@ -73,8 +71,8 @@ def jet_features(jets: np.ndarray) -> Dict[str, Union[float, np.ndarray]]:
 def efps(
     jets: np.ndarray,
     use_particle_masses: bool = False,
-    efpset_args: list = [("n==", 4), ("d==", 4), ("p==", 1)],
-    efp_jobs: int = None,
+    efpset_args: list | None = None,
+    efp_jobs: int | None = None,
 ) -> np.ndarray:
     """
     Utility for calculating EFPs for jets in JetNet format using the energyflow library.
@@ -96,6 +94,8 @@ def efps(
 
     """
 
+    if efpset_args is None:
+        efpset_args = [("n==", 4), ("d==", 4), ("p==", 1)]
     assert len(jets.shape) == 2 or len(jets.shape) == 3, "jets dimensions are incorrect"
     assert jets.shape[-1] - int(use_particle_masses) >= 3, "particle feature format is incorrect"
 
@@ -139,10 +139,7 @@ def to_image(
     eta = jets[..., 0]
     phi = jets[..., 1]
     pt = jets[..., 2]
-    if len(jets.shape) == 2:
-        num_jets = 1
-    else:
-        num_jets = jets.shape[0]
+    num_jets = 1 if len(jets.shape) == 2 else jets.shape[0]
 
     if mask is not None:
         assert len(mask.shape) == 1 or len(mask.shape) == 2, "mask shape incorrect"
@@ -174,7 +171,7 @@ def gen_jet_corrections(
     zero_mask_particles: bool = True,
     zero_neg_pt: bool = True,
     pt_index: int = 2,
-) -> Union[ArrayLike, Tuple[ArrayLike, ArrayLike]]:
+) -> ArrayLike | tuple[ArrayLike, ArrayLike]:
     """
     Zero's masked particles and negative pTs.
 

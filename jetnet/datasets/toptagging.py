@@ -1,4 +1,7 @@
-from typing import Callable, List, Optional, Set, Tuple, Union
+from __future__ import annotations
+
+from copy import copy
+from typing import Callable
 
 import numpy as np
 
@@ -45,29 +48,35 @@ class TopTagging(JetDataset):
             downloaded again. Defaults to False.
     """
 
-    _zenodo_record_id = 2603256
-    max_num_particles = 200
+    _ZENODO_RECORD_ID = 2603256
+    MAX_NUM_PARTICLES = 200
 
-    jet_types = ["qcd", "top"]
-    all_particle_features = ["E", "px", "py", "pz"]
-    all_jet_features = ["type", "E", "px", "py", "pz"]
-    splits = ["train", "valid", "test"]
-    _split_key_mapping = {"train": "train", "valid": "val", "test": "test"}  # map to file name
+    JET_TYPES = ["qcd", "top"]
+    ALL_PARTICLE_FEATURES = ["E", "px", "py", "pz"]
+    ALL_JET_FEATURES = ["type", "E", "px", "py", "pz"]
+    SPLITS = ["train", "valid", "test"]
+    _SPLIT_KEY_MAPPING = {"train": "train", "valid": "val", "test": "test"}  # map to file name
 
     def __init__(
         self,
-        jet_type: Union[str, Set[str]] = "all",
+        jet_type: str | set[str] = "all",
         data_dir: str = "./",
-        particle_features: List[str] = all_particle_features,
-        jet_features: List[str] = all_jet_features,
-        particle_normalisation: Optional[NormaliseABC] = None,
-        jet_normalisation: Optional[NormaliseABC] = None,
-        particle_transform: Optional[Callable] = None,
-        jet_transform: Optional[Callable] = None,
-        num_particles: int = max_num_particles,
+        particle_features: list[str] | None = None,
+        jet_features: list[str] | None = None,
+        particle_normalisation: NormaliseABC | None = None,
+        jet_normalisation: NormaliseABC | None = None,
+        particle_transform: Callable | None = None,
+        jet_transform: Callable | None = None,
+        num_particles: int = MAX_NUM_PARTICLES,
         split: str = "train",
         download: bool = False,
     ):
+        if particle_features is None:
+            particle_features = copy(self.ALL_PARTICLE_FEATURES)
+
+        if jet_features is None:
+            jet_features = copy(self.ALL_JET_FEATURES)
+
         self.particle_data, self.jet_data = self.getData(
             jet_type, data_dir, particle_features, jet_features, num_particles, split, download
         )
@@ -89,14 +98,14 @@ class TopTagging(JetDataset):
     @classmethod
     def getData(
         cls,
-        jet_type: Union[str, Set[str]] = "all",
+        jet_type: str | set[str] = "all",
         data_dir: str = "./",
-        particle_features: List[str] = all_particle_features,
-        jet_features: List[str] = all_jet_features,
-        num_particles: int = max_num_particles,
+        particle_features: list[str] | None = None,
+        jet_features: list[str] | None = None,
+        num_particles: int = MAX_NUM_PARTICLES,
         split: str = "all",
         download: bool = False,
-    ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
+    ) -> tuple[np.ndarray | None, np.ndarray | None]:
         """
         Downloads, if needed, and loads and returns Top Quark Tagging data.
 
@@ -119,17 +128,23 @@ class TopTagging(JetDataset):
         Returns:
             (Tuple[Optional[np.ndarray], Optional[np.ndarray]]): particle data, jet data
         """
-        assert num_particles <= cls.max_num_particles, (
+        if particle_features is None:
+            particle_features = copy(cls.ALL_PARTICLE_FEATURES)
+
+        if jet_features is None:
+            jet_features = copy(cls.ALL_JET_FEATURES)
+
+        assert num_particles <= cls.MAX_NUM_PARTICLES, (
             f"num_particles {num_particles} exceeds max number of "
-            + f"particles in the dataset {cls.max_num_particles}"
+            + f"particles in the dataset {cls.MAX_NUM_PARTICLES}"
         )
 
-        jet_type = checkConvertElements(jet_type, cls.jet_types, ntype="jet type")
-        type_indices = [cls.jet_types.index(t) for t in jet_type]
+        jet_type = checkConvertElements(jet_type, cls.JET_TYPES, ntype="jet type")
+        type_indices = [cls.JET_TYPES.index(t) for t in jet_type]
 
         particle_features, jet_features = checkStrToList(particle_features, jet_features)
         use_particle_features, use_jet_features = checkListNotEmpty(particle_features, jet_features)
-        split = checkConvertElements(split, cls.splits, ntype="splitting")
+        split = checkConvertElements(split, cls.SPLITS, ntype="splitting")
 
         import pandas as pd
 
@@ -139,9 +154,9 @@ class TopTagging(JetDataset):
         for s in split:
             hdf5_file = checkDownloadZenodoDataset(
                 data_dir,
-                dataset_name=cls._split_key_mapping[s],
-                record_id=cls._zenodo_record_id,
-                key=f"{cls._split_key_mapping[s]}.h5",
+                dataset_name=cls._SPLIT_KEY_MAPPING[s],
+                record_id=cls._ZENODO_RECORD_ID,
+                key=f"{cls._SPLIT_KEY_MAPPING[s]}.h5",
                 download=download,
             )
 
@@ -151,17 +166,17 @@ class TopTagging(JetDataset):
             jet_selector = np.sum([data[:, -1] == i for i in type_indices], axis=0).astype(bool)
             data = data[jet_selector]
 
-            # exctract particle and jet features in the order specified by the class
+            # extract particle and jet features in the order specified by the class
             # ``feature_order`` variables
-            total_particle_features = cls.max_num_particles * len(cls.all_particle_features)
+            total_particle_features = cls.MAX_NUM_PARTICLES * len(cls.ALL_PARTICLE_FEATURES)
 
             if use_particle_features:
                 pf = data[:, :total_particle_features].reshape(
-                    -1, cls.max_num_particles, len(cls.all_particle_features)
+                    -1, cls.MAX_NUM_PARTICLES, len(cls.ALL_PARTICLE_FEATURES)
                 )[:, :num_particles]
 
                 # reorder if needed
-                pf = getOrderedFeatures(pf, particle_features, cls.all_particle_features)
+                pf = getOrderedFeatures(pf, particle_features, cls.ALL_PARTICLE_FEATURES)
                 particle_data.append(pf)
 
             if use_jet_features:
@@ -171,7 +186,7 @@ class TopTagging(JetDataset):
                 )
 
                 # reorder if needed
-                jf = getOrderedFeatures(jf, jet_features, cls.all_jet_features)
+                jf = getOrderedFeatures(jf, jet_features, cls.ALL_JET_FEATURES)
                 jet_data.append(jf)
 
         particle_data = np.concatenate(particle_data, axis=0) if use_particle_features else None
@@ -185,6 +200,6 @@ class TopTagging(JetDataset):
         if self.split == "all":
             ret += "\nUsing all data (no split)"
         else:
-            ret += f"\nSplit into {self.split} data out of {self.splits} possible splits"
+            ret += f"\nSplit into {self.split} data out of {self.SPLITS} possible splits"
 
         return ret
