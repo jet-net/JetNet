@@ -1,6 +1,7 @@
 """
 Suite of common ways to normalise data.
 """
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
