@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from __future__ import annotations
 
 import numpy as np
 import torch
@@ -33,16 +33,16 @@ class EMDLoss(nn.Module):
     def __init__(
         self,
         method: str = "qpth",
-        num_particles: int = None,
+        num_particles: int | None = None,
         qpth_form: str = "L2",
         qpth_l2_strength: float = 0.0001,
         device: str = "cpu",
     ):
-        super(EMDLoss, self).__init__()
+        super().__init__()
 
         if method == "qpth":
             try:
-                global qpth
+                global qpth  # noqa: PLW0603
                 qpth = __import__("qpth", globals(), locals())
             except ImportError:
                 print(
@@ -52,7 +52,7 @@ class EMDLoss(nn.Module):
                 raise
         else:
             try:
-                global cp, cvxpylayers
+                global cp, cvxpylayers  # noqa: PLW0603
                 cp = __import__("cvxpy", globals(), locals())
                 cvxpylayers = __import__("cvxpylayers", globals(), locals())
             except ImportError:
@@ -98,7 +98,7 @@ class EMDLoss(nn.Module):
 
     def _emd_inference_qpth(
         self, distance_matrix: Tensor, weight1: Tensor, weight2: Tensor
-    ) -> Tuple[Tensor, Tensor]:
+    ) -> tuple[Tensor, Tensor]:
         """
         Using the QP solver QPTH to get EMDs (LP problem), adapted from
           https://github.com/icoz69/DeepEMD/blob/master/Models/models/emd_utils.py.
@@ -142,7 +142,7 @@ class EMDLoss(nn.Module):
             )
             p = distance_matrix.view(nbatch, nelement_distmatrix).double()
         else:
-            raise ValueError("Unkown form")
+            raise ValueError("Unknown form")
 
         # h = [0 ... 0 w1 w2]
         h_1 = torch.zeros(nbatch, nelement_distmatrix).double().to(self.device)
@@ -183,7 +183,7 @@ class EMDLoss(nn.Module):
 
     def forward(
         self, jets1: Tensor, jets2: Tensor, return_flows: bool = False
-    ) -> Union[Tensor, Tuple[Tensor, Tensor]]:
+    ) -> Tensor | tuple[Tensor, Tensor]:
         """
         Calculate EMD between ``jets1`` and ``jets2``.
 

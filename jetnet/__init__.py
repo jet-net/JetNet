@@ -1,6 +1,7 @@
 # __init__
+from __future__ import annotations
 
-import jetnet.datasets  # noqa: F401
+import jetnet.datasets
 import jetnet.datasets.normalisations
 import jetnet.datasets.utils
 import jetnet.evaluation

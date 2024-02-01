@@ -5,10 +5,9 @@ Utility methods for datasets.
 from __future__ import annotations
 
 import hashlib
-import os
 import sys
-from os.path import isfile
-from typing import Any, List, Set, Tuple, Union
+from pathlib import Path
+from typing import Any
 
 import numpy as np
 import requests
@@ -25,7 +24,7 @@ def download_progress_bar(file_url: str, file_dest: str):
         file_dest (str): path at which to save downloaded file
     """
 
-    with open(file_dest, "wb") as f:
+    with Path(file_dest).open("wb") as f:
         response = requests.get(file_url, stream=True)
         total = response.headers.get("content-length")
 
@@ -51,7 +50,7 @@ def download_progress_bar(file_url: str, file_dest: str):
 
 
 # from TorchVision
-# https://github.com/pytorch/vision/blob/48f8473e21b0f3e425aabc60db201b68fedf59b3/torchvision/datasets/utils.py#L51-L66  # noqa: E501
+# https://github.com/pytorch/vision/blob/48f8473e21b0f3e425aabc60db201b68fedf59b3/torchvision/datasets/utils.py#L51-L66
 def _calculate_md5(fpath: str, chunk_size: int = 1024 * 1024) -> str:
     # Setting the `usedforsecurity` flag does not change anything about the functionality, but
     # indicates that we are not using the MD5 checksum for cryptography. This enables its usage
@@ -60,7 +59,7 @@ def _calculate_md5(fpath: str, chunk_size: int = 1024 * 1024) -> str:
         md5 = hashlib.md5(usedforsecurity=False)
     else:
         md5 = hashlib.md5()
-    with open(fpath, "rb") as f:
+    with Path(fpath).open("rb") as f:
         # switch to simpler assignment operator once we support only Python >=3.8
         # while chunk := f.read(chunk_size):
         for chunk in iter(lambda: f.read(chunk_size), b""):
@@ -102,11 +101,12 @@ def checkDownloadZenodoDataset(
     if not and download = True, downloads it from Zenodo, and returns the file path.
     or if not and download = False, raises an error.
     """
-    file_path = f"{data_dir}/{key}"
+    data_dir = Path(data_dir)
+    file_path = data_dir / key
     file_url, md5 = _getZenodoFileURL(record_id, key)
 
     if download:
-        if isfile(file_path):
+        if file_path.is_file():
             match_md5, fmd5 = _check_md5(file_path, md5)
             if not match_md5:
                 print(
@@ -116,15 +116,15 @@ def checkDownloadZenodoDataset(
                     "\nPlease open an issue at https://github.com/jet-net/JetNet/issues/new "
                     "if you believe this is an error."
                 )
-                os.remove(file_path)
+                file_path.unlink()
 
-        if not isfile(file_path):
-            os.makedirs(data_dir, exist_ok=True)
+        if not file_path.is_file():
+            data_dir.mkdir(parents=True, exist_ok=True)
 
             print(f"Downloading {dataset_name} dataset to {file_path}")
             download_progress_bar(file_url, file_path)
 
-    if not isfile(file_path):
+    if not file_path.is_file():
         raise RuntimeError(
             f"Dataset {dataset_name} not found at {file_path}, "
             "you can use download=True to download it."
@@ -144,7 +144,7 @@ def checkDownloadZenodoDataset(
 
 
 def getOrderedFeatures(
-    data: ArrayLike, features: List[str], features_order: List[str]
+    data: ArrayLike, features: list[str], features_order: list[str]
 ) -> np.ndarray:
     """Returns data with features in the order specified by ``features``.
 
@@ -172,19 +172,19 @@ def getOrderedFeatures(
 
 
 def checkStrToList(
-    *inputs: List[Union[str, List[str], Set[str]]], to_set: bool = False
-) -> Union[List[List[str]], List[Set[str]], list]:
+    *inputs: list[str | list[str] | set[str]], to_set: bool = False
+) -> list[list[str]] | list[set[str]] | list:
     """Converts str inputs to a list or set"""
     ret = []
     for inp in inputs:
         if isinstance(inp, str):
-            inp = [inp] if not to_set else {inp}
+            inp = [inp] if not to_set else {inp}  # noqa: PLW2901
         ret.append(inp)
 
     return ret if len(inputs) > 1 else ret[0]
 
 
-def checkListNotEmpty(*inputs: List[list]) -> List[bool]:
+def checkListNotEmpty(*inputs: list[list]) -> list[bool]:
     """Checks that list inputs are not None or empty"""
     ret = []
     for inp in inputs:
@@ -193,16 +193,16 @@ def checkListNotEmpty(*inputs: List[list]) -> List[bool]:
     return ret if len(inputs) > 1 else ret[0]
 
 
-def firstNotNoneElement(*inputs: List[Any]) -> Any:
+def firstNotNoneElement(*inputs: list[Any]) -> Any:
     """Returns the first element out of all inputs which isn't None"""
     for inp in inputs:
         if inp is not None:
             return inp
 
+    return None
 
-def checkConvertElements(
-    elem: Union[str, List[str]], valid_types: List[str], ntype: str = "element"
-):
+
+def checkConvertElements(elem: str | list[str], valid_types: list[str], ntype: str = "element"):
     """Checks if elem(s) are valid and if needed converts into a list"""
     if elem != "all":
         elem = checkStrToList(elem, to_set=True)
@@ -217,8 +217,8 @@ def checkConvertElements(
 
 
 def getSplitting(
-    length: int, split: str, splits: List[str], split_fraction: List[float]
-) -> Tuple[int, int]:
+    length: int, split: str, splits: list[str], split_fraction: list[float]
+) -> tuple[int, int]:
     """
     Returns starting and ending index for splitting a dataset of length ``length`` according to
     the input ``split`` out of the total possible ``splits`` and a given ``split_fraction``.

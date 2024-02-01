@@ -1,19 +1,21 @@
+from __future__ import annotations
+
 import numpy as np
 import pytest
-
 from jetnet.datasets import utils
 
-test_data_2d = np.random.rand(4, 3)
-test_data_3d = np.random.rand(5, 4, 3)
+rng = np.random.default_rng(42)
+test_data_2d = rng.random((4, 3))
+test_data_3d = rng.random((5, 4, 3))
 
 
-@pytest.fixture
+@pytest.fixture()
 def features_order():
     return ["eta", "phi", "pt"]
 
 
 @pytest.mark.parametrize(
-    "data,features,expected",
+    ("data", "features", "expected"),
     [
         (test_data_2d, ["phi", "pt"], test_data_2d[:, 1:]),
         (test_data_2d, ["phi"], test_data_2d[:, 1:2]),
@@ -32,7 +34,7 @@ def test_getOrderedFeatures(data, features, features_order, expected):
 
 
 @pytest.mark.parametrize(
-    "data,features",
+    ("data", "features"),
     [
         (test_data_2d, ["phi", "pt", "foo"]),
         (test_data_2d, "foo"),
@@ -44,7 +46,7 @@ def test_getOrderedFeaturesException(data, features, features_order):
 
 
 @pytest.mark.parametrize(
-    "inputs,to_set,expected",
+    ("inputs", "to_set", "expected"),
     [
         (["foo"], False, ["foo"]),
         (["foo"], True, {"foo"}),
@@ -59,7 +61,7 @@ def test_checkStrToList(inputs, to_set, expected):
 
 
 @pytest.mark.parametrize(
-    "inputs,expected",
+    ("inputs", "expected"),
     [([[]], False), ([None], False), ([[3]], True), ([[], None, [3]], [False, False, True])],
 )
 def test_checkListNotEmpty(inputs, expected):
@@ -67,7 +69,7 @@ def test_checkListNotEmpty(inputs, expected):
 
 
 @pytest.mark.parametrize(
-    "inputs,expected",
+    ("inputs", "expected"),
     [([None, 3], 3), ([None], None), ([3, 5, None], 3)],
 )
 def test_firstNotNoneElement(inputs, expected):
@@ -79,7 +81,7 @@ tvt_splits_all = ["train", "valid", "test", "all"]
 
 
 @pytest.mark.parametrize(
-    "length,split,splits,split_fraction,expected",
+    ("length", "split", "splits", "split_fraction", "expected"),
     [
         (100, "train", tvt_splits, [0.7, 0.15, 0.15], (0, 70)),
         (100, "valid", tvt_splits, [0.7, 0.15, 0.15], (70, 85)),

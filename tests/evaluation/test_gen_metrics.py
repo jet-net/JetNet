@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 import numpy as np
 import pytest
-from pytest import approx
-
 from jetnet import evaluation
+from pytest import approx
 
 test_zeros = np.zeros((50_000, 2))
 test_ones = np.ones((50_000, 2))

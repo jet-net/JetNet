@@ -1,16 +1,16 @@
-import os
-from os.path import isfile
+from __future__ import annotations
+
+from pathlib import Path
 
 import numpy as np
 import pytest
-from pytest import approx
-
 from jetnet.datasets import TopTagging, normalisations
+from pytest import approx
 
 # TODO: use checksum for downloaded files
 
 
-data_dir = "./datasets/toptagging"
+data_dir = Path("./datasets/toptagging")
 DataClass = TopTagging
 
 valid_length = 403000
@@ -18,9 +18,9 @@ num_particles = 200
 split = "valid"  # for faster testing
 
 
-@pytest.mark.slow
+@pytest.mark.slow()
 @pytest.mark.parametrize(
-    "jet_types,split,expected_length,class_id",
+    ("jet_types", "split", "expected_length", "class_id"),
     [
         # ("qcd", "all", 1008940, 0),
         # ("top", "all", 1009060, 1),
@@ -37,20 +37,20 @@ split = "valid"  # for faster testing
 def test_getData(jet_types, split, expected_length, class_id):
     # test md5 checksum is working for one of the datasets
     if jet_types == "top" and split == "valid":
-        file_path = f"{data_dir}/val.h5"
+        file_path = data_dir / "val.h5"
 
-        if isfile(file_path):
-            os.remove(file_path)
+        if file_path.is_file():
+            file_path.unlink()
 
         # should raise a RunetimeError since file doesn't exist
         with pytest.raises(RuntimeError):
             DataClass.getData(jet_types, data_dir, split=split)
 
         # write random data to file
-        with open(file_path, "wb") as f:
-            f.write(np.random.bytes(100))
+        with file_path.open("wb") as f:
+            f.write(np.random.bytes(100))  # noqa: NPY002
 
-        # should raise a RunetimeError since file exists but is incorret
+        # should raise a RunetimeError since file exists but is incorrect
         with pytest.raises(RuntimeError):
             DataClass.getData(jet_types, data_dir, split=split)
 
@@ -61,7 +61,7 @@ def test_getData(jet_types, split, expected_length, class_id):
         assert np.all(jf[:, 0] == class_id)
 
 
-@pytest.mark.slow
+@pytest.mark.slow()
 def test_getDataFeatures():
     pf, jf = DataClass.getData(data_dir=data_dir, jet_features=["E", "type"], split=split)
     assert pf.shape == (valid_length, num_particles, 4)
@@ -82,7 +82,7 @@ def test_getDataFeatures():
     assert np.max(pf[:, :, 1]) == approx(2000, rel=0.2)
 
 
-@pytest.mark.slow
+@pytest.mark.slow()
 def test_DataClassNormalisation():
     X = DataClass(
         data_dir=data_dir,
@@ -99,7 +99,7 @@ def test_DataClassNormalisation():
     assert np.max(X.jet_data[:, 0]) == 1
 
 
-@pytest.mark.slow
+@pytest.mark.slow()
 def test_getDataErrors():
     with pytest.raises(AssertionError):
         DataClass.getData(jet_type="f", split=split)
