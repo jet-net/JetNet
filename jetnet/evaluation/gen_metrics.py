@@ -707,10 +707,10 @@ def fpd(
             stacklevel=2,
         )
 
-    real_features, gen_features = _check_get_ndarray(real_features, gen_features)
+    X, Y = _check_get_ndarray(real_features, gen_features)
 
     if normalise:
-        X, Y = _normalise_features(real_features, gen_features)
+        X, Y = _normalise_features(X, Y)
 
     # regular intervals in 1/N
     batches = (1 / np.linspace(1.0 / min_samples, 1.0 / max_samples, num_points)).astype("int32")
@@ -836,10 +836,10 @@ def kpd(
     Returns:
         Tuple[float, float]: median and error of KPD.
     """
-    real_features, gen_features = _check_get_ndarray(real_features, gen_features)
+    X, Y = _check_get_ndarray(real_features, gen_features)
 
     if normalise:
-        X, Y = _normalise_features(real_features, gen_features)
+        X, Y = _normalise_features(X, Y)
 
     if num_threads is None:
         vals_point = _kpd_batches(X, Y, num_batches, batch_size, seed)
