@@ -6,7 +6,7 @@
 <b>For developing and reproducing ML + HEP projects.</b>
 </p>
 
-______________________________________________________________________
+---
 
 <p align="center">
   <a href="#jetnet">JetNet</a> •
@@ -18,9 +18,7 @@ ______________________________________________________________________
   <a href="#references">References</a>
 </p>
 
-______________________________________________________________________
-
-
+---
 
 [![CI](https://github.com/jet-net/jetnet/actions/workflows/ci.yml/badge.svg)](https://github.com/jet-net/jetnet/actions)
 [![Documentation Status](https://readthedocs.org/projects/jetnet/badge/?version=latest)](https://jetnet.readthedocs.io/en/latest/)
@@ -32,15 +30,14 @@ ______________________________________________________________________
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10044601.svg)](https://doi.org/10.5281/zenodo.10044601)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.05789/status.svg)](https://doi.org/10.21105/joss.05789)
 
-
-
-______________________________________________________________________
+---
 
 ## JetNet
 
 JetNet is an effort to increase accessibility and reproducibility in jet-based machine learning.
 
 Currently we provide:
+
 - Easy-to-access and standardised interfaces for the following datasets:
   - [JetNet](https://zenodo.org/record/6975118)
   - [TopTagging](https://zenodo.org/record/2603256)
@@ -55,9 +52,7 @@ Currently we provide:
   - Differentiable implementation of the energy mover's distance [[3](#references)]
 - And more general jet utilities.
 
-
 Additional functionality is under development, and please reach out if you're interested in contributing!
-
 
 ## Installation
 
@@ -81,17 +76,22 @@ Datasets can be downloaded and accessed quickly, for example:
 
 ```python
 from jetnet.datasets import JetNet, TopTagging
+
 # as numpy arrays:
-particle_data, jet_data = JetNet.getData(jet_type=["g", "q"], data_dir="./datasets/jetnet/", download=True)
+particle_data, jet_data = JetNet.getData(
+    jet_type=["g", "q"], data_dir="./datasets/jetnet/", download=True
+)
 # or as a PyTorch dataset:
-dataset = TopTagging(jet_type="all", data_dir="./datasets/toptagging/", split="train", download=True)
+dataset = TopTagging(
+    jet_type="all", data_dir="./datasets/toptagging/", split="train", download=True
+)
 ```
 
 Evaluation metrics can be used as such:
 
 ```python
 generated_jets = np.random.rand(50000, 30, 3)
-fpnd_score = jetnet.evaluation.fpnd(generated_jets, jet_type='g')
+fpnd_score = jetnet.evaluation.fpnd(generated_jets, jet_type="g")
 ```
 
 Loss functions can be initialized and used similarly to standard PyTorch in-built losses such as MSE:
@@ -189,11 +189,10 @@ Please further cite the following if you use these components of the library.
 
 Please cite the respective [qpth](https://locuslab.github.io/qpth/) or [cvxpy](https://github.com/cvxpy/cvxpy) libraries, depending on the method used (`qpth` by default), as well as the original EMD paper [[3]](#references).
 
-
 ## References
 
-[1] R. Kansal et al., *Particle Cloud Generation with Message Passing Generative Adversarial Networks*, [NeurIPS 2021](https://proceedings.neurips.cc/paper/2021/hash/c8512d142a2d849725f31a9a7a361ab9-Abstract.html) [[2106.11535](https://arxiv.org/abs/2106.11535)].
+[1] R. Kansal et al., _Particle Cloud Generation with Message Passing Generative Adversarial Networks_, [NeurIPS 2021](https://proceedings.neurips.cc/paper/2021/hash/c8512d142a2d849725f31a9a7a361ab9-Abstract.html) [[2106.11535](https://arxiv.org/abs/2106.11535)].
 
-[2] R. Kansal et al., *Evaluating Generative Models in High Energy Physics*, [Phys. Rev. D **107** (2023) 076017](https://doi.org/10.1103/PhysRevD.107.076017) [[2211.10295](https://arxiv.org/abs/2211.10295)].
+[2] R. Kansal et al., _Evaluating Generative Models in High Energy Physics_, [Phys. Rev. D **107** (2023) 076017](https://doi.org/10.1103/PhysRevD.107.076017) [[2211.10295](https://arxiv.org/abs/2211.10295)].
 
-[3] P. T. Komiske, E. M. Metodiev, and J. Thaler, _The Metric Space of Collider Events_, [Phys. Rev. Lett. __123__ (2019) 041801](https://doi.org/10.1103/PhysRevLett.123.041801) [[1902.02346](https://arxiv.org/abs/1902.02346)].
+[3] P. T. Komiske, E. M. Metodiev, and J. Thaler, _The Metric Space of Collider Events_, [Phys. Rev. Lett. **123** (2019) 041801](https://doi.org/10.1103/PhysRevLett.123.041801) [[1902.02346](https://arxiv.org/abs/1902.02346)].

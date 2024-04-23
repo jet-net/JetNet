@@ -1,17 +1,18 @@
+from __future__ import annotations
+
 import numpy as np
 import pytest
+from jetnet.datasets.normalisations import FeaturewiseLinear, FeaturewiseLinearBounded
 from pytest import approx
 
-from jetnet.datasets.normalisations import FeaturewiseLinear, FeaturewiseLinearBounded
+rng = np.random.default_rng(42)
+test_data_1d = rng.random(3) * 100
+test_data_2d = rng.random((4, 3)) * 100
+test_data_3d = rng.random((5, 4, 3)) * 100
 
-np.random.seed(42)
-test_data_1d = np.random.rand(3) * 100
-test_data_2d = np.random.rand(4, 3) * 100
-test_data_3d = np.random.rand(5, 4, 3) * 100
-
-test_data_1d_posneg = np.random.rand(3) * 100 - 50
-test_data_2d_posneg = np.random.rand(4, 3) * 100 - 50
-test_data_3d_posneg = np.random.rand(5, 4, 3) * 100 - 50
+test_data_1d_posneg = rng.random(3) * 100 - 50
+test_data_2d_posneg = rng.random((4, 3)) * 100 - 50
+test_data_3d_posneg = rng.random((5, 4, 3)) * 100 - 50
 
 
 @pytest.mark.parametrize(

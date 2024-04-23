@@ -1,4 +1,7 @@
-from typing import Callable, List, Optional, Set, Tuple, Union
+from __future__ import annotations
+
+from copy import copy
+from typing import Callable
 
 import numpy as np
 
@@ -54,14 +57,14 @@ class JetNet(JetDataset):
             downloaded again. Defaults to False.
     """
 
-    _zenodo_record_ids = {"30": 6975118, "150": 6975117}
+    _ZENODO_RECORD_IDS = {"30": 6975118, "150": 6975117}
 
-    max_num_particles = 150
+    MAX_NUM_PARTICLES = 150
 
-    jet_types = ["g", "q", "t", "w", "z"]
-    all_particle_features = ["etarel", "phirel", "ptrel", "mask"]
-    all_jet_features = ["type", "pt", "eta", "mass", "num_particles"]
-    splits = ["train", "valid", "test", "all"]
+    JET_TYPES = ["g", "q", "t", "w", "z"]
+    ALL_PARTICLE_FEATURES = ["etarel", "phirel", "ptrel", "mask"]
+    ALL_JET_FEATURES = ["type", "pt", "eta", "mass", "num_particles"]
+    SPLITS = ["train", "valid", "test", "all"]
 
     # normalisation used for ParticleNet training for FPND, as defined in arXiv:2106.11535
     fpnd_norm = FeaturewiseLinearBounded(
@@ -72,20 +75,29 @@ class JetNet(JetDataset):
 
     def __init__(
         self,
-        jet_type: Union[str, Set[str]] = "all",
+        jet_type: str | set[str] = "all",
         data_dir: str = "./",
-        particle_features: List[str] = all_particle_features,
-        jet_features: List[str] = all_jet_features,
-        particle_normalisation: Optional[NormaliseABC] = None,
-        jet_normalisation: Optional[NormaliseABC] = None,
-        particle_transform: Optional[Callable] = None,
-        jet_transform: Optional[Callable] = None,
+        particle_features: list[str] | None = "all",
+        jet_features: list[str] | None = "all",
+        particle_normalisation: NormaliseABC | None = None,
+        jet_normalisation: NormaliseABC | None = None,
+        particle_transform: Callable | None = None,
+        jet_transform: Callable | None = None,
         num_particles: int = 30,
         split: str = "train",
-        split_fraction: List[float] = [0.7, 0.15, 0.15],
+        split_fraction: list[float] | None = None,
         seed: int = 42,
         download: bool = False,
     ):
+        if particle_features == "all":
+            particle_features = copy(self.ALL_PARTICLE_FEATURES)
+
+        if jet_features == "all":
+            jet_features = copy(self.ALL_JET_FEATURES)
+
+        if split_fraction is None:
+            split_fraction = [0.7, 0.15, 0.15]
+
         self.particle_data, self.jet_data = self.getData(
             jet_type,
             data_dir,
@@ -116,16 +128,16 @@ class JetNet(JetDataset):
     @classmethod
     def getData(
         cls: JetDataset,
-        jet_type: Union[str, Set[str]] = "all",
+        jet_type: str | set[str] = "all",
         data_dir: str = "./",
-        particle_features: List[str] = all_particle_features,
-        jet_features: List[str] = all_jet_features,
+        particle_features: list[str] | None = "all",
+        jet_features: list[str] | None = "all",
         num_particles: int = 30,
         split: str = "all",
-        split_fraction: List[float] = [0.7, 0.15, 0.15],
+        split_fraction: list[float] | None = None,
         seed: int = 42,
         download: bool = False,
-    ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
+    ) -> tuple[np.ndarray | None, np.ndarray | None]:
         """
         Downloads, if needed, and loads and returns JetNet data.
 
@@ -153,13 +165,22 @@ class JetNet(JetDataset):
                 downloaded again. Defaults to False.
 
         Returns:
-            Tuple[Optional[np.ndarray], Optional[np.ndarray]]: particle data, jet data
+            tuple[np.ndarray | None, np.ndarray | None]: particle data, jet data
         """
-        assert num_particles <= cls.max_num_particles, (
+        if particle_features == "all":
+            particle_features = copy(cls.ALL_PARTICLE_FEATURES)
+
+        if jet_features == "all":
+            jet_features = copy(cls.ALL_JET_FEATURES)
+
+        if split_fraction is None:
+            split_fraction = [0.7, 0.15, 0.15]
+
+        assert num_particles <= cls.MAX_NUM_PARTICLES, (
             f"num_particles {num_particles} exceeds max number of "
-            + f"particles in the dataset {cls.max_num_particles}"
+            + f"particles in the dataset {cls.MAX_NUM_PARTICLES}"
         )
-        jet_type = checkConvertElements(jet_type, cls.jet_types, ntype="jet type")
+        jet_type = checkConvertElements(jet_type, cls.JET_TYPES, ntype="jet type")
         particle_features, jet_features = checkStrToList(particle_features, jet_features)
         use_particle_features, use_jet_features = checkListNotEmpty(particle_features, jet_features)
 
@@ -177,7 +198,7 @@ class JetNet(JetDataset):
             hdf5_file = checkDownloadZenodoDataset(
                 data_dir,
                 dataset_name=dname,
-                record_id=cls._zenodo_record_ids["150" if use_150 else "30"],
+                record_id=cls._ZENODO_RECORD_IDS["150" if use_150 else "30"],
                 key=f"{dname}.hdf5",
                 download=download,
             )
@@ -192,11 +213,11 @@ class JetNet(JetDataset):
 
             if use_particle_features:
                 # reorder if needed
-                pf = getOrderedFeatures(pf, particle_features, cls.all_particle_features)
+                pf = getOrderedFeatures(pf, particle_features, cls.ALL_PARTICLE_FEATURES)
 
             if use_jet_features:
                 # add class index as first jet feature
-                class_index = cls.jet_types.index(j)
+                class_index = cls.JET_TYPES.index(j)
                 jf = np.concatenate(
                     (
                         np.full([len(jf), 1], class_index),
@@ -207,7 +228,7 @@ class JetNet(JetDataset):
                     axis=1,
                 )
                 # reorder if needed
-                jf = getOrderedFeatures(jf, jet_features, cls.all_jet_features)
+                jf = getOrderedFeatures(jf, jet_features, cls.ALL_JET_FEATURES)
 
             particle_data.append(pf)
             jet_data.append(jf)
@@ -218,10 +239,10 @@ class JetNet(JetDataset):
         length = len(firstNotNoneElement(particle_data, jet_data))
 
         # shuffling and splitting into training and test
-        lcut, rcut = getSplitting(length, split, cls.splits, split_fraction)
+        lcut, rcut = getSplitting(length, split, cls.SPLITS, split_fraction)
 
-        np.random.seed(seed)
-        randperm = np.random.permutation(length)
+        rng = np.random.default_rng(seed)
+        randperm = rng.permutation(length)
 
         if use_particle_features:
             particle_data = particle_data[randperm][lcut:rcut]
@@ -238,7 +259,7 @@ class JetNet(JetDataset):
             ret += "\nUsing all data (no split)"
         else:
             ret += (
-                f"\nSplit into {self.split} data out of {self.splits} possible splits, "
+                f"\nSplit into {self.split} data out of {self.SPLITS} possible splits, "
                 f"with splitting fractions {self.split_fraction}"
             )
 

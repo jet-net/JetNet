@@ -1,11 +1,11 @@
-import os
-from os.path import isfile
+from __future__ import annotations
+
+from pathlib import Path
 
 import numpy as np
 import pytest
-from pytest import approx
-
 from jetnet.datasets import QuarkGluon
+from pytest import approx
 
 # TODO: use checksum for downloaded files
 
@@ -20,15 +20,15 @@ test_file_list_withoutbc = [
     "QG_jets_1.npz",
 ]
 
-data_dir = "./datasets/qgjets"
+data_dir = Path("./datasets/qgjets")
 total_length = 200_000
 DataClass = QuarkGluon
 num_particles = 153
 
 
-@pytest.mark.slow
+@pytest.mark.slow()
 @pytest.mark.parametrize(
-    "jet_types,split,expected_length,class_id",
+    ("jet_types", "split", "expected_length", "class_id"),
     [
         ("g", "all", total_length / 2, 0),
         ("q", "train", total_length * 0.7 / 2, 1),
@@ -39,20 +39,20 @@ num_particles = 153
 def test_getData(jet_types, split, expected_length, class_id, file_list):
     # test md5 checksum is working for one of the datasets
     if jet_types == "q" and file_list == test_file_list_withoutbc:
-        file_path = data_dir + "/" + file_list[-1]
+        file_path = data_dir / file_list[-1]
 
-        if isfile(file_path):
-            os.remove(file_path)
+        if file_path.is_file():
+            file_path.unlink()
 
         # should raise a RunetimeError since file doesn't exist
         with pytest.raises(RuntimeError):
             DataClass.getData(jet_types, data_dir, file_list=file_list, split=split)
 
         # write random data to file
-        with open(file_path, "wb") as f:
-            f.write(np.random.bytes(100))
+        with file_path.open("wb") as f:
+            f.write(np.random.bytes(100))  # noqa: NPY002
 
-        # should raise a RunetimeError since file exists but is incorret
+        # should raise a RunetimeError since file exists but is incorrect
         with pytest.raises(RuntimeError):
             DataClass.getData(jet_types, data_dir, file_list=file_list, split=split)
 
@@ -63,7 +63,7 @@ def test_getData(jet_types, split, expected_length, class_id, file_list):
         assert np.all(jf[:, 0] == class_id)
 
 
-@pytest.mark.slow
+@pytest.mark.slow()
 @pytest.mark.parametrize("file_list", [test_file_list_withbc, test_file_list_withoutbc])
 def test_getDataFeatures(file_list):
     pf, jf = DataClass.getData(data_dir=data_dir, jet_features=None, file_list=file_list)
@@ -82,7 +82,7 @@ def test_getDataFeatures(file_list):
     assert np.max(pf[:, :, 1]) == approx(550, rel=0.2)
 
 
-@pytest.mark.slow
+@pytest.mark.slow()
 def test_getDataErrors():
     with pytest.raises(AssertionError):
         DataClass.getData(jet_type="f")

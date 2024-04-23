@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import re
+from pathlib import Path
 
 from setuptools import find_packages, setup
 
@@ -40,11 +43,11 @@ classifiers = [
 
 
 def readme():
-    with open("README.md") as f:
+    with Path("README.md").open() as f:
         return f.read()
 
 
-with open("jetnet/__init__.py", "r") as f:
+with Path("jetnet/__init__.py").open() as f:
     __version__ = re.search(r'__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read()).group(1)
 
 

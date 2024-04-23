@@ -1,24 +1,24 @@
-import os
-from os.path import isfile
+from __future__ import annotations
+
+from pathlib import Path
 
 import numpy as np
 import pytest
+from jetnet.datasets import JetNet, normalisations
 from pytest import approx
 from torch.utils.data import DataLoader
-
-from jetnet.datasets import JetNet, normalisations
 
 # TODO: use checksum for downloaded files
 
 
-data_dir = "./datasets/jetnet"
+data_dir = Path("./datasets/jetnet")
 DataClass = JetNet
 jet_types = ["g", "q"]  # subset of jet types
 gq_length = 177252 + 170679
 
 
 @pytest.mark.parametrize(
-    "jet_types,expected_length,class_id",
+    ("jet_types", "expected_length", "class_id"),
     [
         ("g", 177252, 0),
         ("q", 170679, 1),
@@ -29,20 +29,20 @@ gq_length = 177252 + 170679
 def test_getData(jet_types, num_particles, expected_length, class_id):
     # test getData errors and md5 checksum for one of the datasets
     if jet_types == "q":
-        file_path = f"{data_dir}/q{'150' if num_particles > 30 else ''}.hdf5"
+        file_path = data_dir / f"q{'150' if num_particles > 30 else ''}.hdf5"
 
-        if isfile(file_path):
-            os.remove(file_path)
+        if file_path.is_file():
+            file_path.unlink()
 
         # should raise a RunetimeError since file doesn't exist
         with pytest.raises(RuntimeError):
             DataClass.getData(jet_types, data_dir, num_particles=num_particles)
 
         # write random data to file
-        with open(file_path, "wb") as f:
-            f.write(np.random.bytes(100))
+        with file_path.open("wb") as f:
+            f.write(np.random.bytes(100))  # noqa: NPY002
 
-        # should raise a RunetimeError since file exists but is incorret
+        # should raise a RunetimeError since file exists but is incorrect
         with pytest.raises(RuntimeError):
             DataClass.getData(jet_types, data_dir, num_particles=num_particles)
 

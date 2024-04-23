@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import numpy as np
 import pytest
-
 from jetnet.utils import to_image
 
 # 1 jet with 3 test particles
@@ -16,7 +17,7 @@ expected_3d = np.stack([expected_2d] * 2)
 
 
 @pytest.mark.parametrize(
-    "data,expected", [(test_data_2d, expected_2d), (test_data_3d, expected_3d)]
+    ("data", "expected"), [(test_data_2d, expected_2d), (test_data_3d, expected_3d)]
 )
 def test_to_image(data, expected):
     jet_image = to_image(data, im_size=3, maxR=1.0)

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -8,7 +10,7 @@ from torch_geometric.nn import EdgeConv, global_mean_pool
 
 class _ParticleNetEdgeNet(nn.Module):
     def __init__(self, in_size, layer_size):
-        super(_ParticleNetEdgeNet, self).__init__()
+        super().__init__()
 
         layers = []
 
@@ -16,7 +18,7 @@ class _ParticleNetEdgeNet(nn.Module):
         layers.append(nn.BatchNorm1d(layer_size))
         layers.append(nn.ReLU())
 
-        for i in range(2):
+        for _ in range(2):
             layers.append(nn.Linear(layer_size, layer_size))
             layers.append(nn.BatchNorm1d(layer_size))
             layers.append(nn.ReLU())
@@ -27,12 +29,12 @@ class _ParticleNetEdgeNet(nn.Module):
         return self.model(x)
 
     def __repr__(self):
-        return "{}(nn={})".format(self.__class__.__name__, self.model)
+        return f"{self.__class__.__name__}(nn={self.model})"
 
 
 class _ParticleNet(nn.Module):
     def __init__(self, num_hits, node_feat_size, num_classes=5):
-        super(_ParticleNet, self).__init__()
+        super().__init__()
         self.num_hits = num_hits
         self.node_feat_size = node_feat_size
         self.num_classes = num_classes
