@@ -9,7 +9,7 @@ test_data_2d = rng.random((4, 3))
 test_data_3d = rng.random((5, 4, 3))
 
 
-@pytest.fixture()
+@pytest.fixture
 def features_order():
     return ["eta", "phi", "pt"]
 
