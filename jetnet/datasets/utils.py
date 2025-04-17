@@ -55,7 +55,7 @@ def _calculate_md5(fpath: str, chunk_size: int = 1024 * 1024) -> str:
     # Setting the `usedforsecurity` flag does not change anything about the functionality, but
     # indicates that we are not using the MD5 checksum for cryptography. This enables its usage
     # in restricted environments like FIPS.
-    if sys.version_info >= (3, 9):  # noqa: UP036 
+    if sys.version_info >= (3, 9):  # noqa: UP036
         md5 = hashlib.md5(usedforsecurity=False)
     else:
         md5 = hashlib.md5()
